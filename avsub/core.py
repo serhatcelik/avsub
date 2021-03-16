@@ -6,6 +6,7 @@ import os
 import re
 import stat
 import signal
+import platform
 
 ################
 # Over Control #
@@ -19,6 +20,7 @@ del_on_exit_temp = dict()
 # Platform #
 ############
 linux = os.name == "posix"  # GNU/Linux
+wsl = linux and "microsoft" in platform.version().lower()  # WSL
 
 ###########
 # Signals #
@@ -47,10 +49,6 @@ colors = {
 #############
 # Utilities #
 #############
-def draw_a_line():
-    print("\n\n" + "-" * os.get_terminal_size().columns)
-
-
 def abspath(path):
     return os.path.abspath(path)
 
@@ -90,7 +88,7 @@ def is_hidden(path):
 
     if linux:
         # Note: "." and ".." are not considered hidden
-        return not re.search(r"^([^.].*|\.{1,2})$", basename(path))
+        return not bool(re.search(r"^([^.].*|\.{1,2})$", basename(path)))
 
     stat_result = os.stat(abspath(path))
     return bool(stat_result.st_file_attributes & stat.FILE_ATTRIBUTE_HIDDEN)

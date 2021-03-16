@@ -38,7 +38,7 @@ def main():
         sys.exit("E : Contradictory definitions when parsing the command-line")
     elif not core.is_ext(opts.ext):
         sys.exit("E : EXTENSION : '%s' : Not a valid format" % opts.ext)
-    elif opts.embed and not core.path_exists(opts.input, check_isfile=True):
+    elif opts.embed and core.path_exists(opts.input, check_isdir=True):
         sys.exit("E : EMBED : INPUT : '%s' : This is a folder" % opts.input)
 
     for sig in core.signals:
@@ -86,23 +86,22 @@ def clean(*args):  # pylint: disable=W0613
     for sig in core.signals:
         signal.signal(sig, signal.SIG_IGN)  # Simply ignore the "sig" signal
 
-    for i, mem in enumerate(list(core.not_processed) + list(core.del_on_exit)):
-        if i == 0:
-            core.draw_a_line()
-
-        if mem in core.not_processed:
-            print("W : Not processed : '%s'" % core.basename(mem))
+    print("\n")
+    for member in list(core.not_processed) + list(core.del_on_exit):
+        if member in core.not_processed:
+            print("W : Not processed : '%s'" % core.basename(member))
         else:
-            print("E : Not completed : '%s'" % core.basename(mem))
+            print("E : Not completed : '%s'" % core.basename(member))
 
-    core.del_del_on_exit()  # Delete files in the "del_on_exit" container
+    # Delete files in "del_on_exit" and "del_on_exit_temp" containers
+    core.del_del_on_exit()
 
     if core.path_exists(getattr(main, "temp"), check_isdir=True):
         # If the folder is not empty...
         if os.listdir(getattr(main, "temp")):
-            core.draw_a_line()
-            print("Destination folder : '%s'" % getattr(main, "temp"))
-            webbrowser.open(getattr(main, "temp"), new=0, autoraise=False)
+            print("I : Output folder : '%s'" % getattr(main, "temp"))
+            if not core.wsl:
+                webbrowser.open(getattr(main, "temp"), new=0, autoraise=False)
 
     sys.exit("\a")
 

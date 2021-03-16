@@ -127,8 +127,9 @@ def execute(cmd, top, files):
         # Finish creating the ultimate FFmpeg command
         new_cmd = cmd.copy() + [output, "-i", file]
 
-        print("[%d/%d] Running : '%s'" % (i + 1, len(files),
-                                          core.basename(file)))
+        # Note: Convert "int" to "str" to find the length of the precision
+        print("[%0*d/%d] Running : '%s'" % (len(str(len(files))), i + 1,
+                                            len(files), core.basename(file)))
         try:
             # Note: Disable "Press [q] to stop" feature with DEVNULL
             subprocess.run(new_cmd, check=True, stdin=subprocess.DEVNULL)

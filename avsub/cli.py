@@ -34,7 +34,7 @@ def create_parser():
     )
     parser.add_argument(
         "-A", "--audio", dest="oaudio", action="store_const", default=[],
-        const=["-vn", "-sn", "-dn"], help="choose audio stream only",
+        const=["-vn", "-sn", "-dn"], help="choose audio stream(s) only",
     )
     parser.add_argument(
         "--compress", metavar="VALUE", dest="crf",
@@ -47,7 +47,7 @@ def create_parser():
     )
     parser.add_argument(
         "-H", "--hidden", action="store_true",
-        help="include hidden input (note: root folders is considered hidden)",
+        help="include hidden input (note: root folders are considered hidden)",
     )
     parser.add_argument(
         "-i", "--inform", dest="loglevel", action="store_const", const="info",
@@ -73,7 +73,7 @@ def create_parser():
     )
     parser.add_argument(
         "-S", "--subtitle", dest="osubtitle", action="store_const", default=[],
-        const=["-an", "-vn", "-dn"], help="choose subtitle stream only",
+        const=["-an", "-vn", "-dn"], help="choose subtitle stream(s) only",
     )
     parser.add_argument(
         "+v", metavar="CODEC",
@@ -85,7 +85,7 @@ def create_parser():
     )
     parser.add_argument(
         "-V", "--video", dest="ovideo", action="store_const", default=[],
-        const=["-an", "-sn", "-dn"], help="choose video stream only",
+        const=["-an", "-sn", "-dn"], help="choose video stream(s) only",
     )
 
     ######################
@@ -129,21 +129,18 @@ def create_parser():
 
 def check_opts(opts):
     return True not in [
-        bool(opts.oaudio) and "audio" in opts.remove,
-        bool(opts.ovideo) and "video" in opts.remove,
-        bool(opts.osubtitle) and "sub" in opts.remove,
+        "audio" in opts.remove and bool(opts.oaudio),
+        "video" in opts.remove and bool(opts.ovideo),
+        "sub" in opts.remove and bool(opts.osubtitle),
         bool(opts.oaudio) and bool(opts.ovideo),
-        bool(opts.ovideo) and bool(opts.oaudio),
-        bool(opts.osubtitle) and bool(opts.oaudio),
         bool(opts.oaudio) and bool(opts.osubtitle),
         bool(opts.ovideo) and bool(opts.osubtitle),
-        bool(opts.osubtitle) and bool(opts.ovideo),
-        bool(opts.acodec) and "audio" in opts.copy,
-        bool(opts.vcodec) and "video" in opts.copy,
-        bool(opts.scodec) and "sub" in opts.copy,
-        bool(opts.acodec) and "all" in opts.copy,
-        bool(opts.vcodec) and "all" in opts.copy,
-        bool(opts.scodec) and "all" in opts.copy,
+        "audio" in opts.copy and bool(opts.acodec),
+        "video" in opts.copy and bool(opts.vcodec),
+        "sub" in opts.copy and bool(opts.scodec),
+        "all" in opts.copy and bool(opts.acodec),
+        "all" in opts.copy and bool(opts.vcodec),
+        "all" in opts.copy and bool(opts.scodec),
         bool(opts.embed) and "video" in opts.copy,
         bool(opts.embed) and "all" in opts.copy,
         not opts.hidden and core.is_hidden(opts.input),
