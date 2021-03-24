@@ -75,29 +75,29 @@ class FFmpeg:
         self.cmd += ["-scodec", self.opts.scodec] if self.opts.scodec else []
 
     def _add_font_name_to_force_style(self):
-        i = {"FontName": self.opts.FontName}
-        self.force_style = string.Template(self.force_style.safe_substitute(i))
+        _ = {"FontName": self.opts.FontName}
+        self.force_style = string.Template(self.force_style.safe_substitute(_))
 
     def _add_font_size_to_force_style(self):
         # Note: abs() is used to prevent "Assertion failed" error from FFmpeg
-        i = {"FontSize": abs(self.opts.FontSize)}
-        self.force_style = string.Template(self.force_style.safe_substitute(i))
+        _ = {"FontSize": abs(self.opts.FontSize)}
+        self.force_style = string.Template(self.force_style.safe_substitute(_))
 
     def _add_alignment_to_force_style(self):
-        i = {"Alignment": core.alignments[self.opts.Alignment]}
-        self.force_style = string.Template(self.force_style.safe_substitute(i))
+        _ = {"Alignment": core.alignments[self.opts.Alignment]}
+        self.force_style = string.Template(self.force_style.safe_substitute(_))
 
     def _add_border_style_to_force_style(self):
-        i = {"BorderStyle": self.opts.BorderStyle}
-        self.force_style = string.Template(self.force_style.safe_substitute(i))
+        _ = {"BorderStyle": self.opts.BorderStyle}
+        self.force_style = string.Template(self.force_style.safe_substitute(_))
 
     def _add_primary_colour_to_force_style(self):
-        i = {"PrimaryColour": core.colors[self.opts.PrimaryColour]}
-        self.force_style = string.Template(self.force_style.safe_substitute(i))
+        _ = {"PrimaryColour": core.colors[self.opts.PrimaryColour]}
+        self.force_style = string.Template(self.force_style.safe_substitute(_))
 
     def _add_outline_colour_to_force_style(self):
-        i = {"OutlineColour": core.colors[self.opts.OutlineColour]}
-        self.force_style = string.Template(self.force_style.safe_substitute(i))
+        _ = {"OutlineColour": core.colors[self.opts.OutlineColour]}
+        self.force_style = string.Template(self.force_style.safe_substitute(_))
 
     def build(self):
         for member in inspect.getmembers(self, predicate=inspect.ismethod):
@@ -105,9 +105,9 @@ class FFmpeg:
                 member[-1]()  # Call all methods of the FFmpeg class
 
     def build_force_style(self, filename):
-        i = "subtitles=%s:force_style='%s'" % (filename,
+        _ = "subtitles=%s:force_style='%s'" % (filename,
                                                self.force_style.template)
-        self.cmd += ["-vf", i]
+        self.cmd += ["-vf", _]
 
 
 def execute(cmd, top, files):
