@@ -2,8 +2,8 @@
 # History of the AVsub #
 ########################
 
-AVsub 1.0.2
------------
+AVsub 1.0.2 [2021.04.12]
+------------------------
 - F1020: Fixed an "AttributeError" that could occur on exiting.
 - C1020: Unprocessed items in a folder can now be determined as "not processed" after an exit request.
 - C1021: The default value for the subtitle font size has been changed from 18 to 20.
