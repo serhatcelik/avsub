@@ -2,41 +2,46 @@
 # Released under the GNU General Public License v3.0
 # Copyright (C) Serhat Çelik
 
+"""Global variables and functions for handling external modules."""
+
 import os
 import re
 import stat
 import signal
-import platform
 
 ################
 # Over Control #
 ################
-not_processed = dict()  # Container for storing unprocessed items
-
 del_on_exit = dict()  # Container for storing items to be deleted on exit
 del_on_exit_temp = dict()
+not_processed = dict()  # Container for storing unprocessed items
 
 ############
 # Platform #
 ############
 linux = os.name == "posix"  # GNU/Linux
-wsl = linux and "microsoft" in platform.version().lower()  # WSL
+windows = not linux  # Microsoft Windows (not include WSL)
 
 ###########
 # Signals #
 ###########
+# SIGINT (linux/windows): Interrupt from keyboard
+# SIGQUIT (linux): Quit from keyboard
+# SIGTSTP (linux): Stop typed at terminal
+
 sigquit = signal.SIGQUIT if linux else None  # pylint: disable=E1101
 sigtstp = signal.SIGTSTP if linux else None  # pylint: disable=E1101
 sigbreak = signal.SIGBREAK if not linux else None  # pylint: disable=E1101
 
-signals = [i for i in [signal.SIGINT, sigquit, sigtstp, sigbreak] if i]
+signals = [_ for _ in [signal.SIGINT, sigquit, sigtstp, sigbreak] if _]
 
 ###########
 # Choices #
 ###########
 alignments = {
-    "bleft": "1", "bottom": "2", "bright": "3", "tleft": "5", "top": "6",
-    "tright": "7", "mleft": "9", "middle": "10", "mright": "11",
+    "bleft": "1", "bottom": "2", "bright": "3",
+    "tleft": "5", "top": "6", "tright": "7",
+    "mleft": "9", "middle": "10", "mright": "11",
 }  # Subtitle positions on screen
 colors = {
     "black": "&H000000&", "blue": "&HFF0000&", "brown": "&H2A2AA5&",
@@ -50,24 +55,24 @@ colors = {
 # Utilities #
 #############
 def abspath(path):
-    return os.path.abspath(path)
+    return os.path.abspath(path)  # "path" will be normalized and absolutized
 
 
 def basename(path):
     return os.path.basename(abspath(path))
 
 
-def join(top, file):
-    return os.path.join(abspath(top), basename(file))
+def join(top, under):
+    return os.path.join(abspath(top), basename(under))
 
 
 def path_exists(path, check_isfile=False, check_isdir=False):
     """
-    Checks if the given path exists.
+    Check if the given path exists.
 
     :param path: Path to check.
-    :param check_isfile: Checks if the given path is an existing file.
-    :param check_isdir: Checks if the given path is an existing folder.
+    :param check_isfile: Check if the given path is an existing file.
+    :param check_isdir: Check if the given path is an existing folder.
     """
 
     if check_isfile:
@@ -79,7 +84,7 @@ def path_exists(path, check_isfile=False, check_isdir=False):
 
 def is_hidden(path):
     """
-    Checks if the given path is hidden.
+    Check if the given path is hidden.
 
     :param path: Path to check.
     """
@@ -96,7 +101,7 @@ def is_hidden(path):
 
 def is_ext(ext):
     """
-    Checks if the given extension is valid.
+    Check if the given extension is valid.
 
     :param ext: Extension to check.
     """
@@ -105,28 +110,28 @@ def is_ext(ext):
     return bool(re.search(r"^[a-zA-Z0-9]+$", ext))
 
 
-def list_files(top):
+def get_files(top):
     """
-    Retrieves files from the top folder.
+    Retrieve files from the top folder.
 
     :param top: Top folder containing files.
     """
 
-    files = [join(top, file=i) for i in os.listdir(abspath(top))]
+    files = [join(top, under=_) for _ in os.listdir(abspath(top))]
 
-    for path in files.copy():
+    for file in files.copy():
         if True in [
-            not path_exists(path, check_isfile=True),
-            not globals()["opts"].hidden and is_hidden(path),
+            path_exists(file, check_isdir=True),
+            not globals()["opts"].hidden and is_hidden(file),
         ]:
-            files.remove(path)
+            files.remove(file)
 
     return files
 
 
 def create_output(top, file):
     """
-    Creates an output from input for the FFmpeg command.
+    Create an output from input for the ultimate FFmpeg command.
 
     :param top: Top folder for output.
     :param file: Original input.
@@ -134,14 +139,18 @@ def create_output(top, file):
 
     no_ext_basename = os.path.splitext(basename(file))[0]
 
-    return join(top, file=".".join([no_ext_basename, globals()["opts"].ext]))
+    return join(top, under=".".join([no_ext_basename, globals()["opts"].ext]))
 
 
-def del_del_on_exit():
-    del_on_exit.update(del_on_exit_temp)  # Update with TEMP files
+def del_del_on_exit(items):
+    """
+    Delete items to be deleted on exit.
 
-    for member in del_on_exit:
+    :param items: Items to be deleted on exit.
+    """
+
+    for item in items:
         try:
-            os.remove(del_on_exit[member])
-        except (PermissionError, FileNotFoundError):
+            os.remove(items[item])
+        except (FileNotFoundError, PermissionError):
             pass

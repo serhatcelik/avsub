@@ -9,10 +9,10 @@ from avsub import __license__, core
 def create_parser():
     parser = argparse.ArgumentParser(
         prog="avsub",
-        description="AVsub : A simplified CLI for FFmpeg\n"
+        description="AVsub - A simplified command-line interface for FFmpeg\n"
                     "Written by Serhat Çelik "
                     "(with the help of my family and a friend)",
-        epilog="This tool is for very basic operations only. "
+        epilog="This tool is for basic operations only. "
                "If you need advanced operations, use FFmpeg instead.\n"
                "See https://github.com/serhatcelik/avsub "
                "for more information.",
@@ -33,12 +33,20 @@ def create_parser():
         dest="acodec", help="set CODEC as output audio codec",
     )
     parser.add_argument(
+        "+s", metavar="CODEC",
+        dest="scodec", help="set CODEC as output subtitle codec",
+    )
+    parser.add_argument(
+        "+v", metavar="CODEC",
+        dest="vcodec", help="set CODEC as output video codec",
+    )
+    parser.add_argument(
         "-A", "--audio", dest="oaudio", action="store_const", default=[],
         const=["-vn", "-sn", "-dn"], help="choose audio stream(s) only",
     )
     parser.add_argument(
         "--compress", metavar="VALUE", dest="crf",
-        type=int, help="set VALUE as crf value to compress input",
+        type=int, help="set VALUE as crf value to compress video",
     )
     parser.add_argument(
         "--copy", metavar="STREAM",
@@ -63,10 +71,6 @@ def create_parser():
         help="do not copy STREAM from input to output",
     )
     parser.add_argument(
-        "+s", metavar="CODEC",
-        dest="scodec", help="set CODEC as output subtitle codec",
-    )
-    parser.add_argument(
         "--speed", metavar="PRESET",
         dest="preset", choices=["faster", "fast", "medium", "slow", "slower"],
         help="set PRESET as encoding speed",
@@ -74,10 +78,6 @@ def create_parser():
     parser.add_argument(
         "-S", "--subtitle", dest="osubtitle", action="store_const", default=[],
         const=["-an", "-vn", "-dn"], help="choose subtitle stream(s) only",
-    )
-    parser.add_argument(
-        "+v", metavar="CODEC",
-        dest="vcodec", help="set CODEC as output video codec",
     )
     parser.add_argument(
         "-v", "--version", action="version",
@@ -95,7 +95,7 @@ def create_parser():
 
     group.add_argument(
         "-b", "--box", dest="BorderStyle", action="store_const",
-        const="3", default="1", help="add an opaque box around subtitle",
+        default="1", const="3", help="add an opaque box around subtitle",
     )
     group.add_argument(
         "--color1", metavar="COLOR",
@@ -120,9 +120,9 @@ def create_parser():
         help="set POSITION as subtitle alignment [default: %(default)s]",
     )
     group.add_argument(
-        "--size", metavar="VALUE", dest="FontSize", type=int, default=18,
+        "--size", metavar="VALUE", dest="FontSize", type=int, default=20,
         help="set VALUE as subtitle font size [default: %(default)s]",
-    )
+    )  # C1021
 
     return parser
 
@@ -141,8 +141,14 @@ def check_opts(opts):
         "all" in opts.copy and bool(opts.acodec),
         "all" in opts.copy and bool(opts.vcodec),
         "all" in opts.copy and bool(opts.scodec),
-        bool(opts.embed) and "video" in opts.copy,
+        bool(opts.embed) and ("video" in opts.copy or opts.vcodec == "copy"),
         bool(opts.embed) and "all" in opts.copy,
+        bool(opts.embed) and "video" in opts.remove,
+        bool(opts.embed) and (bool(opts.oaudio) or bool(opts.osubtitle)),
         not opts.hidden and core.is_hidden(opts.input),
         not opts.hidden and bool(opts.embed) and core.is_hidden(opts.embed),
+        bool(opts.crf) and ("video" in opts.copy or opts.vcodec == "copy"),
+        bool(opts.crf) and "all" in opts.copy,
+        bool(opts.crf) and "video" in opts.remove,
+        sum(True for _ in ["audio", "video", "sub"] if _ in opts.remove) == 3,
     ]

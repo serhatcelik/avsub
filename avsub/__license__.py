@@ -1,5 +1,5 @@
 """
-AVsub : A simplified CLI for FFmpeg.
+AVsub - A simplified command-line interface for FFmpeg.
 Copyright (C) 2021  Serhat Çelik
 
 AVsub is free software: you can redistribute it and/or modify
@@ -16,4 +16,4 @@ You should have received a copy of the GNU General Public License
 along with AVsub.  If not, see <https://www.gnu.org/licenses/>.
 """
 
-VERSION = "1.0.1"
+VERSION = "1.0.2"

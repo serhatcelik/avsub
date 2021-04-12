@@ -2,14 +2,13 @@
 # Released under the GNU General Public License v3.0
 # Copyright (C) Serhat Çelik
 
-"""AVsub : A simplified CLI for FFmpeg."""
+"""AVsub - A simplified command-line interface for FFmpeg."""
 
 import os
 import sys
 import shutil
 import signal
 import tempfile
-import webbrowser
 from avsub import cli, core, ffmpeg
 
 
@@ -25,85 +24,90 @@ def setup_py_main():
 
 
 def main():
+    for sig in core.signals:
+        signal.signal(sig, clean)  # Set the handler for signal "sig"
+
     parser = cli.create_parser()
     opts = parser.parse_args()
-    setattr(core, "opts", opts)  # Set attribute for over control
+    setattr(core, "opts", opts)  # Set attribute for "Over Control"
 
     # Note: Check the existence of inputs first to prevent "FileNotFoundError"
     if not core.path_exists(opts.input):
-        sys.exit("E : INPUT : '%s' : No such file or folder" % opts.input)
+        sys.exit("INPUT -> '%s': No such file or folder" % opts.input)
     elif opts.embed and not core.path_exists(opts.embed, check_isfile=True):
-        sys.exit("E : SUBTITLE : '%s' : No such file" % opts.embed)
-    elif not cli.check_opts(opts):
-        sys.exit("E : Contradictory definitions when parsing the command-line")
+        sys.exit("embed -> SUBTITLE -> '%s': No such file" % opts.embed)
     elif not core.is_ext(opts.ext):
-        sys.exit("E : EXTENSION : '%s' : Not a valid format" % opts.ext)
+        sys.exit("EXTENSION -> '%s': Not a valid format" % opts.ext)
     elif opts.embed and core.path_exists(opts.input, check_isdir=True):
-        sys.exit("E : EMBED : INPUT : '%s' : This is a folder" % opts.input)
-
-    for sig in core.signals:
-        signal.signal(sig, clean)  # Set the handler for signal "sig"
+        sys.exit("embed -> INPUT -> '%s': This is a folder" % opts.input)
+    elif not cli.check_opts(opts):
+        sys.exit("Contradictory options when parsing the command-line")
 
     fff = ffmpeg.FFmpeg(opts)
     fff.build()  # Start creating the ultimate FFmpeg command
 
     try:
+        # The TEMP folder for storing all other TEMP folders
+        the_temp = core.join(tempfile.gettempdir(), under="AVsub")  # C1022
+        # Create the TEMP folder
+        os.makedirs(the_temp, exist_ok=True)
         # Create a new TEMP folder
-        main.temp = tempfile.mkdtemp(prefix="avsub_")
-    except PermissionError:
-        sys.exit("F : TEMP folder could not be created")
+        main.temp = tempfile.mkdtemp(prefix="avsub_", dir=the_temp)
+    except (FileNotFoundError, PermissionError):
+        sys.exit("The required TEMP folder could not be created (fatal)")
 
     # MANUAL OPERATION
     if core.path_exists(opts.input, check_isfile=True):
         # HARDSUB MANUAL OPERATION?
         if opts.embed:
-            # Note: New subtitle name to (almost) solve the escaping nonsense
-            tempsub = core.join(main.temp, file=main.temp)
+            # Note: TEMP subtitle name to -almost- solve the escaping nonsense
+            tempsub = core.join(main.temp, under=main.temp)
 
-            # Store as {None : output} to delete the (TEMP) subtitle on exit
+            # Store as {None: output} to delete the TEMP subtitle on exit
             core.del_on_exit_temp.update({None: tempsub})
             try:
-                # Copy the subtitle to TEMP folder
+                # Copy the subtitle to TEMP folder as TEMP subtitle
                 shutil.copyfile(core.abspath(opts.embed), tempsub)
-            except (PermissionError, FileNotFoundError):
-                sys.exit("F : '%s' : TEMP file could not be created" % tempsub)
+            except (FileNotFoundError, PermissionError):
+                sys.exit("The required TEMP file could not be created (fatal)")
 
-            # Add a new level of escaping for the subtitle path
+            # Add a new level of escaping for the TEMP subtitle path
             tempsub_escaped = tempsub.replace("\\", "/").replace(":", "\\\\:")
             fff.build_force_style(filename=tempsub_escaped)
 
         files = [core.abspath(opts.input)]
     # AUTOMATIC OPERATION
     else:
-        files = core.list_files(opts.input)  # Get all the files to process
+        files = core.get_files(opts.input)  # Get all files to process
         if not files:
-            sys.exit("W : Exiting, no files to process")
+            sys.exit("Exiting, no files to process with current options")
 
     ffmpeg.execute(fff.cmd, top=main.temp, files=files)  # Start the operation
 
 
 def clean(*args):  # pylint: disable=W0613
     for sig in core.signals:
-        signal.signal(sig, signal.SIG_IGN)  # Simply ignore the "sig" signal
+        signal.signal(sig, signal.SIG_IGN)  # Simply ignore the signal "sig"
 
     print("\n")
-    for member in list(core.not_processed) + list(core.del_on_exit):
-        if member in core.not_processed:
-            print("W : Not processed : '%s'" % core.basename(member))
-        else:
-            print("E : Not completed : '%s'" % core.basename(member))
+    for member in core.del_on_exit:
+        print("Not completed -> '%s'" % core.basename(member))
+    for member in core.not_processed:
+        print("Not processed -> '%s'" % core.basename(member))
 
-    # Delete files in "del_on_exit" and "del_on_exit_temp" containers
-    core.del_del_on_exit()
+    # Cleaning...
+    core.del_del_on_exit(core.del_on_exit)
+    core.del_del_on_exit(core.del_on_exit_temp)
 
-    if core.path_exists(getattr(main, "temp"), check_isdir=True):
-        # If the folder is not empty...
-        if os.listdir(getattr(main, "temp")):
-            print("I : Output folder : '%s'" % getattr(main, "temp"))
-            if not core.wsl:
-                webbrowser.open(getattr(main, "temp"), new=0, autoraise=False)
+    if hasattr(main, "temp"):  # F1020
+        if core.path_exists(getattr(main, "temp"), check_isdir=True):
+            # If the TEMP folder is not empty...
+            if os.listdir(getattr(main, "temp")):
+                print("Output folder -> '%s'" % getattr(main, "temp"))
+                if core.windows:  # C1023
+                    os.startfile(getattr(main, "temp"))  # Open the TEMP folder
 
-    sys.exit("\a")
+        sys.exit("\a")
 
 
 if __name__ == "__main__":

@@ -45,13 +45,13 @@ class FFmpeg:
         self.cmd += "-map_chapters", str(-abs("chapters" in self.opts.remove))
 
     def _add_only_audio_to_cmd(self):
-        self.cmd += [i for i in self.opts.oaudio if i not in self.cmd]
+        self.cmd += [_ for _ in self.opts.oaudio if _ not in self.cmd]
 
     def _add_only_video_to_cmd(self):
-        self.cmd += [i for i in self.opts.ovideo if i not in self.cmd]
+        self.cmd += [_ for _ in self.opts.ovideo if _ not in self.cmd]
 
     def _add_only_subtitle_to_cmd(self):
-        self.cmd += [i for i in self.opts.osubtitle if i not in self.cmd]
+        self.cmd += [_ for _ in self.opts.osubtitle if _ not in self.cmd]
 
     def _add_copy_audio_to_cmd(self):
         self.cmd += ["-acodec", "copy"] if "audio" in self.opts.copy else []
@@ -102,33 +102,46 @@ class FFmpeg:
     def build(self):
         for member in inspect.getmembers(self, predicate=inspect.ismethod):
             if member[0] not in ["__init__", "build", "build_force_style"]:
-                member[-1]()  # Call all methods of the FFmpeg class
+                member[-1]()  # Call the method of the FFmpeg class
 
     def build_force_style(self, filename):
         _ = "subtitles=%s:force_style='%s'" % (filename,
                                                self.force_style.template)
-        self.cmd += ["-vf", _]
+        self.cmd += ["-filter:v", _]
 
 
 def execute(cmd, top, files):
+    """
+    Finish creating the ultimate FFmpeg command and execute it.
+
+    :param cmd: FFmpeg command to finish creating.
+    :param top: Top folder that will contain all files.
+    :param files: All files to process.
+    """
+
+    # Mark all files as "not processed" before start processing
+    for file in files:  # C1020
+        core.not_processed.update({file: core.create_output(top, file=file)})
+
     for i, file in enumerate(files):
-        # Note: Output name is the same as input name
-        output = core.create_output(top, file=file)
+        # Note: Output base name is the same as input base name
+        output = core.not_processed[file]
 
         # If the output is already in the destination folder...
         if core.path_exists(output):
-            # Note: Also for inputs with the same name/different extensions
-            # Store as {input : output} to delete the output on exit
-            core.not_processed.update({file: output})
+            # Note: Also for inputs with the same name but different extensions
+            pass
         else:
+            # Store as {input: output} to delete the output on exit
             core.del_on_exit.update({file: output})
+            # Note: Output is no longer marked as "not processed"
+            core.not_processed.pop(file)
 
-        # Note: Copy the original command at every step
         # Finish creating the ultimate FFmpeg command
-        new_cmd = cmd.copy() + [output, "-i", file]
+        new_cmd = cmd + [output, "-i", file]
 
         # Note: Convert "int" to "str" to find the length of the precision
-        print("[%0*d/%d] Running : '%s'" % (len(str(len(files))), i + 1,
+        print("Running [%*d/%d] -> '%s'" % (len(str(len(files))), i + 1,
                                             len(files), core.basename(file)))
         try:
             # Note: Disable "Press [q] to stop" feature with DEVNULL
@@ -138,5 +151,5 @@ def execute(cmd, top, files):
             # Note: Output will be deleted on exit
             pass
         except FileNotFoundError:
-            print("F : FFmpeg could not be executed")
+            print("FFmpeg could not be executed (fatal)")
             return
