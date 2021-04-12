@@ -6,7 +6,7 @@ with open("README.md", "r", encoding="utf-8") as readme:
 setuptools.setup(
     name="avsub",
     version=__import__("avsub.__license__", fromlist="__license__").VERSION,
-    description="A simplified CLI for FFmpeg",
+    description="A simplified command-line interface for FFmpeg",
     long_description=long_description,
     long_description_content_type="text/markdown",
     author="Serhat Çelik",
@@ -43,6 +43,7 @@ setuptools.setup(
         },
     },
     license="GPLv3",
+    license_files=["LICENSE"],
     keywords=["avsub", "audio", "video", "subtitle", "ffmpeg"],
     platforms=["Linux", "Windows"],
     zip_safe=False,

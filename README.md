@@ -1,6 +1,6 @@
 # AVsub
 
-A simplified CLI for FFmpeg.
+A simplified command-line interface for FFmpeg.
 
 ## OS Support
 
@@ -10,11 +10,9 @@ A simplified CLI for FFmpeg.
 ## Requirements
 
 - Python ~=3.5
-- FFmpeg
+- FFmpeg (the latest version is recommended)
 
 ## Preparation and Installation
-
-Note: If you are using a Windows operating system, you may need to configure your PATH after installation.
 
 ```
 $ pip3 install --upgrade pip
@@ -37,13 +35,14 @@ $ avsub --help
 ```
 
 ```
-usage: avsub [-h] [+a CODEC] [-A] [--compress VALUE] [--copy STREAM [STREAM ...]] [-H]
-             [-i] [-L] [--remove STREAM [STREAM ...]] [+s CODEC] [--speed PRESET] [-S]
-             [+v CODEC] [-v] [-V] [-b] [--color1 COLOR] [--color2 COLOR] [--embed SUBTITLE]
+usage: avsub [-h] [+a CODEC] [+s CODEC] [+v CODEC] [-A] [--compress VALUE]
+             [--copy STREAM [STREAM ...]] [-H] [-i] [-L]
+             [--remove STREAM [STREAM ...]] [--speed PRESET] [-S] [-v] [-V]
+             [-b] [--color1 COLOR] [--color2 COLOR] [--embed SUBTITLE]
              [--font NAME] [--position POSITION] [--size VALUE]
              INPUT EXTENSION
 
-AVsub : A simplified CLI for FFmpeg
+AVsub - A simplified command-line interface for FFmpeg
 Written by Serhat Çelik (with the help of my family and a friend)
 
 positional arguments:
@@ -53,8 +52,10 @@ positional arguments:
 optional arguments:
   -h, --help            show this help message and exit
   +a CODEC              set CODEC as output audio codec
+  +s CODEC              set CODEC as output subtitle codec
+  +v CODEC              set CODEC as output video codec
   -A, --audio           choose audio stream(s) only
-  --compress VALUE      set VALUE as crf value to compress input
+  --compress VALUE      set VALUE as crf value to compress video
   --copy STREAM [STREAM ...]
                         use copy codec for output STREAM instead of another codec
   -H, --hidden          include hidden input (note: root folders are considered hidden)
@@ -62,10 +63,8 @@ optional arguments:
   -L, --license         show license and exit
   --remove STREAM [STREAM ...]
                         do not copy STREAM from input to output
-  +s CODEC              set CODEC as output subtitle codec
   --speed PRESET        set PRESET as encoding speed
   -S, --subtitle        choose subtitle stream(s) only
-  +v CODEC              set CODEC as output video codec
   -v, --version         show program version and exit
   -V, --video           choose video stream(s) only
 
@@ -76,10 +75,38 @@ subtitle arguments:
   --embed SUBTITLE      embed SUBTITLE into video
   --font NAME           set NAME as subtitle font name
   --position POSITION   set POSITION as subtitle alignment [default: bottom]
-  --size VALUE          set VALUE as subtitle font size [default: 18]
+  --size VALUE          set VALUE as subtitle font size [default: 20]
 
-This tool is for very basic operations only. If you need advanced operations, use FFmpeg instead.
+This tool is for basic operations only. If you need advanced operations, use FFmpeg instead.
 See https://github.com/serhatcelik/avsub for more information.
+```
+
+## Examples
+
+```
+Convert mkv to mp4
+$ avsub input.mkv mp4
+
+Convert mkv to mp4 with audio codec aac
+$ avsub input.mkv mp4 +a aac
+
+Convert mp4 to mp3 and choose audio stream only
+$ avsub input.mp4 mp3 --audio
+
+Compress video with Constant Rate Factor value 30
+$ avsub input.mp4 mp4 --compress 30
+
+Copy audio and subtitle stream from input to output
+$ avsub input.mp4 mp4 --copy audio sub
+
+Do not copy subtitle stream and metadata from input to output
+$ avsub input.mp4 mp4 --remove sub metadata
+
+Embed subtitle into video with font name Arial and font size 20
+$ avsub input.mp4 mp4 --embed input.srt --font "Arial" --size 20
+
+Embed subtitle into video with primary color red and outline color blue
+$ avsub input.mp4 mp4 --embed input.srt --color1 red --color2 blue
 ```
 
 ## License

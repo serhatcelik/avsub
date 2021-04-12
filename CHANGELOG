@@ -2,6 +2,18 @@
 # History of the AVsub #
 ########################
 
+AVsub 1.0.2
+-----------
+- F1020: Fixed an "AttributeError" that could occur on exiting.
+- C1020: Unprocessed items in a folder can now be determined as "not processed" after an exit request.
+- C1021: The default value for the subtitle font size has been changed from 18 to 20.
+- C1022: All other temporary folders are now collected under one main temporary folder.
+- C1023: Temporary folder now opens only in Windows operating system.
+- Contradictory option check has been improved.
+- Exit messages have been made more meaningful.
+- User interface has been improved.
+
+
 AVsub 1.0.1 [2021.03.16]
 ------------------------
 - Code improvements.
