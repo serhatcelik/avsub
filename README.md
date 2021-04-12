@@ -102,8 +102,8 @@ $ avsub input.mp4 mp4 --copy audio sub
 Do not copy subtitle stream and metadata from input to output
 $ avsub input.mp4 mp4 --remove sub metadata
 
-Embed subtitle into video with font name Arial and font size 20
-$ avsub input.mp4 mp4 --embed input.srt --font "Arial" --size 20
+Embed subtitle into video with font name Arial and font size 25
+$ avsub input.mp4 mp4 --embed input.srt --font "Arial" --size 25
 
 Embed subtitle into video with primary color red and outline color blue
 $ avsub input.mp4 mp4 --embed input.srt --color1 red --color2 blue
