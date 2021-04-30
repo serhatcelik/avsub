@@ -87,13 +87,16 @@ See https://github.com/serhatcelik/avsub for more information.
 Convert mkv to mp4
 $ avsub input.mkv mp4
 
+Convert all files in current directory to mp4 including hidden ones
+$ avsub . mp4 --hidden
+
 Convert mkv to mp4 with audio codec aac
 $ avsub input.mkv mp4 +a aac
 
 Convert mp4 to mp3 and choose audio stream only
 $ avsub input.mp4 mp3 --audio
 
-Compress video with Constant Rate Factor value 30
+Compress video with CRF (Constant Rate Factor) value 30
 $ avsub input.mp4 mp4 --compress 30
 
 Copy audio and subtitle stream from input to output
