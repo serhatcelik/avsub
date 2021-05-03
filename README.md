@@ -1,19 +1,15 @@
 # AVsub
-
 A simplified command-line interface for FFmpeg.
 
 ## OS Support
-
 - GNU/Linux
 - Microsoft Windows
 
 ## Requirements
-
 - Python ~=3.5
 - FFmpeg (the latest version is recommended)
 
 ## Preparation and Installation
-
 ```
 $ pip3 install --upgrade pip
 $ pip3 install --upgrade setuptools
@@ -29,25 +25,24 @@ $ python3 -m avsub --help
 ```
 
 ## Usage
-
 ```
 $ avsub --help
 ```
 
 ```
-usage: avsub [-h] [+a CODEC] [+s CODEC] [+v CODEC] [-A] [--compress VALUE]
-             [--copy STREAM [STREAM ...]] [-H] [-i] [-L]
-             [--remove STREAM [STREAM ...]] [--speed PRESET] [-S] [-v] [-V]
-             [-b] [--color1 COLOR] [--color2 COLOR] [--embed SUBTITLE]
+usage: avsub [-h] [+a CODEC] [+s CODEC] [+v CODEC] [-A] [--channel CHANNEL]
+             [--compress VALUE] [--copy STREAM [STREAM ...]] [-F] [-H] [-i]
+             [-L] [--remove STREAM [STREAM ...]] [--speed PRESET] [-S] [-v]
+             [-V] [-b] [--color1 COLOR] [--color2 COLOR] [--embed SUBTITLE]
              [--font NAME] [--position POSITION] [--size VALUE]
-             INPUT EXTENSION
+             input extension
 
 AVsub - A simplified command-line interface for FFmpeg
 Written by Serhat Çelik (with the help of my family and a friend)
 
 positional arguments:
-  INPUT                 input file or folder
-  EXTENSION             output extension
+  input                 input file or folder
+  extension             output extension
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -55,15 +50,17 @@ optional arguments:
   +s CODEC              set CODEC as output subtitle codec
   +v CODEC              set CODEC as output video codec
   -A, --audio           choose audio stream(s) only
+  --channel CHANNEL     set CHANNEL as output audio channel
   --compress VALUE      set VALUE as crf value to compress video
   --copy STREAM [STREAM ...]
                         use copy codec for output STREAM instead of another codec
-  -H, --hidden          include hidden input (note: root folders are considered hidden)
+  -F, --ffmpeg          show the ffmpeg command during processing (except auto/hardsub)
+  -H, --hidden          include hidden input
   -i, --inform          show informative messages during processing
   -L, --license         show license and exit
   --remove STREAM [STREAM ...]
                         do not copy STREAM from input to output
-  --speed PRESET        set PRESET as encoding speed
+  --speed PRESET        set PRESET as video encoding speed
   -S, --subtitle        choose subtitle stream(s) only
   -v, --version         show program version and exit
   -V, --video           choose video stream(s) only
@@ -82,7 +79,6 @@ See https://github.com/serhatcelik/avsub for more information.
 ```
 
 ## Examples
-
 ```
 Convert mkv to mp4
 $ avsub input.mkv mp4
@@ -99,8 +95,8 @@ $ avsub input.mp4 mp3 --audio
 Compress video with CRF (Constant Rate Factor) value 30
 $ avsub input.mp4 mp4 --compress 30
 
-Copy audio and subtitle stream from input to output
-$ avsub input.mp4 mp4 --copy audio sub
+Copy video and subtitle stream from input to output
+$ avsub input.mp4 mp4 --copy video sub
 
 Do not copy subtitle stream and metadata from input to output
 $ avsub input.mp4 mp4 --remove sub metadata
@@ -113,9 +109,7 @@ $ avsub input.mp4 mp4 --embed input.srt --color1 red --color2 blue
 ```
 
 ## License
-
 [GNU General Public License v3.0](https://choosealicense.com/licenses/gpl-3.0/)
 
 ## Feedback
-
 If you have found a bug or have a suggestion, please consider creating an issue.

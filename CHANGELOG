@@ -2,6 +2,19 @@
 # History of the AVsub #
 ########################
 
+AVsub 1.1.0 [2021.05.03]
+------------------------
+- F1100: Fixed the error "TypeError: startfile() takes no keyword arguments" in Python 3.5.
+- N1100: Added a command-line option that can change audio channels.
+- N1101: Added a command-line option that shows the FFmpeg command during processing.
+- N1102: It is now checked if there is a new version for AVsub when no arguments are specified.
+- C1100: Root folders are no longer considered hidden in Linux.
+- C1101: Fatal FFmpeg error is now also displayed at the end of output for convenience.
+- Code improvements.
+- Exit messages have been made more meaningful.
+- User interface has been improved.
+
+
 AVsub 1.0.2 [2021.04.12]
 ------------------------
 - F1020: Fixed an "AttributeError" that could occur on exiting.
