@@ -12,6 +12,10 @@ import signal
 ################
 # Over Control #
 ################
+# opts <- avsub.__main__.main
+# a_temp <- avsub.__main__.main
+# fatal_ffmpeg <- avsub.ffmpeg.execute
+
 del_on_exit = dict()  # Container for storing items to be deleted on exit
 del_on_exit_temp = dict()
 not_processed = dict()  # Container for storing unprocessed items
@@ -22,22 +26,24 @@ not_processed = dict()  # Container for storing unprocessed items
 linux = os.name == "posix"  # GNU/Linux
 windows = not linux  # Microsoft Windows (not include WSL)
 
+#######################
+# Regular Expressions #
+#######################
+RE_HIDDEN_LINUX = r"^\..*"  # Starts with a dot
+RE_EXTENSION = r"^([a-zA-Z0-9]+)$"  # Only letters and numbers
+
 ###########
 # Signals #
 ###########
-# SIGINT (linux/windows): Interrupt from keyboard
-# SIGQUIT (linux): Quit from keyboard
-# SIGTSTP (linux): Stop typed at terminal
-
-sigquit = signal.SIGQUIT if linux else None  # pylint: disable=E1101
-sigtstp = signal.SIGTSTP if linux else None  # pylint: disable=E1101
-sigbreak = signal.SIGBREAK if not linux else None  # pylint: disable=E1101
-
-signals = [_ for _ in [signal.SIGINT, sigquit, sigtstp, sigbreak] if _]
+sigquit = signal.SIGQUIT if linux else None  # Quit from keyboard
+sigtstp = signal.SIGTSTP if linux else None  # Stop typed at terminal
+sigbreak = signal.SIGBREAK if not linux else None
+all_signals = [_ for _ in [signal.SIGINT, sigquit, sigtstp, sigbreak] if _]
 
 ###########
 # Choices #
 ###########
+acs = {"mono": "1", "stereo": "2"}  # Channels for audio channel manipulation
 alignments = {
     "bleft": "1", "bottom": "2", "bright": "3",
     "tleft": "5", "top": "6", "tright": "7",
@@ -48,12 +54,12 @@ colors = {
     "gray": "&H808080&", "green": "&H008000&", "orange": "&H00A5FF&",
     "pink": "&HCBC0FF&", "purple": "&H800080&", "red": "&H0000FF&",
     "white": "&HFFFFFF&", "yellow": "&H00FFFF&",
-}  # HTML color codes in BGR format
+}  # HTML color codes in BBGGRR format
 
 
-#############
-# Utilities #
-#############
+#########
+# Tools #
+#########
 def abspath(path):
     return os.path.abspath(path)  # "path" will be normalized and absolutized
 
@@ -82,41 +88,24 @@ def path_exists(path, check_isfile=False, check_isdir=False):
     return os.path.exists(abspath(path))
 
 
+def is_ext(ext):
+    return bool(re.search(RE_EXTENSION, ext))
+
+
 def is_hidden(path):
-    """
-    Check if the given path is hidden.
-
-    :param path: Path to check.
-    """
-
-    # Note: Root folders such as "C:\", "D:\" or "/" are considered hidden
-
     if linux:
-        # Note: "." and ".." are not considered hidden
-        return not bool(re.search(r"^([^.].*|\.{1,2})$", basename(path)))
+        # Note: Because of "abspath" in "basename", "." and ".." are not hidden
+        return bool(re.search(RE_HIDDEN_LINUX, basename(path)))  # avsub: C1100
 
-    stat_result = os.stat(abspath(path))
+    try:
+        stat_result = os.stat(abspath(path))
+    except FileNotFoundError:
+        return False
+    # Note: Root folders such as "C:\" and "D:\" are considered hidden
     return bool(stat_result.st_file_attributes & stat.FILE_ATTRIBUTE_HIDDEN)
 
 
-def is_ext(ext):
-    """
-    Check if the given extension is valid.
-
-    :param ext: Extension to check.
-    """
-
-    # Note: Only letters and numbers are allowed
-    return bool(re.search(r"^[a-zA-Z0-9]+$", ext))
-
-
 def get_files(top):
-    """
-    Retrieve files from the top folder.
-
-    :param top: Top folder containing files.
-    """
-
     files = [join(top, under=_) for _ in os.listdir(abspath(top))]
 
     for file in files.copy():
@@ -142,15 +131,10 @@ def create_output(top, file):
     return join(top, under=".".join([no_ext_basename, globals()["opts"].ext]))
 
 
-def del_del_on_exit(items):
-    """
-    Delete items to be deleted on exit.
-
-    :param items: Items to be deleted on exit.
-    """
-
-    for item in items:
-        try:
-            os.remove(items[item])
-        except (FileNotFoundError, PermissionError):
-            pass
+def del_del_on_exits(*args):
+    for dictionary in args:
+        for key in dictionary:
+            try:
+                os.remove(dictionary[key])  # Delete the file
+            except (FileNotFoundError, PermissionError):
+                pass

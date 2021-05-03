@@ -2,6 +2,7 @@
 # Released under the GNU General Public License v3.0
 # Copyright (C) Serhat Çelik
 
+import os
 import string
 import inspect
 import subprocess
@@ -28,6 +29,9 @@ class FFmpeg:
 
     def _add_crf_to_cmd(self):
         self.cmd += ["-crf", str(self.opts.crf)] if self.opts.crf else []
+
+    def _add_ac_to_cmd(self):
+        self.cmd += ["-ac", core.acs[self.opts.ac]] if self.opts.ac else []
 
     def _add_remove_audio_to_cmd(self):
         self.cmd += ["-an"] if "audio" in self.opts.remove else []
@@ -74,12 +78,12 @@ class FFmpeg:
     def _add_codec_subtitle_to_cmd(self):
         self.cmd += ["-scodec", self.opts.scodec] if self.opts.scodec else []
 
-    def _add_font_name_to_force_style(self):
+    def _add_fontname_to_force_style(self):
         _ = {"FontName": self.opts.FontName}
         self.force_style = string.Template(self.force_style.safe_substitute(_))
 
-    def _add_font_size_to_force_style(self):
-        # Note: abs() is used to prevent "Assertion failed" error from FFmpeg
+    def _add_fontsize_to_force_style(self):
+        # Note: "abs" is used to prevent "Assertion failed" error from FFmpeg
         _ = {"FontSize": abs(self.opts.FontSize)}
         self.force_style = string.Template(self.force_style.safe_substitute(_))
 
@@ -87,15 +91,15 @@ class FFmpeg:
         _ = {"Alignment": core.alignments[self.opts.Alignment]}
         self.force_style = string.Template(self.force_style.safe_substitute(_))
 
-    def _add_border_style_to_force_style(self):
+    def _add_borderstyle_to_force_style(self):
         _ = {"BorderStyle": self.opts.BorderStyle}
         self.force_style = string.Template(self.force_style.safe_substitute(_))
 
-    def _add_primary_colour_to_force_style(self):
+    def _add_primarycolour_to_force_style(self):
         _ = {"PrimaryColour": core.colors[self.opts.PrimaryColour]}
         self.force_style = string.Template(self.force_style.safe_substitute(_))
 
-    def _add_outline_colour_to_force_style(self):
+    def _add_outlinecolour_to_force_style(self):
         _ = {"OutlineColour": core.colors[self.opts.OutlineColour]}
         self.force_style = string.Template(self.force_style.safe_substitute(_))
 
@@ -110,17 +114,19 @@ class FFmpeg:
         self.cmd += ["-filter:v", _]
 
 
-def execute(cmd, top, files):
+def execute(cmd, files):
     """
     Finish creating the ultimate FFmpeg command and execute it.
 
     :param cmd: FFmpeg command to finish creating.
-    :param top: Top folder that will contain all files.
     :param files: All files to process.
     """
 
+    top = getattr(core, "a_temp")  # Top folder that will contain all files
+
+    print("Getting ready to start...")
     # Mark all files as "not processed" before start processing
-    for file in files:  # C1020
+    for file in files:  # avsub: C1020
         core.not_processed.update({file: core.create_output(top, file=file)})
 
     for i, file in enumerate(files):
@@ -134,22 +140,33 @@ def execute(cmd, top, files):
         else:
             # Store as {input: output} to delete the output on exit
             core.del_on_exit.update({file: output})
-            # Note: Output is no longer marked as "not processed"
-            core.not_processed.pop(file)
+            if file in core.not_processed:
+                # Note: Output is no longer marked as "not processed"
+                core.not_processed.pop(file)
+
+        # Note: Convert "int" to "str" to find the length of the precision
+        print("Running [%*d/%d]: '%s'" % (len(str(len(files))), i + 1,
+                                          len(files), core.basename(file)))
+        if getattr(core, "opts").show_ffmpeg:
+            # If the operation is not AUTOMATIC or HARDSUB MANUAL...
+            if len(files) == 1 and not getattr(core, "opts").embed:
+                print("-" * os.get_terminal_size().columns)
+                print("%s \"%s\" -i \"%s\"" % (" ".join(cmd), output, file))
+                print("-" * os.get_terminal_size().columns)
 
         # Finish creating the ultimate FFmpeg command
         new_cmd = cmd + [output, "-i", file]
-
-        # Note: Convert "int" to "str" to find the length of the precision
-        print("Running [%*d/%d] -> '%s'" % (len(str(len(files))), i + 1,
-                                            len(files), core.basename(file)))
         try:
-            # Note: Disable "Press [q] to stop" feature with DEVNULL
+            # Note: Disable "Press [q] to stop" feature with "DEVNULL"
             subprocess.run(new_cmd, check=True, stdin=subprocess.DEVNULL)
-            core.del_on_exit.pop(file)  # Pop output to not delete on exit
         except subprocess.CalledProcessError:
             # Note: Output will be deleted on exit
             pass
         except FileNotFoundError:
+            # Set attribute for "Over Control"
+            setattr(core, "fatal_ffmpeg", core.basename(file))
             print("FFmpeg could not be executed (fatal)")
             return
+        else:
+            if file in core.del_on_exit:
+                core.del_on_exit.pop(file)  # Pop output to not delete on exit
