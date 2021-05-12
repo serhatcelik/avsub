@@ -88,7 +88,7 @@ def clean(*args):
         signal.signal(sig, signal.SIG_IGN)  # Simply ignore the signal "sig"
 
     if not hasattr(core, "a_temp"):  # avsub: F1020
-        sys.exit(1)
+        sys.exit(core.del_del_on_exits(*[core.del_on_exit_temp]))  # avsub: F1110
 
     print("\n")
     for member in core.del_on_exit:

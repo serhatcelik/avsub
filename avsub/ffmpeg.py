@@ -109,9 +109,11 @@ class FFmpeg:
                 member[-1]()  # Call the method of the FFmpeg class
 
     def build_force_style(self, filename):
-        _ = "subtitles=%s:force_style='%s'" % (filename,
+        self.cmd += [
+            "-filter:v",
+            "subtitles=%s:force_style='%s'" % (filename,
                                                self.force_style.template)
-        self.cmd += ["-filter:v", _]
+        ]
 
 
 def execute(cmd, files):
@@ -148,8 +150,8 @@ def execute(cmd, files):
         print("Running [%*d/%d]: '%s'" % (len(str(len(files))), i + 1,
                                           len(files), core.basename(file)))
         if getattr(core, "opts").show_ffmpeg:
-            # If the operation is not AUTOMATIC or HARDSUB MANUAL...
-            if len(files) == 1 and not getattr(core, "opts").embed:
+            # If the operation is not HARDSUB MANUAL...
+            if not getattr(core, "opts").embed:  # avsub: C1110
                 print("-" * os.get_terminal_size().columns)
                 print("%s \"%s\" -i \"%s\"" % (" ".join(cmd), output, file))
                 print("-" * os.get_terminal_size().columns)

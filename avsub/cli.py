@@ -59,7 +59,7 @@ def create_parser():
     )
     parser.add_argument(
         "-F", "--ffmpeg", dest="show_ffmpeg", action="store_true",
-        help="show the ffmpeg command during processing (except auto/hardsub)"
+        help="show the ffmpeg command during processing (except hardsub)"
     )  # avsub: N1101
     parser.add_argument(
         "-H", "--hidden", action="store_true", help="include hidden input",
