@@ -1,15 +1,27 @@
 # AVsub
+
 A simplified command-line interface for FFmpeg.
 
+---
+
 ## OS Support
+
 - GNU/Linux
 - Microsoft Windows
 
+---
+
 ## Requirements
+
 - Python ~=3.5
 - FFmpeg (the latest version is recommended)
 
+---
+
 ## Preparation and Installation
+
+Note: You may need to configure your PATH after installation.
+
 ```
 $ pip3 install --upgrade pip
 $ pip3 install --upgrade setuptools
@@ -24,7 +36,10 @@ $ cd avsub
 $ python3 -m avsub --help
 ```
 
+---
+
 ## Usage
+
 ```
 $ avsub --help
 ```
@@ -54,7 +69,7 @@ optional arguments:
   --compress VALUE      set VALUE as crf value to compress video
   --copy STREAM [STREAM ...]
                         use copy codec for output STREAM instead of another codec
-  -F, --ffmpeg          show the ffmpeg command during processing (except auto/hardsub)
+  -F, --ffmpeg          show the ffmpeg command during processing (except hardsub)
   -H, --hidden          include hidden input
   -i, --inform          show informative messages during processing
   -L, --license         show license and exit
@@ -78,7 +93,10 @@ This tool is for basic operations only. If you need advanced operations, use FFm
 See https://github.com/serhatcelik/avsub for more information.
 ```
 
+---
+
 ## Examples
+
 ```
 Convert mkv to mp4
 $ avsub input.mkv mp4
@@ -108,8 +126,14 @@ Embed subtitle into video with primary color red and outline color blue
 $ avsub input.mp4 mp4 --embed input.srt --color1 red --color2 blue
 ```
 
+---
+
 ## License
+
 [GNU General Public License v3.0](https://choosealicense.com/licenses/gpl-3.0/)
 
+---
+
 ## Feedback
+
 If you have found a bug or have a suggestion, please consider creating an issue.

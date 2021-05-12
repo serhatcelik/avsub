@@ -2,6 +2,13 @@
 # History of the AVsub #
 ########################
 
+AVsub 1.1.1 [2021.05.12]
+------------------------
+- F1110: Fixed an error that could cause the temporary subtitle file not to be deleted when exiting.
+- C1110: If specified, the FFmpeg command is now also shown for automatic operations as well.
+- Code improvements.
+
+
 AVsub 1.1.0 [2021.05.03]
 ------------------------
 - F1100: Fixed the error "TypeError: startfile() takes no keyword arguments" in Python 3.5.
