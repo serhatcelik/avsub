@@ -20,7 +20,7 @@ A simplified command-line interface for FFmpeg.
 
 ## Preparation and Installation
 
-Note: You may need to configure your PATH after installation.
+Note: You may need to [configure your PATH](https://github.com/serhatcelik/avsub/wiki/Windows-PATH) after installation.
 
 ```
 $ pip3 install --upgrade pip
