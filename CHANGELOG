@@ -2,6 +2,27 @@
 # History of the AVsub #
 ########################
 
+AVsub 1.2.0 [2021.06.19]
+------------------------
+- F1200: Fixed the error "RuntimeError: reentrant call inside" when terminating the program with an exit signal.
+- F1201: Fixed some errors that caused the program to crash when "PermissionError" occurred.
+- F1202: Fixed the error where the '0' value could not be used for the 'compress' option.
+- F1203: Fixed an error that caused some inputs that did not represent the current folder to be treated as the current folder.
+- N1200: Added a command-line option that can trim the input.
+- N1201: Added a command-line option that allows excluding files with certain extension(s).
+- N1202: Added a command-line option that allows selecting files with certain extension(s) only.
+- N1203: Added an option that allows users to skip checking some command-line arguments.
+- C1200: The input file extension is now preserved if the output extension is equal to '-'.
+- C1201: The ability to check for updates for AVsub has been improved.
+- C1202: A constant compression value is now used when no value is specified for the 'compress' option.
+- C1203: The value that can be entered for the 'compress' option is now limited to the range 0-51.
+- Code improvements.
+- Added some extra error handling.
+- Exit messages have been made more meaningful.
+- User interface has been improved.
+- Documentation has been improved.
+
+
 AVsub 1.1.1 [2021.05.12]
 ------------------------
 - F1110: Fixed an error that could cause the temporary subtitle file not to be deleted when exiting.

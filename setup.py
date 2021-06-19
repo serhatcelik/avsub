@@ -56,5 +56,6 @@ setuptools.setup(
     project_urls={
         "Source Code": "https://github.com/serhatcelik/avsub",
         "Bug Tracker": "https://github.com/serhatcelik/avsub/issues",
+        "Documentation": "https://github.com/serhatcelik/avsub/wiki",
     },
 )
