@@ -18,6 +18,8 @@ def setup_py_main():
             if os.getpgrp() != os.tcgetpgrp(sys.stdout.fileno()):
                 sys.exit(1)
         main()
+        if core.RUN:
+            stop()
         clean()
     else:
         sys.exit(1)
@@ -25,18 +27,20 @@ def setup_py_main():
 
 def main():
     for sig in core.all_signals:
-        signal.signal(sig, clean)  # Set the handler for signal "sig"
+        signal.signal(sig, stop)
 
     if len(sys.argv) == 1:  # avsub: N1102
         print("No arguments specified, checking for updates...")
-        sys.exit(new.check_for_updates())
+        sys.exit(new.check_for_updates(retry=3, timeout=5))
 
     parser = cli.create_parser()
     opts = parser.parse_args()
     setattr(core, "opts", opts)  # Set attribute for "Over Control"
 
-    for condition, error in cli.check_opts(opts).values():
-        if condition:
+    for condition, error, priority in cli.check_opts(opts):
+        if opts.bypass and (priority == "warning"):
+            continue
+        if any([condition] if not isinstance(condition, list) else condition):
             sys.exit(error)
 
     fff = ffmpeg.FFmpeg(opts)
@@ -49,10 +53,11 @@ def main():
         os.makedirs(the_temp, exist_ok=True)
         # Create "a" new TEMP folder
         a_temp = tempfile.mkdtemp(prefix="avsub-", dir=the_temp)
-    except (FileExistsError, FileNotFoundError, PermissionError):
+    except (FileExistsError, FileNotFoundError,
+            NotADirectoryError, PermissionError):
         sys.exit("The required TEMP folder(s) could not be created (fatal)")
 
-    # MANUAL OPERATION
+    # MANUAL OPERATION?
     if core.path_exists(opts.input, check_isfile=True):
         # HARDSUB MANUAL OPERATION?
         if opts.embed:
@@ -72,24 +77,32 @@ def main():
             fff.build_force_style(filename=tempsub_escaped)
 
         files = [core.abspath(opts.input)]
-    # AUTOMATIC OPERATION
+    # AUTOMATIC OPERATION?
     else:
         print("Getting files...")
-        files = core.get_files(opts.input)  # Get all files to process
+        files = core.get_files(opts.input,
+                               ext_exclude=opts.exclude, ext_only=opts.oext)
         if not files:
             sys.exit("Exiting, no files to process with current arguments")
 
-    setattr(core, "a_temp", a_temp)  # Set attribute for "Over Control"
+    setattr(core, "a_temp", a_temp)
     ffmpeg.execute(fff.cmd, files=files)  # Start the operation
 
 
-def clean(*args):
+def stop(*args):  # avsub: F1200
     for sig in core.all_signals:
         signal.signal(sig, signal.SIG_IGN)  # Simply ignore the signal "sig"
+
+    core.RUN = False
+
+    if args and args[0]:
+        setattr(core, "signal_number", args[0])
 
     if not hasattr(core, "a_temp"):  # avsub: F1020
         sys.exit(core.del_del_on_exits(*[core.del_on_exit_temp]))  # avsub: F1110
 
+
+def clean():
     print("\n")
     for member in core.del_on_exit:
         print("Not completed: '%s'" % core.basename(member))
@@ -105,15 +118,18 @@ def clean(*args):
 
     if core.path_exists(getattr(core, "a_temp"), check_isdir=True):
         # If TEMP folder is not empty...
-        if os.listdir(getattr(core, "a_temp", False)):
+        if core.get_files(getattr(core, "a_temp"), check_full=True):
             print("Output folder: '%s'" % getattr(core, "a_temp"))
             if core.windows:  # avsub: C1023
-                # Open TEMP folder
                 os.startfile(getattr(core, "a_temp"), "open")  # avsub: F1100
 
-    if args and args[0]:
-        sys.exit("Exiting, received signal %d\a" % args[0])
-    sys.exit("Done, exiting\a")
+    if getattr(core, "signal_number", False):
+        print("Exiting, received signal %d" % getattr(core, "signal_number"))
+    else:
+        print("Done, exiting")
+    sys.exit("~~~~~~~~~~~~~~~~~~~~~~~\n"
+             "Thanks for using AVsub!\n"
+             "~~~~~~~~~~~~~~~~~~~~~~~\a")
 
 
 if __name__ == "__main__":

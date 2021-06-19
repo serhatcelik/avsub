@@ -12,10 +12,13 @@ import signal
 ################
 # Over Control #
 ################
+RUN = True  # Value that determines whether the program will continue to run
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # opts <- avsub.__main__.main
 # a_temp <- avsub.__main__.main
 # fatal_ffmpeg <- avsub.ffmpeg.execute
-
+# signal_number <- avsub.__main__.stop
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 del_on_exit = dict()  # Container for storing items to be deleted on exit
 del_on_exit_temp = dict()
 not_processed = dict()  # Container for storing unprocessed items
@@ -23,13 +26,13 @@ not_processed = dict()  # Container for storing unprocessed items
 ############
 # Platform #
 ############
-linux = os.name == "posix"  # GNU/Linux
-windows = not linux  # Microsoft Windows (not include WSL)
+linux = os.name == "posix"
+windows = not linux  # Note: Does not include WSL (Windows Subsystem for Linux)
 
 #######################
 # Regular Expressions #
 #######################
-RE_HIDDEN_LINUX = r"^\..*"  # Starts with a dot
+RE_HIDDEN_LINUX = r"^\."  # Starts with a dot
 RE_EXTENSION = r"^([a-zA-Z0-9]+)$"  # Only letters and numbers
 
 ###########
@@ -37,7 +40,7 @@ RE_EXTENSION = r"^([a-zA-Z0-9]+)$"  # Only letters and numbers
 ###########
 sigquit = signal.SIGQUIT if linux else None  # Quit from keyboard
 sigtstp = signal.SIGTSTP if linux else None  # Stop typed at terminal
-sigbreak = signal.SIGBREAK if not linux else None
+sigbreak = signal.SIGBREAK if windows else None
 all_signals = [_ for _ in [signal.SIGINT, sigquit, sigtstp, sigbreak] if _]
 
 ###########
@@ -72,6 +75,10 @@ def join(top, under):
     return os.path.join(abspath(top), basename(under))
 
 
+def endswithext(text, ext):
+    return text.endswith(".%s" % ext.strip("."))
+
+
 def path_exists(path, check_isfile=False, check_isdir=False):
     """
     Check if the given path exists.
@@ -89,7 +96,7 @@ def path_exists(path, check_isfile=False, check_isdir=False):
 
 
 def is_ext(ext):
-    return bool(re.search(RE_EXTENSION, ext))
+    return bool(re.search(RE_EXTENSION, ext)) or ext == "-"
 
 
 def is_hidden(path):
@@ -99,19 +106,29 @@ def is_hidden(path):
 
     try:
         stat_result = os.stat(abspath(path))
-    except FileNotFoundError:
+    except (FileNotFoundError, PermissionError):  # avsub: F1201
         return False
     # Note: Root folders such as "C:\" and "D:\" are considered hidden
     return bool(stat_result.st_file_attributes & stat.FILE_ATTRIBUTE_HIDDEN)
 
 
-def get_files(top):
-    files = [join(top, under=_) for _ in os.listdir(abspath(top))]
+def get_files(top, check_full=False, ext_exclude=(), ext_only=()):
+    try:
+        files = [join(top, under=_) for _ in os.listdir(abspath(top))]
+    except (FileNotFoundError, NotADirectoryError, PermissionError) as err:  # avsub: F1201
+        if not check_full:
+            print(err)
+        return []
+    else:
+        if check_full:
+            return bool(files)
 
     for file in files.copy():
         if True in [
             path_exists(file, check_isdir=True),
             not globals()["opts"].hidden and is_hidden(file),
+            any(endswithext(file, _) for _ in ext_exclude),
+            ext_only and (not any(endswithext(file, _) for _ in ext_only)),
         ]:
             files.remove(file)
 
@@ -126,9 +143,21 @@ def create_output(top, file):
     :param file: Original input.
     """
 
+    ext_basename = basename(file)
     no_ext_basename = os.path.splitext(basename(file))[0]
 
+    if globals()["opts"].ext == "-":
+        return join(top, under=ext_basename)  # avsub: C1200
     return join(top, under=".".join([no_ext_basename, globals()["opts"].ext]))
+
+
+def mark_as_not_processed(files):
+    top = globals()["a_temp"]  # Top folder that will contain all files
+
+    for file in files:  # avsub: C1020
+        if not RUN:
+            return
+        not_processed.update({file: create_output(top, file=file)})
 
 
 def del_del_on_exits(*args):

@@ -8,9 +8,13 @@
 
 import sys
 
-if True in [
-    sys.version_info.major != 3,
-    sys.version_info.major == 3 and sys.version_info.minor < 5,
-]:
-    sys.exit("Requires Python ~=3.5, not %d.%d" % (sys.version_info.major,
-                                                   sys.version_info.minor))
+MAJOR_REQ = 3
+MINOR_MIN = 5
+MINOR_MAX = 9
+
+major = sys.version_info[0]
+minor = sys.version_info[1]
+
+if not (major == MAJOR_REQ and (minor in range(MINOR_MIN, MINOR_MAX + 1))):
+    sys.exit("Requires Python ~=%d.%d, not %d.%d" % (MAJOR_REQ, MINOR_MIN,
+                                                     major, minor))

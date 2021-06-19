@@ -2,20 +2,39 @@
 # Released under the GNU General Public License v3.0
 # Copyright (C) Serhat Çelik
 
+import time
 import urllib.error
 import urllib.request
 from avsub import __license__
 
+VERSION = __license__.VERSION
 
-def check_for_updates():
+
+def check_for_updates(retry, timeout):
+    """
+    Check if there is a new version for AVsub.
+
+    :param retry: Maximum number of retries.
+    :param timeout: Timeout to wait before each retry.
+    """
+
     url_avsub_tag = "https://github.com/serhatcelik/avsub/releases/tag/"
     url_avsub_latest = "https://github.com/serhatcelik/avsub/releases/latest"
 
     try:
-        with urllib.request.urlopen(url_avsub_latest, timeout=10) as response:
-            if response.url != url_avsub_tag + __license__.VERSION:
+        with urllib.request.urlopen(url_avsub_latest, timeout=5) as response:
+            if response.url != url_avsub_tag + VERSION:
                 latest_version = response.url.strip(url_avsub_tag)
                 return "New AVsub version is available (%s)" % latest_version
-            return "You have the latest version of AVsub"
-    except (ValueError, urllib.error.URLError):
-        return "Could not check for updates"
+            return "You have the latest version of AVsub (%s)" % VERSION
+    except (ValueError, urllib.error.URLError) as err:
+        if retry == 0:
+            return "Could not check for updates"
+
+        print("%s\nRetrying in %d seconds..." % (err, timeout))  # avsub: C1201
+
+        start = time.monotonic()
+        while time.monotonic() - start < timeout:
+            pass
+
+        return check_for_updates(retry=retry - 1, timeout=timeout)
