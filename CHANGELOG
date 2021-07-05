@@ -2,6 +2,14 @@
 # History of the AVsub #
 ########################
 
+AVsub 1.2.1 [2021.07.05]
+------------------------
+- F1210: Fixed an error when terminating the program with SIGTSTP on GNU/Linux (it reset to the original behavior).
+- Code improvements.
+- Performance improvements.
+- User interface has been improved.
+
+
 AVsub 1.2.0 [2021.06.19]
 ------------------------
 - F1200: Fixed the error "RuntimeError: reentrant call inside" when terminating the program with an exit signal.
