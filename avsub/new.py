@@ -5,9 +5,8 @@
 import time
 import urllib.error
 import urllib.request
-from avsub import __license__
 
-VERSION = __license__.VERSION
+from avsub.__license__ import VERSION
 
 
 def check_for_updates(retry, timeout):
@@ -24,14 +23,15 @@ def check_for_updates(retry, timeout):
     try:
         with urllib.request.urlopen(url_avsub_latest, timeout=5) as response:
             if response.url != url_avsub_tag + VERSION:
-                latest_version = response.url.strip(url_avsub_tag)
-                return "New AVsub version is available (%s)" % latest_version
-            return "You have the latest version of AVsub (%s)" % VERSION
+                version_new = response.url.strip(url_avsub_tag)
+                return "[+] New AVsub version is available (%s)" % version_new
+            return "[*] You have the latest version of AVsub (%s)" % VERSION
     except (ValueError, urllib.error.URLError) as err:
         if retry == 0:
-            return "Could not check for updates"
+            return "[!] Could not check for updates, try again later"
 
-        print("%s\nRetrying in %d seconds..." % (err, timeout))  # avsub: C1201
+        print("[!] %s" % err)
+        print("[*] Retrying in %d seconds..." % timeout)  # avsub: C1201
 
         start = time.monotonic()
         while time.monotonic() - start < timeout:

@@ -2,10 +2,11 @@
 # Released under the GNU General Public License v3.0
 # Copyright (C) Serhat Çelik
 
+import inspect
 import os
 import string
-import inspect
 import subprocess
+
 from avsub import core
 
 
@@ -18,8 +19,8 @@ class FFmpeg:
                                   "PrimaryColour=$PrimaryColour,"
                                   "OutlineColour=$OutlineColour,")
 
-    def __init__(self, opts):
-        self.opts = opts
+    def __init__(self, parsed_args):
+        self.opts = parsed_args
 
     def _add_loglevel_to_cmd___(self):
         self.cmd += ["-loglevel", self.opts.loglevel]
@@ -132,9 +133,6 @@ def execute(cmd, files):
     :param files: All files to process.
     """
 
-    print("Getting ready to start...")
-    core.mark_as_not_processed(files)
-
     for i, file in enumerate(files):
         # Note: Output base name is the same as input base name
         output = core.not_processed[file]
@@ -151,8 +149,8 @@ def execute(cmd, files):
                 core.not_processed.pop(file)
 
         # Note: Convert "int" to "str" to find the length of the precision
-        print("Running [%*d/%d]: '%s'" % (len(str(len(files))), i + 1,
-                                          len(files), core.basename(file)))
+        print("[*] Running [%*d/%d]: '%s'" % (len(str(len(files))), i + 1,
+                                              len(files), core.basename(file)))
         if getattr(core, "opts").show_ffmpeg:
             # If the operation is not HARDSUB MANUAL...
             if not getattr(core, "opts").embed:  # avsub: C1110
@@ -174,7 +172,7 @@ def execute(cmd, files):
             pass
         except FileNotFoundError:
             setattr(core, "fatal_ffmpeg", core.basename(file))
-            print("FFmpeg could not be executed (fatal)")
+            print("[!] FFmpeg could not be executed (fatal)")
             return
         else:
             if file in core.del_on_exit:

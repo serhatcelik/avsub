@@ -3,6 +3,7 @@
 # Copyright (C) Serhat Çelik
 
 import argparse
+
 from avsub import __license__, core
 
 

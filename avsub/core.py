@@ -6,8 +6,10 @@
 
 import os
 import re
-import stat
 import signal
+import stat
+
+from typing import Union
 
 ################
 # Over Control #
@@ -39,7 +41,7 @@ RE_EXTENSION = r"^([a-zA-Z0-9]+)$"  # Only letters and numbers
 # Signals #
 ###########
 sigquit = signal.SIGQUIT if linux else None  # Quit from keyboard
-sigtstp = signal.SIGTSTP if linux else None  # Stop typed at terminal
+sigtstp = None  # avsub: F1210
 sigbreak = signal.SIGBREAK if windows else None
 all_signals = [_ for _ in [signal.SIGINT, sigquit, sigtstp, sigbreak] if _]
 
@@ -63,23 +65,23 @@ colors = {
 #########
 # Tools #
 #########
-def abspath(path):
+def abspath(path: str) -> str:
     return os.path.abspath(path)  # "path" will be normalized and absolutized
 
 
-def basename(path):
+def basename(path: str) -> str:
     return os.path.basename(abspath(path))
 
 
-def join(top, under):
+def join(top: str, under: str) -> str:
     return os.path.join(abspath(top), basename(under))
 
 
-def endswithext(text, ext):
+def endswithext(text: str, ext: str) -> bool:
     return text.endswith(".%s" % ext.strip("."))
 
 
-def path_exists(path, check_isfile=False, check_isdir=False):
+def path_exists(path: str, check_isfile: bool = False, check_isdir: bool = False) -> bool:  # pylint: disable=C0301
     """
     Check if the given path exists.
 
@@ -95,11 +97,11 @@ def path_exists(path, check_isfile=False, check_isdir=False):
     return os.path.exists(abspath(path))
 
 
-def is_ext(ext):
+def is_ext(ext: str) -> bool:
     return bool(re.search(RE_EXTENSION, ext)) or ext == "-"
 
 
-def is_hidden(path):
+def is_hidden(path: str) -> bool:
     if linux:
         # Note: Because of "abspath" in "basename", "." and ".." are not hidden
         return bool(re.search(RE_HIDDEN_LINUX, basename(path)))  # avsub: C1100
@@ -112,7 +114,7 @@ def is_hidden(path):
     return bool(stat_result.st_file_attributes & stat.FILE_ATTRIBUTE_HIDDEN)
 
 
-def get_files(top, check_full=False, ext_exclude=(), ext_only=()):
+def get_files(top: str, check_full: bool = False, ext_exclude: list = None, ext_only: list = None) -> Union[bool, list]:  # pylint: disable=C0301
     try:
         files = [join(top, under=_) for _ in os.listdir(abspath(top))]
     except (FileNotFoundError, NotADirectoryError, PermissionError) as err:  # avsub: F1201
@@ -135,7 +137,7 @@ def get_files(top, check_full=False, ext_exclude=(), ext_only=()):
     return files
 
 
-def create_output(top, file):
+def create_output(top: str, file: str) -> str:
     """
     Create an output from input for the ultimate FFmpeg command.
 
@@ -151,16 +153,14 @@ def create_output(top, file):
     return join(top, under=".".join([no_ext_basename, globals()["opts"].ext]))
 
 
-def mark_as_not_processed(files):
-    top = globals()["a_temp"]  # Top folder that will contain all files
-
+def mark_as_not_processed(top: str, files: list) -> None:
     for file in files:  # avsub: C1020
         if not RUN:
             return
         not_processed.update({file: create_output(top, file=file)})
 
 
-def del_del_on_exits(*args):
+def del_del_on_exits(*args: dict) -> None:
     for dictionary in args:
         for key in dictionary:
             try:

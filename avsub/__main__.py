@@ -5,10 +5,11 @@
 """AVsub - A simplified command-line interface for FFmpeg."""
 
 import os
-import sys
 import shutil
 import signal
+import sys
 import tempfile
+
 from avsub import cli, core, ffmpeg, new
 
 
@@ -30,7 +31,7 @@ def main():
         signal.signal(sig, stop)
 
     if len(sys.argv) == 1:  # avsub: N1102
-        print("No arguments specified, checking for updates...")
+        print("[*] No arguments specified, checking for updates...")
         sys.exit(new.check_for_updates(retry=3, timeout=5))
 
     parser = cli.create_parser()
@@ -41,9 +42,9 @@ def main():
         if opts.bypass and (priority == "warning"):
             continue
         if any([condition] if not isinstance(condition, list) else condition):
-            sys.exit(error)
+            sys.exit("[!] %s" % error)
 
-    fff = ffmpeg.FFmpeg(opts)
+    fff = ffmpeg.FFmpeg(parsed_args=opts)
     fff.build()  # Start creating the ultimate FFmpeg command
 
     # "The" TEMP folder for storing all other TEMP folders
@@ -55,7 +56,7 @@ def main():
         a_temp = tempfile.mkdtemp(prefix="avsub-", dir=the_temp)
     except (FileExistsError, FileNotFoundError,
             NotADirectoryError, PermissionError):
-        sys.exit("The required TEMP folder(s) could not be created (fatal)")
+        sys.exit("[!] Required TEMP folder(s) could not be created (fatal)")
 
     # MANUAL OPERATION?
     if core.path_exists(opts.input, check_isfile=True):
@@ -70,7 +71,7 @@ def main():
                 # Copy the subtitle to TEMP folder as TEMP subtitle
                 shutil.copyfile(core.abspath(opts.embed), tempsub)
             except (FileNotFoundError, PermissionError):
-                sys.exit("The required TEMP file could not be created (fatal)")
+                sys.exit("[!] Required TEMP file couldn't be created (fatal)")
 
             # Add a new level of escaping for TEMP subtitle path
             tempsub_escaped = tempsub.replace("\\", "/").replace(":", "\\\\:")
@@ -79,11 +80,14 @@ def main():
         files = [core.abspath(opts.input)]
     # AUTOMATIC OPERATION?
     else:
-        print("Getting files...")
-        files = core.get_files(opts.input,
+        print("[*] Getting files...")
+        files = core.get_files(top=opts.input,
                                ext_exclude=opts.exclude, ext_only=opts.oext)
         if not files:
-            sys.exit("Exiting, no files to process with current arguments")
+            sys.exit("[-] Exiting, no files to process with current arguments")
+
+    print("[*] Getting ready to start...")
+    core.mark_as_not_processed(top=a_temp, files=files)
 
     setattr(core, "a_temp", a_temp)
     ffmpeg.execute(fff.cmd, files=files)  # Start the operation
@@ -105,29 +109,28 @@ def stop(*args):  # avsub: F1200
 def clean():
     print("\n")
     for member in core.del_on_exit:
-        print("Not completed: '%s'" % core.basename(member))
+        print("[-] Not completed: '%s'" % core.basename(member))
     for member in core.not_processed:
-        print("Not processed: '%s'" % core.basename(member))
+        print("[ ] Not processed: '%s'" % core.basename(member))
     if getattr(core, "fatal_ffmpeg", False):
-        print("Fatal, FFmpeg: '%s'" % getattr(core, "fatal_ffmpeg"))  # avsub: C1101
+        print("[!] Fatal, FFmpeg: '%s'" % getattr(core, "fatal_ffmpeg"))  # avsub: C1101
     print()
 
+    if getattr(core, "signal_number", False):
+        print("[*] Received a signal: %d" % getattr(core, "signal_number"))
     if core.del_on_exit or core.del_on_exit_temp:
-        print("Cleaning in progress, please do not interrupt...")
+        print("[*] Cleaning in progress, please do not interrupt...")
         core.del_del_on_exits(*[core.del_on_exit, core.del_on_exit_temp])
 
     if core.path_exists(getattr(core, "a_temp"), check_isdir=True):
         # If TEMP folder is not empty...
-        if core.get_files(getattr(core, "a_temp"), check_full=True):
-            print("Output folder: '%s'" % getattr(core, "a_temp"))
+        if core.get_files(top=getattr(core, "a_temp"), check_full=True):
+            print("[+] Output folder: '%s'" % getattr(core, "a_temp"))
             if core.windows:  # avsub: C1023
                 os.startfile(getattr(core, "a_temp"), "open")  # avsub: F1100
 
-    if getattr(core, "signal_number", False):
-        print("Exiting, received signal %d" % getattr(core, "signal_number"))
-    else:
-        print("Done, exiting")
-    sys.exit("~~~~~~~~~~~~~~~~~~~~~~~\n"
+    sys.exit("[*] Done, exiting\n"
+             "~~~~~~~~~~~~~~~~~~~~~~~\n"
              "Thanks for using AVsub!\n"
              "~~~~~~~~~~~~~~~~~~~~~~~\a")
 
