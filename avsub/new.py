@@ -2,6 +2,10 @@
 # Released under the GNU General Public License v3.0
 # Copyright (C) Serhat Çelik
 
+"""
+This module is used to check for updates.
+"""
+
 import time
 import urllib.error
 import urllib.request

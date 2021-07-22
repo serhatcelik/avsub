@@ -2,6 +2,10 @@
 # Released under the GNU General Public License v3.0
 # Copyright (C) Serhat Çelik
 
+"""
+This module contains functions for command-line parsing.
+"""
+
 import argparse
 
 from avsub import __license__, core
@@ -36,14 +40,6 @@ def create_parser():
         "+a", metavar="CODEC",
         dest="acodec", help="set CODEC as output audio codec",
     )
-    parser.add_argument(
-        "+s", metavar="CODEC",
-        dest="scodec", help="set CODEC as output subtitle codec",
-    )
-    parser.add_argument(
-        "+v", metavar="CODEC",
-        dest="vcodec", help="set CODEC as output video codec",
-    )
     mutual_group_0.add_argument(
         "-A", "--audio", dest="oaudio", action="store_const", default=[],
         const=["-vn", "-sn", "-dn"], help="choose audio stream(s) only",
@@ -54,7 +50,7 @@ def create_parser():
     )  # avsub: N1203
     parser.add_argument(
         "--channel", metavar="CHANNEL", dest="ac",
-        choices=core.acs, help="set CHANNEL as output audio channel",
+        choices=core.ACS, help="set CHANNEL as output audio channel",
     )  # avsub: N1100
     parser.add_argument(
         "--compress", metavar="VALUE", dest="crf",
@@ -72,20 +68,28 @@ def create_parser():
     )  # avsub: N1201
     parser.add_argument(
         "-F", "--ffmpeg", dest="show_ffmpeg", action="store_true",
-        help="show the ffmpeg command during processing (except hardsub)"
+        help="show the ffmpeg command during processing",
     )  # avsub: N1101
+    parser.add_argument(
+        "-f", metavar="ARGS", dest="custom_ffmpeg", default="",
+        help="provide ARGS as a custom ffmpeg argument list (be careful!!)",
+    )  # avsub: N1300
     parser.add_argument(
         "-H", "--hidden",
         dest="hidden", action="store_true", help="include hidden input",
     )
     parser.add_argument(
-        "-i", "--inform", dest="loglevel", action="store_const", const="info",
-        default="warning", help="show informative messages during processing",
-    )
+        "-i", "--inform", dest="loglevel", action="count", default=0,
+        help="show informative messages during processing (can be increased)",
+    )  # avsub: C1301,C1302
     parser.add_argument(
         "-L", "--license", dest="license", action="version",
         version=__license__.__doc__, help="show license and exit",
     )
+    parser.add_argument(
+        "--no-map-all", dest="no_map_all", action="store_true",
+        help="disable choosing all streams (may cause data loss)",
+    )  # avsub: N1301
     mutual_group_1.add_argument(
         "--only", metavar="EXTENSION", dest="oext", nargs="+",
         default=[], help="process input only if its extension is EXTENSION",
@@ -94,6 +98,10 @@ def create_parser():
         "--remove", metavar="STREAM", dest="remove", nargs="+",
         default=[], choices=["audio", "video", "sub", "metadata", "chapters"],
         help="do not copy STREAM from input to output",
+    )
+    parser.add_argument(
+        "+s", metavar="CODEC",
+        dest="scodec", help="set CODEC as output subtitle codec",
     )
     parser.add_argument(
         "--speed", metavar="PRESET",
@@ -108,6 +116,10 @@ def create_parser():
         "--trim", metavar=("FROM", "TO"), dest="trim", nargs=2, type=int,
         help="extract a portion of input from second FROM to TO",
     )  # avsub: N1200
+    parser.add_argument(
+        "+v", metavar="CODEC",
+        dest="vcodec", help="set CODEC as output video codec",
+    )
     parser.add_argument(
         "-v", "--version", dest="version", action="version",
         version=__license__.VERSION, help="show program version and exit",
@@ -127,12 +139,12 @@ def create_parser():
     )
     group.add_argument(
         "--color1", metavar="COLOR",
-        dest="PrimaryColour", default="white", choices=core.colors,
+        dest="PrimaryColour", default="white", choices=core.COLORS,
         help="set COLOR as subtitle primary color [default: %(default)s]",
     )
     group.add_argument(
         "--color2", metavar="COLOR",
-        dest="OutlineColour", default="black", choices=core.colors,
+        dest="OutlineColour", default="black", choices=core.COLORS,
         help="set COLOR as subtitle outline color [default: %(default)s]",
     )
     group.add_argument(
@@ -145,7 +157,7 @@ def create_parser():
     )
     group.add_argument(
         "--position", metavar="POSITION",
-        dest="Alignment", default="bottom", choices=core.alignments,
+        dest="Alignment", default="bottom", choices=core.ALIGNMENTS,
         help="set POSITION as subtitle alignment [default: %(default)s]",
     )
     group.add_argument(
@@ -157,6 +169,13 @@ def create_parser():
 
 
 def check_opts(opts):
+    """
+    Check for parsed command-line arguments.
+
+    :param opts: Parsed command-line arguments.
+    :type opts: argparse.Namespace
+    """
+
     return [
         [
             False not in [all(_ not in opts.input for _ in ["/", "\\"]),
@@ -240,6 +259,11 @@ def check_opts(opts):
             [opts.embed and ("video" in opts.copy or opts.vcodec == "copy"),
              opts.embed and "all" in opts.copy],
             "embed ~ '%s': Not allowed with [ copy video/all ]" % opts.embed,
+            "warning",
+        ],
+        [
+            opts.trim and (opts.trim[0] < 0),
+            "trim: Error, FROM value (1st) cannot be negative",
             "warning",
         ],
         [

@@ -2,8 +2,11 @@
 # Released under the GNU General Public License v3.0
 # Copyright (C) Serhat Çelik
 
-"""Global variables and functions for handling external modules."""
+"""
+Global variables and functions for handling external modules.
+"""
 
+import collections
 import os
 import re
 import signal
@@ -15,21 +18,21 @@ from typing import Union
 # Over Control #
 ################
 RUN = True  # Value that determines whether the program will continue to run
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# opts <- avsub.__main__.main
-# a_temp <- avsub.__main__.main
-# fatal_ffmpeg <- avsub.ffmpeg.execute
-# signal_number <- avsub.__main__.stop
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-del_on_exit = dict()  # Container for storing items to be deleted on exit
-del_on_exit_temp = dict()
-not_processed = dict()  # Container for storing unprocessed items
+FULL_CLEAN_AFTER_STOP = False
+OPTS = None  # Parsed command-line arguments
+A_TEMP = None
+CMD_TO_SHOW = None
+FATAL_FFMPEG = None
+SIGNAL_NUMBER = None  # Captured signal number
+DEL_ON_EXIT = dict()  # Container for storing items to be deleted on exit
+DEL_ON_EXIT_TEMP = dict()
+NOT_PROCESSED = dict()  # Container for storing unprocessed items
 
-############
-# Platform #
-############
-linux = os.name == "posix"
-windows = not linux  # Note: Does not include WSL (Windows Subsystem for Linux)
+#############
+# Platforms #
+#############
+LINUX = os.name == "posix"
+WINDOWS = not LINUX  # Note: Does not include WSL (Windows Subsystem for Linux)
 
 #######################
 # Regular Expressions #
@@ -40,26 +43,28 @@ RE_EXTENSION = r"^([a-zA-Z0-9]+)$"  # Only letters and numbers
 ###########
 # Signals #
 ###########
-sigquit = signal.SIGQUIT if linux else None  # Quit from keyboard
-sigtstp = None  # avsub: F1210
-sigbreak = signal.SIGBREAK if windows else None
-all_signals = [_ for _ in [signal.SIGINT, sigquit, sigtstp, sigbreak] if _]
+SIGINT = signal.SIGINT  # Interrupt from keyboard
+SIGQUIT = signal.SIGQUIT if LINUX else None  # Quit from keyboard
+SIGBREAK = signal.SIGBREAK if WINDOWS else None
+ALL_SIGNALS = [_ for _ in [SIGINT, SIGQUIT, SIGBREAK] if _]
 
 ###########
 # Choices #
 ###########
-acs = {"mono": "1", "stereo": "2"}  # Channels for audio channel manipulation
-alignments = {
+ACS = {"mono": "1", "stereo": "2"}  # Channels for audio channel manipulation
+ALIGNMENTS = {
     "bleft": "1", "bottom": "2", "bright": "3",
     "tleft": "5", "top": "6", "tright": "7",
     "mleft": "9", "middle": "10", "mright": "11",
 }  # Subtitle positions on screen
-colors = {
+COLORS = {
     "black": "&H000000&", "blue": "&HFF0000&", "brown": "&H2A2AA5&",
     "gray": "&H808080&", "green": "&H008000&", "orange": "&H00A5FF&",
     "pink": "&HCBC0FF&", "purple": "&H800080&", "red": "&H0000FF&",
     "white": "&HFFFFFF&", "yellow": "&H00FFFF&",
 }  # HTML color codes in BBGGRR format
+LOGLEVELS = collections.defaultdict(lambda: "verbose")  # Log verbosity levels
+LOGLEVELS.update({0: "error", 1: "warning", 2: "info", 3: "verbose"})
 
 
 #########
@@ -81,7 +86,9 @@ def endswithext(text: str, ext: str) -> bool:
     return text.endswith(".%s" % ext.strip("."))
 
 
-def path_exists(path: str, check_isfile: bool = False, check_isdir: bool = False) -> bool:  # pylint: disable=C0301
+def path_exists(path: str,
+                check_isfile: bool = False,
+                check_isdir: bool = False) -> bool:
     """
     Check if the given path exists.
 
@@ -98,11 +105,23 @@ def path_exists(path: str, check_isfile: bool = False, check_isdir: bool = False
 
 
 def is_ext(ext: str) -> bool:
+    """
+    Check if the given extension is valid.
+
+    :param ext: Extension to check.
+    """
+
     return bool(re.search(RE_EXTENSION, ext)) or ext == "-"
 
 
 def is_hidden(path: str) -> bool:
-    if linux:
+    """
+    Check if the given path is hidden.
+
+    :param path: Path to check.
+    """
+
+    if LINUX:
         # Note: Because of "abspath" in "basename", "." and ".." are not hidden
         return bool(re.search(RE_HIDDEN_LINUX, basename(path)))  # avsub: C1100
 
@@ -114,7 +133,10 @@ def is_hidden(path: str) -> bool:
     return bool(stat_result.st_file_attributes & stat.FILE_ATTRIBUTE_HIDDEN)
 
 
-def get_files(top: str, check_full: bool = False, ext_exclude: list = None, ext_only: list = None) -> Union[bool, list]:  # pylint: disable=C0301
+def get_files(top: str,
+              check_full: bool = False,
+              ext_exclude: list = None,
+              ext_only: list = None) -> Union[bool, list]:
     try:
         files = [join(top, under=_) for _ in os.listdir(abspath(top))]
     except (FileNotFoundError, NotADirectoryError, PermissionError) as err:  # avsub: F1201
@@ -128,7 +150,7 @@ def get_files(top: str, check_full: bool = False, ext_exclude: list = None, ext_
     for file in files.copy():
         if True in [
             path_exists(file, check_isdir=True),
-            not globals()["opts"].hidden and is_hidden(file),
+            not globals()["OPTS"].hidden and is_hidden(file),
             any(endswithext(file, _) for _ in ext_exclude),
             ext_only and (not any(endswithext(file, _) for _ in ext_only)),
         ]:
@@ -148,22 +170,32 @@ def create_output(top: str, file: str) -> str:
     ext_basename = basename(file)
     no_ext_basename = os.path.splitext(basename(file))[0]
 
-    if globals()["opts"].ext == "-":
+    if globals()["OPTS"].ext == "-":
         return join(top, under=ext_basename)  # avsub: C1200
-    return join(top, under=".".join([no_ext_basename, globals()["opts"].ext]))
+    return join(top, under=".".join([no_ext_basename, globals()["OPTS"].ext]))
 
 
 def mark_as_not_processed(top: str, files: list) -> None:
     for file in files:  # avsub: C1020
         if not RUN:
             return
-        not_processed.update({file: create_output(top, file=file)})
+        NOT_PROCESSED.update({file: create_output(top, file=file)})
 
 
-def del_del_on_exits(*args: dict) -> None:
+def cleaner(*args: dict) -> None:
+    """
+    Delete files that to be deleted on exit.
+
+    :param args: Containers that store items to be deleted on exit.
+    """
+
     for dictionary in args:
         for key in dictionary:
             try:
                 os.remove(dictionary[key])  # Delete the file
             except (FileNotFoundError, PermissionError):
                 pass
+            except OSError as err:
+                # 22: Invalid argument
+                if err.errno == 22:
+                    pass
