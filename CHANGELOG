@@ -2,6 +2,19 @@
 # History of the AVsub #
 ########################
 
+AVsub 1.3.0 [2021.07.22]
+------------------------
+- N1300: Added a command-line option that allows users to provide a custom FFmpeg argument list.
+- N1301: Added a command-line option that can disable choosing all streams.
+- C1300: If specified, the FFmpeg command is now also shown for hardsub manual operations as well.
+- C1301: The default value for the log verbosity level has been changed from "warning" to "error".
+- C1302: Log verbosity level can be increased even more.
+- Code improvements.
+- Added some extra error handling.
+- Contradictory option check has been improved.
+- PEP 8 compliance.
+
+
 AVsub 1.2.1 [2021.07.05]
 ------------------------
 - F1210: Fixed an error when terminating the program with SIGTSTP on GNU/Linux (it reset to the original behavior).
