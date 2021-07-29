@@ -29,15 +29,7 @@ $ avsub --help
 ```
 
 ```
-usage: avsub [-h] [+a CODEC] [-A] [-B] [--channel CHANNEL]
-             [--compress [VALUE]] [--copy STREAM [STREAM ...]]
-             [--exclude EXTENSION [EXTENSION ...]] [-F] [-f ARGS] [-H] [-i]
-             [-L] [--no-map-all] [--only EXTENSION [EXTENSION ...]]
-             [--remove STREAM [STREAM ...]] [+s CODEC] [--speed PRESET] [-S]
-             [--trim FROM TO] [+v CODEC] [-v] [-V] [-b] [--color1 COLOR]
-             [--color2 COLOR] [--embed SUBTITLE] [--font NAME]
-             [--position POSITION] [--size VALUE]
-             input extension
+usage: avsub [input extension [extra_arguments]]
 
 AVsub - A simplified command-line interface for FFmpeg
 Written by Serhat Çelik (with the help of my family and a friend)
@@ -50,21 +42,13 @@ optional arguments:
   -h, --help            show this help message and exit
   +a CODEC              set CODEC as output audio codec
   -A, --audio           choose audio stream(s) only
-  -B, --bypass          skip checking some command-line arguments (not recommended)
   --channel CHANNEL     set CHANNEL as output audio channel
-  --compress [VALUE]    set VALUE as crf value to compress video [constant: 30]
-  --copy STREAM [STREAM ...]
+  -C [VALUE], --compress [VALUE]
+                        set VALUE as crf value to compress video [constant: 30]
+  -c STREAM [STREAM ...], --copy STREAM [STREAM ...]
                         use copy codec for output STREAM instead of another codec
-  --exclude EXTENSION [EXTENSION ...]
-                        do not process input if its extension is EXTENSION
-  -F, --ffmpeg          show the ffmpeg command during processing
   -f ARGS               provide ARGS as a custom ffmpeg argument list (be careful!!)
-  -H, --hidden          include hidden input
-  -i, --inform          show informative messages during processing (can be increased)
-  -L, --license         show license and exit
   --no-map-all          disable choosing all streams (may cause data loss)
-  --only EXTENSION [EXTENSION ...]
-                        process input only if its extension is EXTENSION
   --remove STREAM [STREAM ...]
                         do not copy STREAM from input to output
   +s CODEC              set CODEC as output subtitle codec
@@ -72,17 +56,30 @@ optional arguments:
   -S, --subtitle        choose subtitle stream(s) only
   --trim FROM TO        extract a portion of input from second FROM to TO
   +v CODEC              set CODEC as output video codec
-  -v, --version         show program version and exit
   -V, --video           choose video stream(s) only
 
 hardsub arguments:
   -b, --box             add an opaque box around subtitle
   --color1 COLOR        set COLOR as subtitle primary color [default: white]
   --color2 COLOR        set COLOR as subtitle outline color [default: black]
-  --embed SUBTITLE      embed SUBTITLE into video
+  -e SUBTITLE, --embed SUBTITLE
+                        embed SUBTITLE into video
   --font NAME           set NAME as subtitle font name
   --position POSITION   set POSITION as subtitle alignment [default: bottom]
   --size VALUE          set VALUE as subtitle font size [default: 20]
+
+independent arguments:
+  -B, --bypass          skip checking some command-line arguments (not recommended)
+  --exclude EXTENSION [EXTENSION ...]
+                        do not process input if its extension is EXTENSION
+  -F, --ffmpeg          show the ffmpeg command during processing
+  -H, --hidden          include hidden input
+  -i, --inform          show informative messages during processing (can be increased)
+  -L, --license         show license and exit
+  --no-open-dir         do not open the output folder at the end (active for gnu/linux)
+  --only EXTENSION [EXTENSION ...]
+                        process input only if its extension is EXTENSION
+  -v, --version         show program version and exit
 
 This tool is for basic operations only. If you need advanced operations, use FFmpeg instead.
 See https://github.com/serhatcelik/avsub for more information.

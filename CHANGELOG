@@ -2,6 +2,16 @@
 # History of the AVsub #
 ########################
 
+AVsub 1.4.0 [2021.07.29]
+------------------------
+- N1400: Added a command-line option that allows users to disable opening the output folder at the end.
+- Code improvements.
+- Performance improvements.
+- Exit statuses have been changed; 0: All is well, 2: Error, 3: Fatal.
+- User interface has been improved.
+- Documentation has been improved.
+
+
 AVsub 1.3.0 [2021.07.22]
 ------------------------
 - N1300: Added a command-line option that allows users to provide a custom FFmpeg argument list.
