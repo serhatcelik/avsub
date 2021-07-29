@@ -123,6 +123,10 @@ class FFmpeg:
         self.force_style = string.Template(self.force_style.safe_substitute(_))
 
     def build(self):
+        """
+        Update the ultimate FFmpeg command.
+        """
+
         for member in inspect.getmembers(self, predicate=inspect.ismethod):
             if member[0].endswith("___"):
                 member[-1]()  # Call the method of the FFmpeg class
@@ -131,6 +135,12 @@ class FFmpeg:
         core.CMD_TO_SHOW = self.__str__()
 
     def build_force_style(self, subpath):
+        """
+        Update the ultimate FFmpeg command for the hardsub operation.
+
+        :param subpath: Subtitle pathname.
+        """
+
         force_style = self.force_style.template
         filter_v = "subtitles=%s:force_style='%s'" % (subpath, force_style)
 
@@ -162,8 +172,10 @@ def execute(cmd, files):
                 core.NOT_PROCESSED.pop(file)
 
         # Note: Convert "int" to "str" to find the length of the precision
-        print("[*] Running [%*d/%d]: '%s'" % (len(str(len(files))), i + 1,
-                                              len(files), core.basename(file)))
+        print("[*] Running [%*d/%d]: '%s' -> %s" % (len(str(len(files))),
+                                                    i + 1, len(files),
+                                                    core.basename(file),
+                                                    core.get_ext(file)))
         if core.OPTS.show_ffmpeg:  # avsub: C1300
             columns = os.get_terminal_size().columns
             print("-" * columns)

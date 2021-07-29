@@ -12,8 +12,12 @@ from avsub import __license__, core
 
 
 def create_parser():
+    """
+    Create a parser to parse command-line arguments.
+    """
+
     parser = argparse.ArgumentParser(
-        prog="avsub",
+        prog="avsub", usage="%(prog)s [input extension [extra_arguments]]",
         description="AVsub - A simplified command-line interface for FFmpeg\n"
                     "Written by Serhat Çelik "
                     "(with the help of my family and a friend)",
@@ -35,7 +39,6 @@ def create_parser():
     # Optional Arguments #
     ######################
     mutual_group_0 = parser.add_mutually_exclusive_group()
-    mutual_group_1 = parser.add_mutually_exclusive_group()
     parser.add_argument(
         "+a", metavar="CODEC",
         dest="acodec", help="set CODEC as output audio codec",
@@ -45,55 +48,27 @@ def create_parser():
         const=["-vn", "-sn", "-dn"], help="choose audio stream(s) only",
     )
     parser.add_argument(
-        "-B", "--bypass", dest="bypass", action="store_true",
-        help="skip checking some command-line arguments (not recommended)",
-    )  # avsub: N1203
-    parser.add_argument(
         "--channel", metavar="CHANNEL", dest="ac",
         choices=core.ACS, help="set CHANNEL as output audio channel",
     )  # avsub: N1100
     parser.add_argument(
-        "--compress", metavar="VALUE", dest="crf",
+        "-C", "--compress", metavar="VALUE", dest="crf",
         nargs="?", const=30, type=int, choices=range(0, 51 + 1),
         help="set VALUE as crf value to compress video [constant: %(const)s]",
     )  # avsub: C1202,C1203
     parser.add_argument(
-        "--copy", metavar="STREAM", dest="copy",
+        "-c", "--copy", metavar="STREAM", dest="copy",
         nargs="+", default=[], choices=["audio", "video", "sub", "all"],
         help="use copy codec for output STREAM instead of another codec",
     )
-    mutual_group_1.add_argument(
-        "--exclude", metavar="EXTENSION", dest="exclude", nargs="+",
-        default=[], help="do not process input if its extension is EXTENSION",
-    )  # avsub: N1201
-    parser.add_argument(
-        "-F", "--ffmpeg", dest="show_ffmpeg", action="store_true",
-        help="show the ffmpeg command during processing",
-    )  # avsub: N1101
     parser.add_argument(
         "-f", metavar="ARGS", dest="custom_ffmpeg", default="",
         help="provide ARGS as a custom ffmpeg argument list (be careful!!)",
     )  # avsub: N1300
     parser.add_argument(
-        "-H", "--hidden",
-        dest="hidden", action="store_true", help="include hidden input",
-    )
-    parser.add_argument(
-        "-i", "--inform", dest="loglevel", action="count", default=0,
-        help="show informative messages during processing (can be increased)",
-    )  # avsub: C1301,C1302
-    parser.add_argument(
-        "-L", "--license", dest="license", action="version",
-        version=__license__.__doc__, help="show license and exit",
-    )
-    parser.add_argument(
         "--no-map-all", dest="no_map_all", action="store_true",
         help="disable choosing all streams (may cause data loss)",
     )  # avsub: N1301
-    mutual_group_1.add_argument(
-        "--only", metavar="EXTENSION", dest="oext", nargs="+",
-        default=[], help="process input only if its extension is EXTENSION",
-    )  # avsub: N1202
     parser.add_argument(
         "--remove", metavar="STREAM", dest="remove", nargs="+",
         default=[], choices=["audio", "video", "sub", "metadata", "chapters"],
@@ -120,10 +95,6 @@ def create_parser():
         "+v", metavar="CODEC",
         dest="vcodec", help="set CODEC as output video codec",
     )
-    parser.add_argument(
-        "-v", "--version", dest="version", action="version",
-        version=__license__.VERSION, help="show program version and exit",
-    )
     mutual_group_0.add_argument(
         "-V", "--video", dest="ovideo", action="store_const", default=[],
         const=["-an", "-sn", "-dn"], help="choose video stream(s) only",
@@ -148,7 +119,7 @@ def create_parser():
         help="set COLOR as subtitle outline color [default: %(default)s]",
     )
     group.add_argument(
-        "--embed", metavar="SUBTITLE",
+        "-e", "--embed", metavar="SUBTITLE",
         dest="embed", help="embed SUBTITLE into video",
     )
     group.add_argument(
@@ -165,6 +136,48 @@ def create_parser():
         help="set VALUE as subtitle font size [default: %(default)s]",
     )  # avsub: C1021
 
+    #########################
+    # Independent Arguments #
+    #########################
+    group_independent = parser.add_argument_group("independent arguments")
+    mutual_group_1 = group_independent.add_mutually_exclusive_group()
+    group_independent.add_argument(
+        "-B", "--bypass", dest="bypass", action="store_true",
+        help="skip checking some command-line arguments (not recommended)",
+    )  # avsub: N1203
+    mutual_group_1.add_argument(
+        "--exclude", metavar="EXTENSION", dest="exclude", nargs="+",
+        default=[], help="do not process input if its extension is EXTENSION",
+    )  # avsub: N1201
+    group_independent.add_argument(
+        "-F", "--ffmpeg", dest="show_ffmpeg", action="store_true",
+        help="show the ffmpeg command during processing",
+    )  # avsub: N1101
+    group_independent.add_argument(
+        "-H", "--hidden",
+        dest="hidden", action="store_true", help="include hidden input",
+    )
+    group_independent.add_argument(
+        "-i", "--inform", dest="loglevel", action="count", default=0,
+        help="show informative messages during processing (can be increased)",
+    )  # avsub: C1301,C1302
+    group_independent.add_argument(
+        "-L", "--license", dest="license", action="version",
+        version=__license__.__doc__, help="show license and exit",
+    )
+    group_independent.add_argument(
+        "--no-open-dir", dest="no_open_dir", action="store_true",
+        help="do not open the output folder at the end (active for gnu/linux)",
+    )  # avsub: N1400
+    mutual_group_1.add_argument(
+        "--only", metavar="EXTENSION", dest="oext", nargs="+",
+        default=[], help="process input only if its extension is EXTENSION",
+    )  # avsub: N1202
+    group_independent.add_argument(
+        "-v", "--version", dest="version", action="version",
+        version=__license__.VERSION, help="show program version and exit",
+    )
+
     return parser
 
 
@@ -173,7 +186,6 @@ def check_opts(opts):
     Check for parsed command-line arguments.
 
     :param opts: Parsed command-line arguments.
-    :type opts: argparse.Namespace
     """
 
     return [

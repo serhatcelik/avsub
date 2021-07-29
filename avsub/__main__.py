@@ -19,13 +19,13 @@ def setup_py_main():
     if sys.stdin.isatty() and sys.stdout.isatty() and sys.stderr.isatty():
         if core.LINUX:
             if os.getpgrp() != os.tcgetpgrp(sys.stdout.fileno()):
-                sys.exit(1)
+                sys.exit(2)
         main()
         if core.RUN:
             stop()
         clean()
     else:
-        sys.exit(1)
+        sys.exit(2)
 
 
 def main():
@@ -34,7 +34,8 @@ def main():
 
     if len(sys.argv) == 1:  # avsub: N1102
         print("[*] No arguments specified, checking for updates...")
-        sys.exit(new.check_for_updates(retry=3, timeout=5))
+        status = new.check_for_updates(retry=3, timeout=5)
+        sys.exit(status)
 
     parser = cli.create_parser()
     opts = parser.parse_args()
@@ -44,7 +45,8 @@ def main():
         if opts.bypass and (priority == "warning"):
             continue
         if any([condition] if not isinstance(condition, list) else condition):
-            sys.exit("[!] %s" % error)
+            print("[!] %s" % error)
+            sys.exit(2)
 
     fff = ffmpeg.FFmpeg(parsed_args=opts)
     fff.build()  # Start creating the ultimate FFmpeg command
@@ -59,7 +61,8 @@ def main():
         core.A_TEMP = a_temp
     except (FileExistsError, FileNotFoundError, NotADirectoryError,
             PermissionError):
-        sys.exit("[!] Required TEMP folder(s) could not be created (fatal)")
+        print("[!] Required TEMP folder(s) could not be created (fatal)")
+        sys.exit(3)
 
     # MANUAL OPERATION?
     if core.path_exists(opts.input, check_isfile=True):
@@ -74,7 +77,8 @@ def main():
                 # Copy the subtitle to TEMP folder as TEMP subtitle
                 shutil.copyfile(core.abspath(opts.embed), tempsub)
             except (FileNotFoundError, PermissionError):
-                sys.exit("[!] Required TEMP file could not be created (fatal)")
+                print("[!] Required TEMP file could not be created (fatal)")
+                sys.exit(3)
 
             # Add a new level of escaping for TEMP subtitle path
             tempsub_escaped = tempsub.replace("\\", "/").replace(":", "\\\\:")
@@ -84,10 +88,10 @@ def main():
     # AUTOMATIC OPERATION?
     else:
         print("[*] Getting files...")
-        files = core.get_files(top=opts.input,
-                               ext_exclude=opts.exclude, ext_only=opts.oext)
+        files = core.get_files(top=opts.input)
         if not files:
-            sys.exit("[-] Exiting, no files to process with current arguments")
+            print("[-] Exiting, no files to process with current arguments")
+            sys.exit(2)
 
     print("[*] Getting ready to start...")
     core.mark_as_not_processed(top=a_temp, files=files)
@@ -112,7 +116,8 @@ def stop(*args):  # avsub: F1200
         core.SIGNAL_NUMBER = args[0]
 
     if not core.FULL_CLEAN_AFTER_STOP:
-        sys.exit(core.cleaner(*[core.DEL_ON_EXIT_TEMP]))  # avsub: F1110
+        core.cleaner(core.DEL_ON_EXIT_TEMP)  # avsub: F1110
+        sys.exit(2)
 
 
 def clean():
@@ -120,12 +125,17 @@ def clean():
     Show the log, do the cleaning and exit the program.
     """
 
+    status = 0  # Current exit status (0: All is well, 2: Error, 3: Fatal)
+
     print("\n")
     for member in core.DEL_ON_EXIT:
+        status = 2
         print("[-] Not completed: '%s'" % core.basename(member))
     for member in core.NOT_PROCESSED:
+        status = 2
         print("[ ] Not processed: '%s'" % core.basename(member))
     if core.FATAL_FFMPEG is not None:
+        status = 3
         print("[!] Fatal, FFmpeg: '%s'" % core.FATAL_FFMPEG)  # avsub: C1101
     print()
 
@@ -133,20 +143,21 @@ def clean():
         print("[*] Received a signal: %d" % core.SIGNAL_NUMBER)
     if core.DEL_ON_EXIT or core.DEL_ON_EXIT_TEMP:
         print("[*] Cleaning in progress, please do not interrupt...")
-        core.cleaner(*[core.DEL_ON_EXIT, core.DEL_ON_EXIT_TEMP])
+        core.cleaner(core.DEL_ON_EXIT, core.DEL_ON_EXIT_TEMP)
 
     if core.A_TEMP is not None:
         if core.path_exists(core.A_TEMP, check_isdir=True):
             # If TEMP folder is not empty...
             if core.get_files(top=core.A_TEMP, check_full=True):
                 print("[+] Output folder: '%s'" % core.A_TEMP)
-                if core.WINDOWS:  # avsub: C1023
+                if core.WINDOWS and (not core.OPTS.no_open_dir):
                     os.startfile(core.A_TEMP, "open")  # avsub: F1100
 
-    sys.exit("[*] Done, exiting\n"
-             "~~~~~~~~~~~~~~~~~~~~~~~\n"
-             "Thanks for using AVsub!\n"
-             "~~~~~~~~~~~~~~~~~~~~~~~\a")
+    print("[*] Done, exiting\n"
+          "~~~~~~~~~~~~~~~~~~~~~~~\n"
+          "Thanks for using AVsub!\n"
+          "~~~~~~~~~~~~~~~~~~~~~~~\a")
+    sys.exit(status)
 
 
 if __name__ == "__main__":

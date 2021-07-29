@@ -28,11 +28,14 @@ def check_for_updates(retry, timeout):
         with urllib.request.urlopen(url_avsub_latest, timeout=5) as response:
             if response.url != url_avsub_tag + VERSION:
                 version_new = response.url.strip(url_avsub_tag)
-                return "[+] New AVsub version is available (%s)" % version_new
-            return "[*] You have the latest version of AVsub (%s)" % VERSION
+                print("[+] New AVsub version is available (%s)" % version_new)
+                return 0
+            print("[*] You have the latest version of AVsub (%s)" % VERSION)
+            return 0
     except (ValueError, urllib.error.URLError) as err:
         if retry == 0:
-            return "[!] Could not check for updates, try again later"
+            print("[!] Could not check for updates, try again later")
+            return 2
 
         print("[!] %s" % err)
         print("[*] Retrying in %d seconds..." % timeout)  # avsub: C1201

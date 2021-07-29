@@ -16,4 +16,4 @@ You should have received a copy of the GNU General Public License
 along with AVsub.  If not, see <https://www.gnu.org/licenses/>.
 """
 
-VERSION = "1.3.0"
+VERSION = "1.4.0"

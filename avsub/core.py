@@ -19,11 +19,13 @@ from typing import Union
 ################
 RUN = True  # Value that determines whether the program will continue to run
 FULL_CLEAN_AFTER_STOP = False
+
 OPTS = None  # Parsed command-line arguments
 A_TEMP = None
 CMD_TO_SHOW = None
 FATAL_FFMPEG = None
 SIGNAL_NUMBER = None  # Captured signal number
+
 DEL_ON_EXIT = dict()  # Container for storing items to be deleted on exit
 DEL_ON_EXIT_TEMP = dict()
 NOT_PROCESSED = dict()  # Container for storing unprocessed items
@@ -104,6 +106,12 @@ def path_exists(path: str,
     return os.path.exists(abspath(path))
 
 
+def get_ext(name: str) -> str:
+    if globals()["OPTS"].ext != "-":
+        return globals()["OPTS"].ext
+    return os.path.splitext(basename(name))[-1].strip(".")
+
+
 def is_ext(ext: str) -> bool:
     """
     Check if the given extension is valid.
@@ -133,10 +141,7 @@ def is_hidden(path: str) -> bool:
     return bool(stat_result.st_file_attributes & stat.FILE_ATTRIBUTE_HIDDEN)
 
 
-def get_files(top: str,
-              check_full: bool = False,
-              ext_exclude: list = None,
-              ext_only: list = None) -> Union[bool, list]:
+def get_files(top: str, check_full: bool = False) -> Union[bool, list]:
     try:
         files = [join(top, under=_) for _ in os.listdir(abspath(top))]
     except (FileNotFoundError, NotADirectoryError, PermissionError) as err:  # avsub: F1201
@@ -146,6 +151,9 @@ def get_files(top: str,
     else:
         if check_full:
             return bool(files)
+
+    ext_exclude = set(globals()["OPTS"].exclude)
+    ext_only = set(globals()["OPTS"].oext)
 
     for file in files.copy():
         if True in [
@@ -168,7 +176,7 @@ def create_output(top: str, file: str) -> str:
     """
 
     ext_basename = basename(file)
-    no_ext_basename = os.path.splitext(basename(file))[0]
+    no_ext_basename = os.path.splitext(ext_basename)[0]
 
     if globals()["OPTS"].ext == "-":
         return join(top, under=ext_basename)  # avsub: C1200
@@ -190,9 +198,9 @@ def cleaner(*args: dict) -> None:
     """
 
     for dictionary in args:
-        for key in dictionary:
+        for file in dictionary.values():
             try:
-                os.remove(dictionary[key])  # Delete the file
+                os.remove(file)  # Delete the file
             except (FileNotFoundError, PermissionError):
                 pass
             except OSError as err:
