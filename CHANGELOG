@@ -2,6 +2,28 @@
 # History of the AVsub #
 ########################
 
+AVsub 2.0.0 [2021.08.12]
+------------------------
+- P2000: Removed Python version 3.5 support.
+- F2000: Fixed an error that caused action to be taken for files that would not be processed.
+- F2001: Fixed the error that caused unprocessed items to appear as "not completed" after telling the program to stop.
+- F2002: Fixed the error of continuing to print output after telling the program to stop.
+- N2000: If the input file is hidden, the output file is now also marked as hidden.
+- N2001: A new 'veryslow' value is now available for the 'speed' option.
+- C2000: A constant encoding speed value is now used when no value is specified for the 'speed' option.
+- C2001: Users can now decide in more detail when not to open the output folder.
+- C2002: A constant value is now used when no value is specified for the 'no-open-dir' option.
+- C2003: Removed default values for the following options: 'box', 'color1', 'color2', 'font', 'position', 'size'.
+- C2004: The '-' and '_' characters and some non-English letters are now valid for the input file extension.
+- C2005: Temporary folder now also opens in GNU/Linux operating system (again).
+- C2006: Now all error messages are shown when contradictory option check fails.
+- Code improvements.
+- Performance improvements.
+- Exit messages have been made more meaningful.
+- User interface has been improved.
+- Documentation has been improved.
+
+
 AVsub 1.4.0 [2021.07.29]
 ------------------------
 - N1400: Added a command-line option that allows users to disable opening the output folder at the end.
