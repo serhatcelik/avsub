@@ -9,9 +9,9 @@ Note: On GNU/Linux, change the command "python" to "python3".
 ### PyPI
 
 ```shell
-python -m install -U pip
-python -m install -U setuptools
-python -m install -U avsub
+python -m pip install -U pip
+python -m pip install -U setuptools
+python -m pip install -U avsub
 ```
 
 Note: You may need to [configure your Windows PATH][3] after installation.
