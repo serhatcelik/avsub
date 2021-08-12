@@ -10,15 +10,24 @@ AVsub - A simplified command-line interface for FFmpeg.
 
 import sys
 
-MAJOR_REQ = 3
-MINOR_MIN = 5
-MINOR_MAX = 9
+_MAJOR = 3
+_MINOR_MIN = 6  # avsub: P2000
+_MINOR_MAX = 9
 
-major = sys.version_info[0]
-minor = sys.version_info[1]
+###############
+# Requirement #
+###############
+_MAJOR_REQ = _MAJOR
+_MINOR_REQ = range(_MINOR_MIN, _MINOR_MAX + 1)
+_PYTHON_REQ = "%d.%d-%d" % (_MAJOR, _MINOR_MIN, _MINOR_MAX)
 
-if not (major == MAJOR_REQ and (minor in range(MINOR_MIN, MINOR_MAX + 1))):
-    print("[!] Requires Python %d.%d-%d, got %d.%d" % (MAJOR_REQ,
-                                                       MINOR_MIN, MINOR_MAX,
-                                                       major, minor))
+###########
+# Current #
+###########
+_MAJOR_NOW = sys.version_info[0]
+_MINOR_NOW = sys.version_info[1]
+_PYTHON_NOW = "%d.%d" % (_MAJOR_NOW, _MINOR_NOW)
+
+if _MAJOR_NOW != _MAJOR_REQ or _MINOR_NOW not in _MINOR_REQ:
+    print("[!] Expected Python %s, got Python %s" % (_PYTHON_REQ, _PYTHON_NOW))
     sys.exit(2)

@@ -8,19 +8,19 @@ This module contains functions for command-line parsing.
 
 import argparse
 
-from avsub import __license__, core
+from avsub import __license__
+from avsub.__license__ import AUTHOR
+from avsub.__license__ import VERSION
+from avsub.core import consts
+from avsub.str import Str
 
 
 def create_parser():
-    """
-    Create a parser to parse command-line arguments.
-    """
-
     parser = argparse.ArgumentParser(
         prog="avsub", usage="%(prog)s [input extension [extra_arguments]]",
-        description="AVsub - A simplified command-line interface for FFmpeg\n"
-                    "Written by Serhat Çelik "
-                    "(with the help of my family and a friend)",
+        description=f"AVsub - A simplified command-line interface for FFmpeg\n"
+                    f"Written by {AUTHOR} "
+                    f"(with the help of my family and a friend)",
         epilog="This tool is for basic operations only. "
                "If you need advanced operations, use FFmpeg instead.\n"
                "See https://github.com/serhatcelik/avsub "
@@ -28,72 +28,92 @@ def create_parser():
         formatter_class=argparse.RawTextHelpFormatter, prefix_chars="+-",
     )
 
+    group_hardsub = parser.add_argument_group("hardsub arguments")
+    group_independent = parser.add_argument_group("independent arguments")
+
+    mutual_group_0 = parser.add_mutually_exclusive_group()
+    mutual_group_1 = group_independent.add_mutually_exclusive_group()
+
     ########################
     # Positional Arguments #
     ########################
-    parser.add_argument("input", help="input file or folder")
-    parser.add_argument("ext", metavar="extension",
-                        help="output extension ('-' for input file extension)")
+    parser.add_argument(
+        "input", metavar="input", action="store", help="input file or folder",
+    )
+    parser.add_argument(
+        "ext", metavar="extension", action="store",
+        help="output extension ('-' for input file extension)",
+    )
 
     ######################
     # Optional Arguments #
     ######################
-    mutual_group_0 = parser.add_mutually_exclusive_group()
     parser.add_argument(
-        "+a", metavar="CODEC",
-        dest="acodec", help="set CODEC as output audio codec",
+        "+a", metavar="CODEC", dest="acodec", action="store", default=None,
+        help="set %(metavar)s as output audio codec",
     )
     mutual_group_0.add_argument(
         "-A", "--audio", dest="oaudio", action="store_const", default=[],
         const=["-vn", "-sn", "-dn"], help="choose audio stream(s) only",
     )
     parser.add_argument(
-        "--channel", metavar="CHANNEL", dest="ac",
-        choices=core.ACS, help="set CHANNEL as output audio channel",
-    )  # avsub: N1100
+        "--channel", metavar="CHANNEL", dest="ac", action="store",
+        default=None, choices=consts.AC,
+        help="set %(metavar)s as output audio channel;\n"
+             "\tChoices: %(choices)s",
+    )
     parser.add_argument(
-        "-C", "--compress", metavar="VALUE", dest="crf",
-        nargs="?", const=30, type=int, choices=range(0, 51 + 1),
-        help="set VALUE as crf value to compress video [constant: %(const)s]",
-    )  # avsub: C1202,C1203
+        "-C", "--compress", metavar="VALUE", dest="crf", action="store",
+        nargs="?", default=None, const=30, type=int, choices=consts.CRF,
+        help="set %%(metavar)s as crf value to compress video;\n"
+             "\tConstant: %%(const)s\n"
+             "\tChoices: %d-%d" % (consts.CRF[0], consts.CRF[-1]),
+    )
     parser.add_argument(
-        "-c", "--copy", metavar="STREAM", dest="copy",
+        "-c", "--copy", metavar="STREAM", dest="copy", action="store",
         nargs="+", default=[], choices=["audio", "video", "sub", "all"],
-        help="use copy codec for output STREAM instead of another codec",
+        help="use copy codec for output %(metavar)s instead of another;\n"
+             "\tChoices: %(choices)s",
     )
     parser.add_argument(
-        "-f", metavar="ARGS", dest="custom_ffmpeg", default="",
-        help="provide ARGS as a custom ffmpeg argument list (be careful!!)",
-    )  # avsub: N1300
+        "-f", metavar="ARGS", dest="custom_ffmpeg", action="store",
+        default=None,
+        help="provide %(metavar)s as an ffmpeg argument list (be careful!)",
+    )
     parser.add_argument(
-        "--no-map-all", dest="no_map_all", action="store_true",
+        "--no-map-all", dest="no_map_all", action="store_true", default=False,
         help="disable choosing all streams (may cause data loss)",
-    )  # avsub: N1301
+    )
     parser.add_argument(
-        "--remove", metavar="STREAM", dest="remove", nargs="+",
+        "--remove", metavar="STREAM", dest="remove", action="store", nargs="+",
         default=[], choices=["audio", "video", "sub", "metadata", "chapters"],
-        help="do not copy STREAM from input to output",
+        help="do not copy %(metavar)s from input to output;\n"
+             "\tChoices: %(choices)s",
     )
     parser.add_argument(
-        "+s", metavar="CODEC",
-        dest="scodec", help="set CODEC as output subtitle codec",
+        "+s", metavar="CODEC", dest="scodec", action="store", default=None,
+        help="set %(metavar)s as output subtitle codec",
     )
     parser.add_argument(
-        "--speed", metavar="PRESET",
-        dest="preset", choices=["faster", "fast", "medium", "slow", "slower"],
-        help="set PRESET as video encoding speed",
-    )
+        "--speed", metavar="PRESET", dest="preset", action="store", nargs="?",
+        default=None, const="fast",
+        choices=["faster", "fast", "medium", "slow", "slower", "veryslow"],
+        help="set %(metavar)s as video encoding speed;\n"
+             "\tConstant: %(const)s\n"
+             "\tChoices: %(choices)s",
+    )  # avsub: N2001,C2000
     mutual_group_0.add_argument(
         "-S", "--subtitle", dest="osubtitle", action="store_const", default=[],
         const=["-an", "-vn", "-dn"], help="choose subtitle stream(s) only",
     )
     parser.add_argument(
-        "--trim", metavar=("FROM", "TO"), dest="trim", nargs=2, type=int,
-        help="extract a portion of input from second FROM to TO",
-    )  # avsub: N1200
+        "--trim", metavar=("FROM", "TO"), dest="trim", action="store", nargs=2,
+        default=None, type=int,
+        help="extract a portion of input from sec FROM to TO",
+    )
     parser.add_argument(
-        "+v", metavar="CODEC",
-        dest="vcodec", help="set CODEC as output video codec",
+        "+v", metavar="CODEC", dest="vcodec", action="store", default=None,
+        help="set %(metavar)s as output video codec",
     )
     mutual_group_0.add_argument(
         "-V", "--video", dest="ovideo", action="store_const", default=[],
@@ -103,190 +123,199 @@ def create_parser():
     #####################
     # Hardsub Arguments #
     #####################
-    group = parser.add_argument_group("hardsub arguments")
-    group.add_argument(
-        "-b", "--box", dest="BorderStyle", action="store_const",
-        default="1", const="3", help="add an opaque box around subtitle",
+    group_hardsub.add_argument(
+        "-b", "--box", dest="BorderStyle", action="store_const", default=None,
+        const="3", help="add an opaque box around subtitle",
+    )  # avsub: C2003
+    group_hardsub.add_argument(
+        "--color1", metavar="COLOR", dest="PrimaryColour", action="store",
+        default=None, choices=consts.PRIMARYCOLOUR,
+        help="set %(metavar)s as subtitle primary color",
+    )  # avsub: C2003
+    group_hardsub.add_argument(
+        "--color2", metavar="COLOR", dest="OutlineColour", action="store",
+        default=None, choices=consts.OUTLINECOLOUR,
+        help="set %(metavar)s as subtitle outline color",
+    )  # avsub: C2003
+    group_hardsub.add_argument(
+        "-e", "--embed", metavar="SUBTITLE", dest="embed", action="store",
+        default=None, help="embed %(metavar)s into video",
     )
-    group.add_argument(
-        "--color1", metavar="COLOR",
-        dest="PrimaryColour", default="white", choices=core.COLORS,
-        help="set COLOR as subtitle primary color [default: %(default)s]",
-    )
-    group.add_argument(
-        "--color2", metavar="COLOR",
-        dest="OutlineColour", default="black", choices=core.COLORS,
-        help="set COLOR as subtitle outline color [default: %(default)s]",
-    )
-    group.add_argument(
-        "-e", "--embed", metavar="SUBTITLE",
-        dest="embed", help="embed SUBTITLE into video",
-    )
-    group.add_argument(
-        "--font", metavar="NAME",
-        dest="FontName", default="", help="set NAME as subtitle font name",
-    )
-    group.add_argument(
-        "--position", metavar="POSITION",
-        dest="Alignment", default="bottom", choices=core.ALIGNMENTS,
-        help="set POSITION as subtitle alignment [default: %(default)s]",
-    )
-    group.add_argument(
-        "--size", metavar="VALUE", dest="FontSize", type=int, default=20,
-        help="set VALUE as subtitle font size [default: %(default)s]",
-    )  # avsub: C1021
+    group_hardsub.add_argument(
+        "--font", metavar="NAME", dest="FontName", action="store",
+        default=None, help="set %(metavar)s as subtitle font name",
+    )  # avsub: C2003
+    group_hardsub.add_argument(
+        "--position", metavar="POSITION", dest="Alignment", action="store",
+        default=None, choices=consts.ALIGNMENT,
+        help="set %(metavar)s as subtitle alignment",
+    )  # avsub: C2003
+    group_hardsub.add_argument(
+        "--size", metavar="VALUE", dest="FontSize", action="store",
+        default=None, type=int, help="set %(metavar)s as subtitle font size",
+    )  # avsub: C2003
 
     #########################
     # Independent Arguments #
     #########################
-    group_independent = parser.add_argument_group("independent arguments")
-    mutual_group_1 = group_independent.add_mutually_exclusive_group()
     group_independent.add_argument(
-        "-B", "--bypass", dest="bypass", action="store_true",
+        "-B", "--bypass", dest="bypass", action="store_true", default=False,
         help="skip checking some command-line arguments (not recommended)",
-    )  # avsub: N1203
+    )
     mutual_group_1.add_argument(
-        "--exclude", metavar="EXTENSION", dest="exclude", nargs="+",
-        default=[], help="do not process input if its extension is EXTENSION",
-    )  # avsub: N1201
+        "--exclude", metavar="EXTENSION", dest="exclude", action="store",
+        nargs="+", default=[],
+        help="do not process input if its extension is %(metavar)s",
+    )
     group_independent.add_argument(
         "-F", "--ffmpeg", dest="show_ffmpeg", action="store_true",
-        help="show the ffmpeg command during processing",
-    )  # avsub: N1101
+        default=False, help="show the ffmpeg command during processing",
+    )
     group_independent.add_argument(
-        "-H", "--hidden",
-        dest="hidden", action="store_true", help="include hidden input",
+        "-H", "--hidden", dest="hidden", action="store_true", default=False,
+        help="include hidden input",
     )
     group_independent.add_argument(
         "-i", "--inform", dest="loglevel", action="count", default=0,
         help="show informative messages during processing (can be increased)",
-    )  # avsub: C1301,C1302
+    )
     group_independent.add_argument(
         "-L", "--license", dest="license", action="version",
         version=__license__.__doc__, help="show license and exit",
     )
     group_independent.add_argument(
-        "--no-open-dir", dest="no_open_dir", action="store_true",
-        help="do not open the output folder at the end (active for gnu/linux)",
-    )  # avsub: N1400
+        "--no-open-dir", metavar="MODE", dest="no_open_dir", action="store",
+        nargs="?", default="empty", const="always",
+        choices=["never", "empty", "always"],
+        help="set %(metavar)s to change the output folder opening behavior;\n"
+             "\tDefault: %(default)s\n"
+             "\tConstant: %(const)s\n"
+             "\tChoices: %(choices)s",
+    )  # avsub: C2001,C2002
     mutual_group_1.add_argument(
-        "--only", metavar="EXTENSION", dest="oext", nargs="+",
-        default=[], help="process input only if its extension is EXTENSION",
-    )  # avsub: N1202
+        "--only", metavar="EXTENSION", dest="oext", action="store", nargs="+",
+        default=[], help="process input only if its extension is %(metavar)s",
+    )
     group_independent.add_argument(
-        "-v", "--version", dest="version", action="version",
-        version=__license__.VERSION, help="show program version and exit",
+        "-v", "--version", dest="version", action="version", version=VERSION,
+        help="show program version and exit",
     )
 
     return parser
 
 
 def check_opts(opts):
-    """
-    Check for parsed command-line arguments.
-
-    :param opts: Parsed command-line arguments.
-    """
-
     return [
         [
-            False not in [all(_ not in opts.input for _ in ["/", "\\"]),
-                          opts.input != ".",
-                          core.abspath(opts.input) == core.abspath(".")],
-            "input ~ '%s': Did you mean '.' (current folder)?" % opts.input,
-            "error",
-        ],  # avsub: F1203
-        [
-            not core.path_exists(opts.input),
-            "input ~ '%s': No such file or folder" % opts.input,
-            "error",
+            all([all(_ not in opts.input for _ in ("/", "\\")),
+                 opts.input != ".",
+                 Str(opts.input).iscwd()]),
+            f"input ~ '{opts.input}': Did you mean '.' (current folder)?",
+            "!",
         ],
         [
-            opts.embed and not core.path_exists(opts.embed, check_isfile=True),
-            "embed ~ '%s': No such file" % opts.embed,
-            "error",
+            not Str(opts.input).exists(),
+            f"input ~ '{opts.input}': No such file or folder",
+            "!",
         ],
         [
-            not core.is_ext(opts.ext),
-            "extension ~ '%s': Not a valid format" % opts.ext,
-            "error",
+            not Str(opts.ext).isext(),
+            f"extension ~ '{opts.ext}': Not a valid format",
+            "!",
         ],
         [
-            opts.embed and core.path_exists(opts.input, check_isdir=True),
-            "embed: input ~ '%s': This is a folder" % opts.input,
-            "error",
+            opts.embed and not Str(opts.embed).isfile(),
+            f"-e/--embed ~ '{opts.embed}': No such file",
+            "!",
         ],
         [
-            not opts.hidden and core.is_hidden(opts.input),
-            "hidden: input ~ '%s': Hidden or root folder" % opts.input,
-            "error",
+            opts.embed and Str(opts.input).isdir(),
+            f"-e/--embed: BANNED: input ~ '{opts.input}': This is a folder",
+            "!",
         ],
         [
-            not opts.hidden and opts.embed and core.is_hidden(opts.embed),
-            "hidden: embed ~ '%s': File is hidden" % opts.embed,
-            "error",
+            not opts.hidden and Str(opts.input).ishidden(),
+            f"-H/--hidden: BANNED: input ~ '{opts.input}': Hidden or root",
+            "!",
         ],
         [
-            [opts.ac and ("audio" in opts.copy or opts.acodec == "copy"),
-             opts.ac and "all" in opts.copy],
-            "channel: Not allowed with [ copy audio/all ]",
-            "warning",
+            not opts.hidden and opts.embed and Str(opts.embed).ishidden(),
+            f"-H/--hidden: BANNED: -e/--embed ~ '{opts.embed}': It is hidden",
+            "!",
         ],
         [
-            "audio" in opts.remove and opts.oaudio,
-            "remove ~ audio: Not allowed with [ only audio ]",
-            "warning",
+            opts.embed and ("video" in opts.copy or "all" in opts.copy),
+            "-e/--embed: BANNED: -c/--copy {video | all}: Forbidden option",
+            "W",
         ],
         [
-            "video" in opts.remove and opts.ovideo,
-            "remove ~ video: Not allowed with [ only video ]",
-            "warning",
+            opts.embed and opts.vcodec == "copy",
+            "-e/--embed: BANNED: +v copy: Forbidden option",
+            "W",
         ],
         [
-            "sub" in opts.remove and opts.osubtitle,
-            "remove ~ sub: Not allowed with [ only subtitle ]",
-            "warning",
+            opts.ac and ("audio" in opts.copy or "all" in opts.copy),
+            "--channel: BANNED: -c/--copy {audio | all}: Meaningless option",
+            "W",
         ],
         [
-            sum(1 for _ in ["audio", "video", "sub"] if _ in opts.remove) == 3,
-            "remove ~ audio: Not allowed with [ remove video sub ]",
-            "warning",
+            opts.ac and opts.acodec == "copy",
+            "--channel: BANNED: +a copy: Meaningless option",
+            "W",
         ],
         [
-            ("audio" in opts.copy or "all" in opts.copy) and opts.acodec,
-            "copy ~ audio/all: Not allowed with [ codec audio ]",
-            "warning",
+            opts.oaudio and "audio" in opts.remove,
+            "-A/--audio: BANNED: --remove audio: Mutually exclusive group",
+            "W",
         ],
         [
-            ("video" in opts.copy or "all" in opts.copy) and opts.vcodec,
-            "copy ~ video/all: Not allowed with [ codec video ]",
-            "warning",
+            opts.ovideo and "video" in opts.remove,
+            "-V/--video: BANNED: --remove video: Mutually exclusive group",
+            "W",
         ],
         [
-            ("sub" in opts.copy or "all" in opts.copy) and opts.scodec,
-            "copy ~ sub/all: Not allowed with [ codec subtitle ]",
-            "warning",
+            opts.osubtitle and "sub" in opts.remove,
+            "-S/--subtitle: BANNED: --remove sub: Mutually exclusive group",
+            "W",
         ],
         [
-            [opts.embed and ("video" in opts.copy or opts.vcodec == "copy"),
-             opts.embed and "all" in opts.copy],
-            "embed ~ '%s': Not allowed with [ copy video/all ]" % opts.embed,
-            "warning",
+            sum(1 for _ in ("audio", "video", "sub") if _ in opts.remove) == 3,
+            "--remove audio video sub: Error, output contains no stream",
+            "W",
         ],
         [
-            opts.trim and (opts.trim[0] < 0),
-            "trim: Error, FROM value (1st) cannot be negative",
-            "warning",
+            opts.acodec and ("audio" in opts.copy or "all" in opts.copy),
+            "+a: BANNED: -c/--copy {audio | all}: Mutually exclusive group",
+            "W",
         ],
         [
-            opts.trim and (opts.trim[-1] <= opts.trim[0]),
-            "trim: Error, TO value (2nd) smaller than or equal to FROM value",
-            "warning",
+            opts.vcodec and ("video" in opts.copy or "all" in opts.copy),
+            "+v: BANNED: -c/--copy {video | all}: Mutually exclusive group",
+            "W",
         ],
         [
-            [opts.trim and ("video" in opts.copy or opts.vcodec == "copy"),
-             opts.trim and "all" in opts.copy],
-            "trim: Not allowed with [ copy video/all ]",
-            "warning",
+            opts.scodec and ("sub" in opts.copy or "all" in opts.copy),
+            "+s: BANNED: -c/--copy {sub | all}: Mutually exclusive group",
+            "W",
+        ],
+        [
+            opts.trim and opts.trim[0] < 0,
+            "--trim: Error, FROM value (1.) cannot be negative",
+            "W",
+        ],
+        [
+            opts.trim and opts.trim[-1] <= opts.trim[0],
+            "--trim: Error, TO value (2.) smaller than or equal to FROM value",
+            "W",
+        ],
+        [
+            opts.trim and ("video" in opts.copy or "all" in opts.copy),
+            "--trim: BANNED: -c/--copy {video | all}: Meaningless option",
+            "W",
+        ],
+        [
+            opts.trim and opts.vcodec == "copy",
+            "--trim: BANNED: +v copy: Meaningless option",
+            "W",
         ],
     ]

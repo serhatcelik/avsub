@@ -8,195 +8,189 @@ This module provides ways to use FFmpeg effectively.
 
 import inspect
 import os
-import string
 import subprocess
 
-from avsub import core
+from avsub.core import consts
+from avsub.core import x
+from avsub.core.tools import mark_as_hidden
+from avsub.str import Str
 
 
 class FFmpeg:
     cmd = ["ffmpeg", "-n", "-hide_banner", "-stats"]
-    force_style = string.Template("FontName=$FontName,"
-                                  "FontSize=$FontSize,"
-                                  "Alignment=$Alignment,"
-                                  "BorderStyle=$BorderStyle,"
-                                  "PrimaryColour=$PrimaryColour,"
-                                  "OutlineColour=$OutlineColour,")
-
-    def __init__(self, parsed_args):
-        self.opts = parsed_args
-
-    def __str__(self):
-        return " ".join(self.cmd)
+    _force_style = []
 
     def _add_map_all_to_cmd___(self):
-        self.cmd += ["-map", "0"] if not self.opts.no_map_all else []
+        self.cmd += ["-map", "0"] if not x.OPTS.no_map_all else []
 
     def _add_loglevel_to_cmd___(self):
-        self.cmd += ["-loglevel", core.LOGLEVELS[self.opts.loglevel]]
+        self.cmd += ["-loglevel", str(consts.LOGLEVEL[x.OPTS.loglevel])]
 
     def _add_preset_to_cmd___(self):
-        self.cmd += ["-preset", self.opts.preset] if self.opts.preset else []
+        self.cmd += ["-preset", x.OPTS.preset] if x.OPTS.preset else []
 
     def _add_crf_to_cmd___(self):
         self.cmd += [
-            "-crf", str(self.opts.crf)
-        ] if isinstance(self.opts.crf, int) else []  # avsub: F1202
+            "-crf", str(x.OPTS.crf)
+        ] if isinstance(x.OPTS.crf, int) else []
 
     def _add_ac_to_cmd___(self):
-        self.cmd += ["-ac", core.ACS[self.opts.ac]] if self.opts.ac else []
+        self.cmd += ["-ac", consts.AC[x.OPTS.ac]] if x.OPTS.ac else []
 
     def _add_remove_audio_to_cmd___(self):
-        self.cmd += ["-an"] if "audio" in self.opts.remove else []
+        self.cmd += [
+            "-an",
+        ] if all(["audio" in x.OPTS.remove, "-an" not in self.cmd]) else []
 
     def _add_remove_video_to_cmd___(self):
-        self.cmd += ["-vn"] if "video" in self.opts.remove else []
+        self.cmd += [
+            "-vn",
+        ] if all(["video" in x.OPTS.remove, "-vn" not in self.cmd]) else []
 
     def _add_remove_subtitle_to_cmd___(self):
-        self.cmd += ["-sn"] if "sub" in self.opts.remove else []
+        self.cmd += [
+            "-sn",
+        ] if all(["sub" in x.OPTS.remove, "-sn" not in self.cmd]) else []
 
     def _add_remove_metadata_to_cmd___(self):
-        self.cmd += "-map_metadata", str(-abs("metadata" in self.opts.remove))
+        self.cmd += "-map_metadata", str(-abs("metadata" in x.OPTS.remove))
 
     def _add_remove_chapters_to_cmd___(self):
-        self.cmd += "-map_chapters", str(-abs("chapters" in self.opts.remove))
+        self.cmd += "-map_chapters", str(-abs("chapters" in x.OPTS.remove))
 
     def _add_only_audio_to_cmd___(self):
-        self.cmd += [_ for _ in self.opts.oaudio if _ not in self.cmd]
+        self.cmd += [_ for _ in x.OPTS.oaudio if _ not in self.cmd]
 
     def _add_only_video_to_cmd___(self):
-        self.cmd += [_ for _ in self.opts.ovideo if _ not in self.cmd]
+        self.cmd += [_ for _ in x.OPTS.ovideo if _ not in self.cmd]
 
     def _add_only_subtitle_to_cmd___(self):
-        self.cmd += [_ for _ in self.opts.osubtitle if _ not in self.cmd]
+        self.cmd += [_ for _ in x.OPTS.osubtitle if _ not in self.cmd]
 
     def _add_copy_audio_to_cmd___(self):
-        self.cmd += ["-acodec", "copy"] if "audio" in self.opts.copy else []
+        self.cmd += ["-acodec", "copy"] if "audio" in x.OPTS.copy else []
 
     def _add_copy_video_to_cmd___(self):
-        self.cmd += ["-vcodec", "copy"] if "video" in self.opts.copy else []
+        self.cmd += ["-vcodec", "copy"] if "video" in x.OPTS.copy else []
 
     def _add_copy_subtitle_to_cmd___(self):
-        self.cmd += ["-scodec", "copy"] if "sub" in self.opts.copy else []
+        self.cmd += ["-scodec", "copy"] if "sub" in x.OPTS.copy else []
 
     def _add_copy_all_to_cmd___(self):
-        self.cmd += ["-codec", "copy"] if "all" in self.opts.copy else []
+        self.cmd += ["-codec", "copy"] if "all" in x.OPTS.copy else []
 
     def _add_codec_audio_to_cmd___(self):
-        self.cmd += ["-acodec", self.opts.acodec] if self.opts.acodec else []
+        self.cmd += ["-acodec", x.OPTS.acodec] if x.OPTS.acodec else []
 
     def _add_codec_video_to_cmd___(self):
-        self.cmd += ["-vcodec", self.opts.vcodec] if self.opts.vcodec else []
+        self.cmd += ["-vcodec", x.OPTS.vcodec] if x.OPTS.vcodec else []
 
     def _add_codec_subtitle_to_cmd___(self):
-        self.cmd += ["-scodec", self.opts.scodec] if self.opts.scodec else []
+        self.cmd += ["-scodec", x.OPTS.scodec] if x.OPTS.scodec else []
 
     def _add_trim_to_cmd___(self):
         self.cmd += [
-            "-ss", str(self.opts.trim[0]),
-            "-to", str(self.opts.trim[-1]),
-        ] if self.opts.trim else []
+            "-ss", str(x.OPTS.trim[0]),
+            "-to", str(x.OPTS.trim[-1]),
+        ] if x.OPTS.trim else []
 
     def _add_fontname_to_force_style___(self):
-        _ = {"FontName": self.opts.FontName}
-        self.force_style = string.Template(self.force_style.safe_substitute(_))
+        self._force_style += [
+            f"FontName={x.OPTS.FontName}",
+        ] if x.OPTS.FontName else []
 
     def _add_fontsize_to_force_style___(self):
-        # Note: "abs" is used to prevent "Assertion failed" error from FFmpeg
-        _ = {"FontSize": abs(self.opts.FontSize)}
-        self.force_style = string.Template(self.force_style.safe_substitute(_))
+        # Note: abs() is used to prevent "Assertion failed" error from FFmpeg
+        self._force_style += [
+            f"FontSize={abs(x.OPTS.FontSize)}",
+        ] if x.OPTS.FontSize else []
 
     def _add_alignment_to_force_style___(self):
-        _ = {"Alignment": core.ALIGNMENTS[self.opts.Alignment]}
-        self.force_style = string.Template(self.force_style.safe_substitute(_))
+        self._force_style += [
+            f"Alignment={consts.ALIGNMENT[x.OPTS.Alignment]}",
+        ] if x.OPTS.Alignment else []
 
     def _add_borderstyle_to_force_style___(self):
-        _ = {"BorderStyle": self.opts.BorderStyle}
-        self.force_style = string.Template(self.force_style.safe_substitute(_))
+        self._force_style += [
+            f"BorderStyle={x.OPTS.BorderStyle}",
+        ] if x.OPTS.BorderStyle else []
 
     def _add_primarycolour_to_force_style___(self):
-        _ = {"PrimaryColour": core.COLORS[self.opts.PrimaryColour]}
-        self.force_style = string.Template(self.force_style.safe_substitute(_))
+        self._force_style += [
+            f"PrimaryColour={consts.PRIMARYCOLOUR[x.OPTS.PrimaryColour]}",
+        ] if x.OPTS.PrimaryColour else []
 
     def _add_outlinecolour_to_force_style___(self):
-        _ = {"OutlineColour": core.COLORS[self.opts.OutlineColour]}
-        self.force_style = string.Template(self.force_style.safe_substitute(_))
+        self._force_style += [
+            f"OutlineColour={consts.OUTLINECOLOUR[x.OPTS.OutlineColour]}",
+        ] if x.OPTS.OutlineColour else []
 
     def build(self):
-        """
-        Update the ultimate FFmpeg command.
-        """
-
         for member in inspect.getmembers(self, predicate=inspect.ismethod):
             if member[0].endswith("___"):
                 member[-1]()  # Call the method of the FFmpeg class
 
-        self.cmd += self.opts.custom_ffmpeg.strip().split()
-        core.CMD_TO_SHOW = self.__str__()
+        if x.OPTS.custom_ffmpeg:
+            self.cmd += x.OPTS.custom_ffmpeg.strip().split()
+        x.CMD_TO_SHOW = " ".join(self.cmd)
 
-    def build_force_style(self, subpath):
-        """
-        Update the ultimate FFmpeg command for the hardsub operation.
+    def build_hardsub(self, subpath):
+        filter_v = f"subtitles={subpath}"
 
-        :param subpath: Subtitle pathname.
-        """
+        if self._force_style:
+            filter_v += ":force_style='%s'" % ",".join(self._force_style)
 
-        force_style = self.force_style.template
-        filter_v = "subtitles=%s:force_style='%s'" % (subpath, force_style)
-
-        core.CMD_TO_SHOW = "%s -filter:v \"%s\"" % (self.__str__(), filter_v)
+        x.CMD_TO_SHOW = "%s -filter:v \"%s\"" % (" ".join(self.cmd), filter_v)
         self.cmd += ["-filter:v", filter_v]
 
 
 def execute(cmd, files):
-    """
-    Finish creating the ultimate FFmpeg command and execute it.
-
-    :param cmd: FFmpeg command to finish creating.
-    :param files: All files to process.
-    """
-
     for i, file in enumerate(files):
         # Note: Output base name is the same as input base name
-        output = core.NOT_PROCESSED[file]
+        output = x.NOT_PROCESSED[file]
 
         # If the output is already in the destination folder...
-        if core.path_exists(output):
+        if Str(output).exists():
             # Note: Also for inputs with the same name but different extensions
-            pass
+            x.RUN_FFMPEG = False
         else:
-            # Store as {input: output} to delete the output on exit
-            core.DEL_ON_EXIT.update({file: output})
-            if file in core.NOT_PROCESSED:
+            x.RUN_FFMPEG = True
+            if x.RUN:  # avsub: F2001
                 # Note: Output is no longer marked as "not processed"
-                core.NOT_PROCESSED.pop(file)
+                x.NOT_PROCESSED.pop(file)
+                x.DEL_ON_EXIT.update({file: output})
 
-        # Note: Convert "int" to "str" to find the length of the precision
-        print("[*] Running [%*d/%d]: '%s' -> %s" % (len(str(len(files))),
-                                                    i + 1, len(files),
-                                                    core.basename(file),
-                                                    core.get_ext(file)))
-        if core.OPTS.show_ffmpeg:  # avsub: C1300
-            columns = os.get_terminal_size().columns
-            print("-" * columns)
-            print("%s \"%s\" -i \"%s\"" % (core.CMD_TO_SHOW, output, file))
-            print("-" * columns)
+        if x.RUN:  # avsub: F2002
+            print("[*] Running [%*d/%d]: '%s' -> %s" % (len(str(len(files))),
+                                                        i + 1, len(files),
+                                                        Str(file).base(),
+                                                        Str(file).ext()))
+            if x.OPTS.show_ffmpeg:
+                line = "~" * os.get_terminal_size().columns
+                print(line)
+                print(f"{x.CMD_TO_SHOW} \"{output}\" -i \"{file}\"")
+                print(line)
 
-        # Finish creating the ultimate FFmpeg command once
         new_cmd = cmd + [output, "-i", file]
+
         try:
             # If an exit signal has already been caught...
-            if not core.RUN:
+            if not x.RUN:
                 return
+            if not x.RUN_FFMPEG:  # avsub: F2000
+                print(f"File '{output}' already exists, passing")
+                continue
             # Note: Disable "Press [q] to stop" feature with "DEVNULL"
             subprocess.run(new_cmd, check=True, stdin=subprocess.DEVNULL)
         except subprocess.CalledProcessError:
             # Note: Output will be deleted on exit
-            pass
+            continue
         except FileNotFoundError:
-            core.FATAL_FFMPEG = core.basename(file)
-            print("[!] FFmpeg could not be executed (fatal)")
+            x.FATAL_FFMPEG = Str(file).base()
+            print("FFmpeg could not be executed (fatal)")
             return
         else:
-            if file in core.DEL_ON_EXIT:
-                core.DEL_ON_EXIT.pop(file)  # Pop output to not delete on exit
+            # Note: Output will not be deleted on exit
+            x.SUCCEEDED.update({file: x.DEL_ON_EXIT.pop(file)})
+            if Str(file).ishidden():
+                mark_as_hidden(output)  # avsub: N2000
