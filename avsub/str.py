@@ -1,3 +1,5 @@
+# coding=utf-8
+
 # This file is part of AVsub
 # Released under the GNU General Public License v3.0
 # Copyright (C) Serhat Çelik
@@ -33,9 +35,10 @@ class Str:
         return os.path.exists(self.abs())
 
     def ext(self) -> str:
-        if x.OPTS.ext == "-":
-            return os.path.splitext(self.base())[-1].strip(".")
-        return x.OPTS.ext
+        return os.path.splitext(self.base())[-1].strip(".")
+
+    def extout(self) -> str:
+        return self.ext() if x.OPTS.ext == "-" else x.OPTS.ext
 
     def iscwd(self) -> bool:
         return self.abs() == Str(".").abs()
@@ -44,7 +47,7 @@ class Str:
         return os.path.isdir(self.abs())
 
     def isext(self) -> bool:
-        return bool(re.search(r"^[-\w]+$", self._s))  # avsub: C2004
+        return bool(re.search(r"^[a-zA-Z0-9_-]+$", self._s))  # avsub: C2011
 
     def isfile(self) -> bool:
         return os.path.isfile(self.abs())
@@ -55,9 +58,12 @@ class Str:
         return False
 
     def ishidden(self) -> bool:
-        if consts.LINUX:
+        if consts.POSIX:
             return self.base().startswith(".")
         return bool(self.attrs() & stat.FILE_ATTRIBUTE_HIDDEN)
 
     def join(self, *args: str) -> str:
         return os.path.join(self.abs(), *[Str(_).base() for _ in args])
+
+    def noext(self) -> str:
+        return os.path.splitext(self._s)[0]

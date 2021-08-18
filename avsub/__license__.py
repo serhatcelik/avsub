@@ -1,3 +1,5 @@
+# coding=utf-8
+
 """
 AVsub - A simplified command-line interface for FFmpeg.
 Copyright (C) 2021  Serhat Çelik
@@ -18,4 +20,4 @@ along with AVsub.  If not, see <https://www.gnu.org/licenses/>.
 
 AUTHOR = "Serhat Çelik"
 LICENSE = "GPLv3"
-VERSION = "2.0.0"
+VERSION = "2.1.0"

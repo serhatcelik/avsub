@@ -1,3 +1,5 @@
+# coding=utf-8
+
 # This file is part of AVsub
 # Released under the GNU General Public License v3.0
 # Copyright (C) Serhat Çelik
@@ -21,7 +23,7 @@ def check_for_updates(retry=3, timeout=5):
         with urllib.request.urlopen(url_avsub_latest, timeout=10) as response:
             if response.url != url_avsub_tag + __license__.VERSION:
                 version_new = response.url.strip(url_avsub_tag)
-                print(f"[+] New AVsub version is available ({version_new})")
+                print("[+] New AVsub version is available (%s)" % version_new)
                 return 0
             print("[*] You have the latest version of AVsub")
             return 0

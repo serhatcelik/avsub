@@ -1,3 +1,5 @@
+# coding=utf-8
+
 # This file is part of AVsub
 # Released under the GNU General Public License v3.0
 # Copyright (C) Serhat Çelik
@@ -9,6 +11,8 @@ This module provides ways to use FFmpeg effectively.
 import inspect
 import os
 import subprocess
+from subprocess import CalledProcessError
+from subprocess import TimeoutExpired
 
 from avsub.core import consts
 from avsub.core import x
@@ -96,33 +100,33 @@ class FFmpeg:
 
     def _add_fontname_to_force_style___(self):
         self._force_style += [
-            f"FontName={x.OPTS.FontName}",
+            "FontName=%s" % x.OPTS.FontName,
         ] if x.OPTS.FontName else []
 
     def _add_fontsize_to_force_style___(self):
         # Note: abs() is used to prevent "Assertion failed" error from FFmpeg
         self._force_style += [
-            f"FontSize={abs(x.OPTS.FontSize)}",
+            "FontSize=%s" % abs(x.OPTS.FontSize),
         ] if x.OPTS.FontSize else []
 
     def _add_alignment_to_force_style___(self):
         self._force_style += [
-            f"Alignment={consts.ALIGNMENT[x.OPTS.Alignment]}",
+            "Alignment=%s" % consts.ALIGNMENT[x.OPTS.Alignment],
         ] if x.OPTS.Alignment else []
 
     def _add_borderstyle_to_force_style___(self):
         self._force_style += [
-            f"BorderStyle={x.OPTS.BorderStyle}",
+            "BorderStyle=%s" % x.OPTS.BorderStyle,
         ] if x.OPTS.BorderStyle else []
 
     def _add_primarycolour_to_force_style___(self):
         self._force_style += [
-            f"PrimaryColour={consts.PRIMARYCOLOUR[x.OPTS.PrimaryColour]}",
+            "PrimaryColour=%s" % consts.PRIMARYCOLOUR[x.OPTS.PrimaryColour],
         ] if x.OPTS.PrimaryColour else []
 
     def _add_outlinecolour_to_force_style___(self):
         self._force_style += [
-            f"OutlineColour={consts.OUTLINECOLOUR[x.OPTS.OutlineColour]}",
+            "OutlineColour=%s" % consts.OUTLINECOLOUR[x.OPTS.OutlineColour],
         ] if x.OPTS.OutlineColour else []
 
     def build(self):
@@ -135,13 +139,24 @@ class FFmpeg:
         x.CMD_TO_SHOW = " ".join(self.cmd)
 
     def build_hardsub(self, subpath):
-        filter_v = f"subtitles={subpath}"
+        filter_v = "subtitles=%s" % subpath
 
         if self._force_style:
             filter_v += ":force_style='%s'" % ",".join(self._force_style)
 
         x.CMD_TO_SHOW = "%s -filter:v \"%s\"" % (" ".join(self.cmd), filter_v)
         self.cmd += ["-filter:v", filter_v]
+
+
+def check():
+    try:
+        subprocess.check_call(["ffmpeg", "-version"],
+                              timeout=4,
+                              stdout=subprocess.DEVNULL,
+                              stderr=subprocess.DEVNULL)
+    except (FileNotFoundError, CalledProcessError, TimeoutExpired):
+        return False
+    return True
 
 
 def execute(cmd, files):
@@ -164,11 +179,11 @@ def execute(cmd, files):
             print("[*] Running [%*d/%d]: '%s' -> %s" % (len(str(len(files))),
                                                         i + 1, len(files),
                                                         Str(file).base(),
-                                                        Str(file).ext()))
+                                                        Str(file).extout()))
             if x.OPTS.show_ffmpeg:
                 line = "~" * os.get_terminal_size().columns
                 print(line)
-                print(f"{x.CMD_TO_SHOW} \"{output}\" -i \"{file}\"")
+                print("%s \"%s\" -i \"%s\"" % (x.CMD_TO_SHOW, output, file))
                 print(line)
 
         new_cmd = cmd + [output, "-i", file]
@@ -178,15 +193,15 @@ def execute(cmd, files):
             if not x.RUN:
                 return
             if not x.RUN_FFMPEG:  # avsub: F2000
-                print(f"File '{output}' already exists, passing")
+                print("File '%s' already exists, passing" % output)
                 continue
             # Note: Disable "Press [q] to stop" feature with "DEVNULL"
             subprocess.run(new_cmd, check=True, stdin=subprocess.DEVNULL)
-        except subprocess.CalledProcessError:
+        except CalledProcessError:
             # Note: Output will be deleted on exit
             continue
         except FileNotFoundError:
-            x.FATAL_FFMPEG = Str(file).base()
+            x.FATAL_FFMPEG = file
             print("FFmpeg could not be executed (fatal)")
             return
         else:

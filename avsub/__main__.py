@@ -1,3 +1,5 @@
+# coding=utf-8
+
 # This file is part of AVsub
 # Released under the GNU General Public License v3.0
 # Copyright (C) Serhat Çelik
@@ -6,12 +8,16 @@
 AVsub - A simplified command-line interface for FFmpeg.
 """
 
+import datetime
 import os
 import shutil
 import signal
+import string
 import subprocess
 import sys
 import tempfile
+from subprocess import CalledProcessError
+from subprocess import TimeoutExpired
 
 from avsub import cli
 from avsub import ffmpeg
@@ -26,7 +32,7 @@ from avsub.str import Str
 
 def setup_py_main():
     if sys.stdin.isatty() and sys.stdout.isatty() and sys.stderr.isatty():
-        if consts.LINUX:
+        if consts.POSIX:
             if os.getpgrp() != os.tcgetpgrp(sys.stdout.fileno()):
                 sys.exit(2)
         main()
@@ -37,10 +43,7 @@ def setup_py_main():
         sys.exit(2)
 
 
-def main():
-    for sig in consts.ALL_SIGNALS:
-        signal.signal(sig, stop)
-
+def checker():
     if len(sys.argv) == 1:
         print("[*] No arguments specified, checking for updates...")
         status = new.check_for_updates()
@@ -55,19 +58,30 @@ def main():
         if x.OPTS.bypass and priority == "W":
             continue
         if condition:
-            print(f"[{priority}]", error)
+            print("[%s]" % priority, error)
             gotcha = True  # avsub: C2006
 
     if gotcha:
         sys.exit(2)
 
+    if not ffmpeg.check():  # avsub: N2102
+        print("[F] FFmpeg could not be executed")
+        sys.exit(3)
+
+
+def main():
+    for sig in consts.ALL_SIGNALS:
+        signal.signal(sig, stop)
+
+    checker()
+
     fff = ffmpeg.FFmpeg()
     fff.build()
 
     try:
-        the_temp = Str(tempfile.gettempdir()).join("AVsub")
-        os.makedirs(the_temp, exist_ok=True)
-        x.A_TEMP = tempfile.mkdtemp(prefix="avsub-", dir=the_temp)
+        x.THE_TEMP = Str(x.OPTS.temp).abs()
+        os.makedirs(x.THE_TEMP, exist_ok=True)
+        x.A_TEMP = tempfile.mkdtemp(prefix="avsub-", dir=x.THE_TEMP)
     except (FileNotFoundError, PermissionError) as err:
         print(err)
         print("[F] Required TEMP folder(s) could not be created")
@@ -121,23 +135,55 @@ def stop(*args):
         sys.exit(2)
 
 
+def logger():
+    log = []
+    status = 0
+
+    for member in x.SUCCEEDED:
+        message = string.Template("[+] Job completed: '$member'")
+        print(message.substitute(member=Str(member).base()))
+        log.append(message.substitute(member=Str(member).abs()))
+    for member in x.DEL_ON_EXIT:
+        message = string.Template("[-] Not completed: '$member'")
+        print(message.substitute(member=Str(member).base()))
+        log.append(message.substitute(member=Str(member).abs()))
+        status = 2
+    for member in x.NOT_PROCESSED:
+        message = string.Template("[ ] Not processed: '$member'")
+        print(message.substitute(member=Str(member).base()))
+        log.append(message.substitute(member=Str(member).abs()))
+        status = 2
+    if x.FATAL_FFMPEG is not None:
+        message = string.Template("[F] Fatal, FFmpeg: '$member'")
+        print(message.substitute(member=Str(x.FATAL_FFMPEG).base()))
+        log.append(message.substitute(member=Str(x.FATAL_FFMPEG).abs()))
+        status = 3
+
+    if x.OPTS.log:
+        try:
+            with open(Str(x.THE_TEMP).join(x.A_TEMP + ".log"),
+                      "a",
+                      encoding="utf-8",
+                      errors="xmlcharrefreplace") as file:
+                date = datetime.datetime.now().strftime("%m/%d/%Y - %H:%M:%S")
+                line = "-" * len(date)
+                file.write("+{0}+\n|{1}|\n+{0}+\n".format(line, date))
+                for message in log:
+                    file.write(message + "\n")
+        except (FileNotFoundError, PermissionError) as err:
+            print("[!] Logging error:", err)
+        else:
+            print("[*] Results saved: '%s'" % Str(file.name).abs())
+
+    return status
+
+
 def clean():
-    status = 0  # Current exit status (0: All is well, 2: Error, 3: Fatal)
     line = "-" * os.get_terminal_size().columns
 
     print("\n")
     print(line)
-    for member in x.SUCCEEDED:
-        print(f"[+] Job completed: '{Str(member).base()}'")
-    for member in x.DEL_ON_EXIT:
-        print(f"[-] Not completed: '{Str(member).base()}'")
-        status = 2
-    for member in x.NOT_PROCESSED:
-        print(f"[ ] Not processed: '{Str(member).base()}'")
-        status = 2
-    if x.FATAL_FFMPEG is not None:
-        print(f"[F] Fatal, FFmpeg: '{x.FATAL_FFMPEG}'")
-        status = 3
+    status = logger()
     print(line)
 
     if x.SIGNAL_NUMBER is not None:
@@ -173,12 +219,15 @@ def clean():
                 else:  # avsub: C2005
                     try:
                         subprocess.check_call(["xdg-open", x.A_TEMP],
+                                              timeout=5,
                                               stdout=subprocess.DEVNULL,
                                               stderr=subprocess.DEVNULL)
-                    except (FileNotFoundError, subprocess.CalledProcessError):
+                    except FileNotFoundError:
+                        pass
+                    except (CalledProcessError, TimeoutExpired):
                         pass
 
-    sys.exit(status)
+    sys.exit(status)  # Exit status (0: All is well, 2: Error, 3: Fatal)
 
 
 if __name__ == "__main__":
