@@ -1,3 +1,5 @@
+# coding=utf-8
+
 # This file is part of AVsub
 # Released under the GNU General Public License v3.0
 # Copyright (C) Serhat Çelik
@@ -13,15 +15,15 @@ import signal
 ############
 # Platform #
 ############
-LINUX = os.name == "posix"
-WINDOWS = not LINUX
+POSIX = os.name == "posix"
+WINDOWS = not POSIX
 
 ##########
 # Signal #
 ##########
 _SIGBREAK = signal.SIGBREAK if WINDOWS else None
 _SIGINT = signal.SIGINT  # Interrupt from keyboard
-_SIGQUIT = signal.SIGQUIT if LINUX else None  # Quit from keyboard
+_SIGQUIT = signal.SIGQUIT if POSIX else None  # Quit from keyboard
 ALL_SIGNALS = [_ for _ in (_SIGINT, _SIGQUIT, _SIGBREAK) if _]
 
 ###################

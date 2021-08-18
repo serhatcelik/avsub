@@ -1,3 +1,5 @@
+# coding=utf-8
+
 # This file is part of AVsub
 # Released under the GNU General Public License v3.0
 # Copyright (C) Serhat Çelik
@@ -34,8 +36,8 @@ def get_files(parent: str) -> list:
 
 
 def create_output(parent: str, file: str) -> str:
-    basename_no_ext = os.path.splitext(Str(file).base())[0]
-    return Str(parent).join(".".join([basename_no_ext, Str(file).ext()]))
+    basename_no_ext = Str(Str(file).base()).noext()
+    return Str(parent).join(".".join([basename_no_ext, Str(file).extout()]))
 
 
 def mark_as_not_processed(parent: str, files: list) -> None:
