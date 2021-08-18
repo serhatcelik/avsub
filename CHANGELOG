@@ -5,7 +5,7 @@
 AVsub 2.1.0 [2021.08.18]
 ------------------------
 - N2100: Added a command-line option that allows users to change the output folder location.
-- N2101: Added a command-line option that logs operation results to a file has been added.
+- N2101: Added a command-line option that logs operation results to a file.
 - N2102: Now FFmpeg is tested before the process starts.
 - C2010: The default value for the 'no-open-dir' option has been changed from "empty" to "always" (POSIX only).
 - C2011: Non-English letters are no longer valid for the input file extension.
