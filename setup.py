@@ -1,3 +1,5 @@
+# coding=utf-8
+
 """
 Setup script for AVsub.
 """
