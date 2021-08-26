@@ -1,6 +1,8 @@
 # AVsub
 
-AVsub is a simplified command-line interface for FFmpeg. It supports [Python 3][1] (3.6 to 3.9) and requires [FFmpeg][2] to be installed to run. It is intended to be cross platform, and runs on GNU/Linux and Microsoft Windows.
+[![](https://img.shields.io/badge/thank-serhatcelik-1EAEDB.svg)][saythanks]
+
+**AVsub is a simplified command-line interface for FFmpeg. It supports [Python 3][1] (3.6 to 3.9) and requires [FFmpeg][2] to be installed to run. It is intended to be cross platform, and runs on GNU/Linux and Microsoft Windows.**
 
 ## Preparation and Installation
 
@@ -75,6 +77,7 @@ avsub "input.mp4" mp4 -f="-b:v 2M -maxrate 2M -bufsize 1M"
 If you have found a bug or have a suggestion, please consider [creating an issue][5].
 
 
+[saythanks]: https://saythanks.io/to/serhatcelik
 [1]: https://www.python.org
 [2]: https://ffmpeg.org
 [3]: https://github.com/serhatcelik/avsub/wiki/Windows-PATH
