@@ -2,6 +2,27 @@
 # History of the AVsub #
 ########################
 
+AVsub 2.2.0 [2021.08.27]
+------------------------
+- F2200: Fixed the "OSError: [WinError 123]" that could occur due to incorrectly entered pathname.
+- F2201: Fixed the error where the '0' value could not be used for the '--size' option.
+- N2200: Added a command-line option that allows users to continue processing when fatal FFmpeg errors are encountered.
+- N2201: Users can now provide a trim value in HH:MM:SS syntax.
+- N2202: A new 'data' value is now available for the '--remove' option.
+- N2203: It is now checked whether the current operating system is supported or not.
+- N2204: Added a new cleaner for folders.
+- C2200: Operation results are now displayed in reverse order for the log file.
+- C2201: FFmpeg check feature has been improved.
+- C2202: Privileged access is now prohibited by default.
+- C2203: When a fatal FFmpeg error is encountered, incomplete items no longer appear as "not completed".
+- Code improvements.
+- Added some extra error handling.
+- Contradictory option check has been improved.
+- User interface has been improved.
+- Type annotations have been improved.
+- Documentation has been improved.
+
+
 AVsub 2.1.0 [2021.08.18]
 ------------------------
 - N2100: Added a command-line option that allows users to change the output folder location.

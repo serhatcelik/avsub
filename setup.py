@@ -1,5 +1,9 @@
 # coding=utf-8
 
+# This file is part of AVsub
+# Released under the GNU General Public License v3.0
+# Copyright (C) Serhat Çelik
+
 """
 Setup script for AVsub.
 """
@@ -11,11 +15,11 @@ with open("README.md", "r", encoding="utf-8") as readme:
 
 setuptools.setup(
     name="avsub",
-    version=__import__("avsub.__license__", fromlist="__license__").VERSION,
+    version=__import__("avsub.core.notice", fromlist="core.notice").VERSION,
     description="A simplified command-line interface for FFmpeg",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    author=__import__("avsub.__license__", fromlist="__license__").AUTHOR,
+    author=__import__("avsub.core.notice", fromlist="core.notice").AUTHOR,
     url="https://github.com/serhatcelik/avsub",
     download_url="https://github.com/serhatcelik/avsub/releases/latest",
     packages=setuptools.find_packages(),
@@ -48,7 +52,7 @@ setuptools.setup(
             "executable": "/bin/custom_python",
         },
     },
-    license=__import__("avsub.__license__", fromlist="__license__").LICENSE,
+    license=__import__("avsub.core.notice", fromlist="core.notice").LICENSE,
     license_files=["LICENSE"],
     keywords=["avsub", "audio", "video", "subtitle", "ffmpeg"],
     platforms=["Linux", "Windows"],
@@ -63,5 +67,6 @@ setuptools.setup(
         "Source Code": "https://github.com/serhatcelik/avsub",
         "Bug Tracker": "https://github.com/serhatcelik/avsub/issues",
         "Documentation": "https://github.com/serhatcelik/avsub/wiki",
+        "Say Thanks!": "https://saythanks.io/to/serhatcelik",
     },
 )
