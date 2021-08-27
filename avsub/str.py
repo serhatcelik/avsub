@@ -7,14 +7,15 @@
 import os
 import re
 import stat
+from typing import List
 
-from avsub.core import consts
-from avsub.core import x
+from avsub import OS, POSIX
+from avsub.core import consts, x
 
 
 class Str:
     def __init__(self, s: str):
-        self._s = s
+        self._s: str = s
 
     def abs(self) -> str:
         return os.path.abspath(self._s)  # Will be normalized and absolutized
@@ -24,6 +25,10 @@ class Str:
             return os.stat(self.abs()).st_file_attributes
         except (FileNotFoundError, PermissionError):
             return False
+        except OSError as err:
+            if err.errno == consts.EINVAL:  # avsub: F2200
+                return False
+            raise
 
     def base(self) -> str:
         return os.path.basename(self.abs())
@@ -47,7 +52,7 @@ class Str:
         return os.path.isdir(self.abs())
 
     def isext(self) -> bool:
-        return bool(re.search(r"^[a-zA-Z0-9_-]+$", self._s))  # avsub: C2011
+        return bool(re.match(r"^[a-zA-Z0-9_-]+$", self._s))  # avsub: C2011
 
     def isfile(self) -> bool:
         return os.path.isfile(self.abs())
@@ -58,12 +63,18 @@ class Str:
         return False
 
     def ishidden(self) -> bool:
-        if consts.POSIX:
+        if OS[POSIX]:
             return self.base().startswith(".")
         return bool(self.attrs() & stat.FILE_ATTRIBUTE_HIDDEN)
 
     def join(self, *args: str) -> str:
         return os.path.join(self.abs(), *[Str(_).base() for _ in args])
+
+    def line(self, col: int = 0) -> str:
+        return self._s * (col if col != 0 else os.get_terminal_size().columns)
+
+    def listdir(self) -> List[str]:
+        return [Str(self._s).join(_) for _ in os.listdir(self.abs())]
 
     def noext(self) -> str:
         return os.path.splitext(self._s)[0]

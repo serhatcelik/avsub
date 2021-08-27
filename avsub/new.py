@@ -8,35 +8,18 @@
 This module is used to check for updates.
 """
 
-import time
-import urllib.error
-import urllib.request
+import urllib.request as request
 
-from avsub import __license__
+from avsub.core import notice
+from avsub.core.tools import Repeater
 
 
-def check_for_updates(retry=3, timeout=5):
-    url_avsub_tag = "https://github.com/serhatcelik/avsub/releases/tag/"
-    url_avsub_latest = "https://github.com/serhatcelik/avsub/releases/latest"
-
-    try:
-        with urllib.request.urlopen(url_avsub_latest, timeout=10) as response:
-            if response.url != url_avsub_tag + __license__.VERSION:
-                version_new = response.url.strip(url_avsub_tag)
-                print("[+] New AVsub version is available (%s)" % version_new)
-                return 0
-            print("[*] You have the latest version of AVsub")
-            return 0
-    except (ValueError, urllib.error.URLError) as err:
-        if retry == 0:
-            print("[!] Could not check for updates, try again later")
-            return 2
-
-        print("[!]", err)
-        print("[*] Retrying in %d seconds..." % timeout)
-
-        start = time.monotonic()
-        while time.monotonic() - start < timeout:
-            continue
-
-        return check_for_updates(retry=retry - 1)
+@Repeater(retry=3, countdown=5)
+def check_for_updates() -> bool:
+    with request.urlopen(notice.URL + "/releases/latest/", timeout=10) as rep:
+        if rep.url != notice.URL + "/releases/tag/" + notice.VERSION:
+            latest: str = rep.url.strip(notice.URL + "/releases/tag/")
+            print("[+] New AVsub version is available (%s)" % latest)
+            return True
+        print("[*] You have the latest version of AVsub")
+        return True

@@ -8,92 +8,91 @@
 AVsub - A simplified command-line interface for FFmpeg.
 """
 
-import datetime
+import argparse
 import os
 import shutil
 import signal
 import string
-import subprocess
 import sys
 import tempfile
-from subprocess import CalledProcessError
-from subprocess import TimeoutExpired
+from datetime import datetime
+from typing import List
 
-from avsub import cli
-from avsub import ffmpeg
-from avsub import new
-from avsub.core import consts
-from avsub.core import x
-from avsub.core.tools import cleaner
-from avsub.core.tools import get_files
-from avsub.core.tools import mark_as_not_processed
+from avsub import cli, ffmpeg, new
+from avsub.core import consts, x
+from avsub.core.tools import dcleaner, dopen, fcleaner, get_files
+from avsub.core.tools import is_a_foreground, is_a_tty, mark_as_not_processed
 from avsub.str import Str
 
 
-def setup_py_main():
-    if sys.stdin.isatty() and sys.stdout.isatty() and sys.stderr.isatty():
-        if consts.POSIX:
-            if os.getpgrp() != os.tcgetpgrp(sys.stdout.fileno()):
-                sys.exit(2)
+def setup_py_main() -> None:
+    if is_a_tty() and is_a_foreground():
         main()
         if x.RUN:
             stop()
         clean()
     else:
-        sys.exit(2)
+        sys.exit(34)  # You know what it is ;)
 
 
-def checker():
+def checker() -> None:
     if len(sys.argv) == 1:
-        print("[*] No arguments specified, checking for updates...")
-        status = new.check_for_updates()
-        sys.exit(status)
+        print("[*] No options specified, checking for updates...")
+        if not new.check_for_updates():
+            print("[!] Could not check for updates, try again later")
+            sys.exit(2)
+        sys.exit(0)
 
-    parser = cli.create_parser()
+    parser: argparse.ArgumentParser = cli.create_parser()
     x.OPTS = parser.parse_args()
 
-    gotcha = False
+    gotcha: bool = False
 
     for condition, error, priority in cli.check_opts(x.OPTS):
         if x.OPTS.bypass and priority == "W":
             continue
         if condition:
             print("[%s]" % priority, error)
-            gotcha = True  # avsub: C2006
+            gotcha: bool = True  # avsub: C2006
 
     if gotcha:
         sys.exit(2)
 
+    print("[*] Starting a run test for FFmpeg...")
     if not ffmpeg.check():  # avsub: N2102
-        print("[F] FFmpeg could not be executed")
-        sys.exit(3)
+        print("[F] Could not execute FFmpeg")
+        if not x.OPTS.no_err_exit:
+            sys.exit(3)
 
 
-def main():
+def main() -> None:
     for sig in consts.ALL_SIGNALS:
         signal.signal(sig, stop)
 
     checker()
 
-    fff = ffmpeg.FFmpeg()
+    fff: ffmpeg.FFmpeg = ffmpeg.FFmpeg()
     fff.build()
 
     try:
         x.THE_TEMP = Str(x.OPTS.temp).abs()
         os.makedirs(x.THE_TEMP, exist_ok=True)
         x.A_TEMP = tempfile.mkdtemp(prefix="avsub-", dir=x.THE_TEMP)
+        x.DEL_ON_EXIT_TEMP_FOLDER.append(x.A_TEMP)
     except (FileNotFoundError, PermissionError) as err:
         print(err)
-        print("[F] Required TEMP folder(s) could not be created")
+        print("[F] Required TEMP folders could not be created")
         sys.exit(3)
+    else:
+        x.LOG_FILE = Str(x.THE_TEMP).join("%s.log" % x.A_TEMP)
 
     # MANUAL OPERATION?
     if Str(x.OPTS.input).isfile():
-        files = [Str(x.OPTS.input).abs()]
+        files: List[str] = [Str(x.OPTS.input).abs()]
         # HARDSUB MANUAL OPERATION?
         if x.OPTS.embed:
             # Note: New TEMP subtitle to -almost- avoid the escaping nonsense
-            tempsub = Str(x.A_TEMP).join(x.A_TEMP)
+            tempsub: str = Str(x.A_TEMP).join(x.A_TEMP)
             x.DEL_ON_EXIT_TEMP.update({tempsub: tempsub})
 
             try:
@@ -101,17 +100,19 @@ def main():
             except (FileNotFoundError, PermissionError) as err:
                 print(err)
                 print("[F] Required TEMP subtitle could not be created")
+                dcleaner(x.DEL_ON_EXIT_TEMP_FOLDER)
                 sys.exit(3)
 
             # Add a new level of escaping for TEMP subtitle pathname
-            tempsub_escaped = tempsub.replace("\\", "/").replace(":", "\\\\:")
-            fff.build_hardsub(subpath=tempsub_escaped)
+            sub_escaped: str = tempsub.replace("\\", "/").replace(":", "\\\\:")
+            fff.build_hardsub(subpath=sub_escaped)
     # AUTOMATIC OPERATION?
     else:
         print("[*] Getting files...")
-        files = get_files(parent=x.OPTS.input)
+        files: List[str] = get_files(parent=x.OPTS.input)
         if not files:
-            print("[-] Exiting, no files to process with current arguments")
+            print("[-] Exiting, no files to process with current options")
+            dcleaner(x.DEL_ON_EXIT_TEMP_FOLDER)
             sys.exit(2)
 
     print("[*] Getting ready to start...")
@@ -121,7 +122,7 @@ def main():
     ffmpeg.execute(fff.cmd, files=files)
 
 
-def stop(*args):
+def stop(*args) -> None:
     for sig in consts.ALL_SIGNALS:
         signal.signal(sig, signal.SIG_IGN)  # Simply ignore the signal "sig"
 
@@ -131,102 +132,90 @@ def stop(*args):
         x.SIGNAL_NUMBER = args[0]
 
     if not x.FULL_CLEAN_AFTER_STOP:
-        cleaner(x.DEL_ON_EXIT_TEMP)
+        fcleaner(x.DEL_ON_EXIT_TEMP)
+        dcleaner(x.DEL_ON_EXIT_TEMP_FOLDER)
         sys.exit(2)
 
 
-def logger():
-    log = []
-    status = 0
+def logger() -> int:
+    log: List[str] = []
+    status: int = 0
 
     for member in x.SUCCEEDED:
-        message = string.Template("[+] Job completed: '$member'")
-        print(message.substitute(member=Str(member).base()))
-        log.append(message.substitute(member=Str(member).abs()))
+        msg: string.Template = string.Template("[+] Job completed: '$member'")
+        print(msg.substitute(member=Str(member).base()))
+        log.append(msg.substitute(member=Str(member).abs()))
     for member in x.DEL_ON_EXIT:
-        message = string.Template("[-] Not completed: '$member'")
-        print(message.substitute(member=Str(member).base()))
-        log.append(message.substitute(member=Str(member).abs()))
-        status = 2
+        if member in x.FATAL_FFMPEG:  # avsub: C2203
+            continue
+        msg: string.Template = string.Template("[-] Not completed: '$member'")
+        print(msg.substitute(member=Str(member).base()))
+        log.append(msg.substitute(member=Str(member).abs()))
+        status: int = 2
     for member in x.NOT_PROCESSED:
-        message = string.Template("[ ] Not processed: '$member'")
-        print(message.substitute(member=Str(member).base()))
-        log.append(message.substitute(member=Str(member).abs()))
-        status = 2
-    if x.FATAL_FFMPEG is not None:
-        message = string.Template("[F] Fatal, FFmpeg: '$member'")
-        print(message.substitute(member=Str(x.FATAL_FFMPEG).base()))
-        log.append(message.substitute(member=Str(x.FATAL_FFMPEG).abs()))
-        status = 3
+        msg: string.Template = string.Template("[ ] Not processed: '$member'")
+        print(msg.substitute(member=Str(member).base()))
+        log.append(msg.substitute(member=Str(member).abs()))
+        status: int = 2
+    for member in x.FATAL_FFMPEG:
+        msg: string.Template = string.Template("[F] Fatal, FFmpeg: '$member'")
+        print(msg.substitute(member=Str(member).base()))
+        log.append(msg.substitute(member=Str(member).abs()))
+        status: int = 3
+
+    xml: str = "xmlcharrefreplace"
 
     if x.OPTS.log:
         try:
-            with open(Str(x.THE_TEMP).join(x.A_TEMP + ".log"),
-                      "a",
-                      encoding="utf-8",
-                      errors="xmlcharrefreplace") as file:
-                date = datetime.datetime.now().strftime("%m/%d/%Y - %H:%M:%S")
-                line = "-" * len(date)
+            with open(x.LOG_FILE, "a", encoding="utf-8", errors=xml) as file:
+                date: str = datetime.now().strftime("%m/%d/%Y - %H:%M:%S")
+                line: str = Str("-").line(col=len(date))
                 file.write("+{0}+\n|{1}|\n+{0}+\n".format(line, date))
+                log.reverse()  # avsub: C2200
                 for message in log:
                     file.write(message + "\n")
         except (FileNotFoundError, PermissionError) as err:
             print("[!] Logging error:", err)
         else:
-            print("[*] Results saved: '%s'" % Str(file.name).abs())
+            print("[*] Results saved: '%s'" % file.name)
 
     return status
 
 
-def clean():
-    line = "-" * os.get_terminal_size().columns
+def clean() -> None:
+    line: str = Str("-").line()
 
     print("\n")
     print(line)
-    status = logger()
+    status: int = logger()
     print(line)
 
-    if x.SIGNAL_NUMBER is not None:
+    if hasattr(x, "SIGNAL_NUMBER"):
         print("[x] Received a signal:", x.SIGNAL_NUMBER)
     if status != 0 or x.DEL_ON_EXIT_TEMP:
         print("[*] Cleaning, please do not interrupt", end="...", flush=True)
-        cleaner(x.DEL_ON_EXIT, x.DEL_ON_EXIT_TEMP)
+        fcleaner(x.DEL_ON_EXIT, x.DEL_ON_EXIT_TEMP)
+        if x.OPTS.no_open_dir != "never" and not x.OPTS.log:
+            dcleaner(x.DEL_ON_EXIT_TEMP_FOLDER)
         print("DONE")
         print(line)
 
-    succeeded = len(x.SUCCEEDED)
-    failed = len(x.DEL_ON_EXIT) + len(x.NOT_PROCESSED)
-    total = succeeded + failed
+    succeeded: int = len(x.SUCCEEDED)
+    failed: int = len(x.DEL_ON_EXIT) + len(x.NOT_PROCESSED)
+    fatal: int = len(x.FATAL_FFMPEG)
+    total: int = succeeded + failed
 
     print("SUMMARY")
     print("-------")
     print("Total:", total)
     print("Successful:", succeeded)
-    print("Unsuccessful:", failed)
+    print("Unsuccessful:", failed, "(%d fatal)" % fatal)
     print("Output folder: '%s'" % x.A_TEMP)
     print(line)
     print("Thanks for using AVsub|")
     print("----------------------+\a")
 
-    if x.A_TEMP is not None:
-        if Str(x.A_TEMP).isdir():
-            if any([
-                x.OPTS.no_open_dir == "never",
-                x.OPTS.no_open_dir == "empty" and Str(x.A_TEMP).isfull(),
-            ]):
-                if consts.WINDOWS:
-                    os.startfile(x.A_TEMP, "open")
-                else:  # avsub: C2005
-                    try:
-                        subprocess.check_call(["xdg-open", x.A_TEMP],
-                                              timeout=5,
-                                              stdout=subprocess.DEVNULL,
-                                              stderr=subprocess.DEVNULL)
-                    except FileNotFoundError:
-                        pass
-                    except (CalledProcessError, TimeoutExpired):
-                        pass
-
+    dopen(x.A_TEMP)
     sys.exit(status)  # Exit status (0: All is well, 2: Error, 3: Fatal)
 
 
