@@ -8,39 +8,53 @@
 This file contains constants.
 """
 
-import collections
-import os
+import errno
 import signal
+import urllib.error
+from collections import defaultdict as safedict
+from subprocess import CalledProcessError, TimeoutExpired
+from typing import DefaultDict, Dict, List, Optional
 
-############
-# Platform #
-############
-POSIX = os.name == "posix"
-WINDOWS = not POSIX
+from avsub import NT, OS, POSIX
 
 ##########
 # Signal #
 ##########
-_SIGBREAK = signal.SIGBREAK if WINDOWS else None
-_SIGINT = signal.SIGINT  # Interrupt from keyboard
-_SIGQUIT = signal.SIGQUIT if POSIX else None  # Quit from keyboard
-ALL_SIGNALS = [_ for _ in (_SIGINT, _SIGQUIT, _SIGBREAK) if _]
+_SIGBREAK: Optional[int] = signal.SIGBREAK if OS[NT] else None
+_SIGINT: int = signal.SIGINT  # Interrupt from keyboard
+_SIGQUIT: Optional[int] = signal.SIGQUIT if OS[POSIX] else None
+ALL_SIGNALS: List[int] = [_ for _ in (_SIGINT, _SIGQUIT, _SIGBREAK) if _]
 
 ###################
 # Argument Choice #
 ###################
-AC = {"mono": "1", "stereo": "2"}  # Audio channel manipulation values
-ALIGNMENT = {
-    "bleft": "1", "bottom": "2", "bright": "3",
-    "tleft": "5", "top": "6", "tright": "7",
-    "mleft": "9", "middle": "10", "mright": "11",
-}  # Subtitle positions on screen
-CRF = range(52)  # Constant Rate Factor values for video compression
-LOGLEVEL = collections.defaultdict(lambda: 40, {0: 16, 1: 24, 2: 32})
-OUTLINECOLOUR = {
+AC: Dict[str, int] = {"mono": 1, "stereo": 2}  # Audio channel manipulation
+ALIGN: Dict[str, int] = {
+    "bleft": 1, "bottom": 2, "bright": 3,
+    "tleft": 5, "top": 6, "tright": 7,
+    "mleft": 9, "middle": 10, "mright": 11,
+}  # Subtitle positions (Alignments) on screen
+C1: Dict[str, str] = {
     "black": "&H000000&", "blue": "&HFF0000&", "brown": "&H2A2AA5&",
     "gray": "&H808080&", "green": "&H008000&", "orange": "&H00A5FF&",
     "pink": "&HCBC0FF&", "purple": "&H800080&", "red": "&H0000FF&",
     "white": "&HFFFFFF&", "yellow": "&H00FFFF&",
-}  # HTML color codes in BBGGRR format
-PRIMARYCOLOUR = OUTLINECOLOUR
+}  # HTML PrimaryColour codes in BBGGRR format
+C2: Dict[str, str] = C1  # HTML OutlineColour codes in BBGGRR format
+CRF: range = range(52)  # Constant Rate Factor values for video compression
+LOGLEVEL: DefaultDict[int, int] = safedict(lambda: 40, {0: 16, 1: 24, 2: 32})
+
+####################
+# Exception Choice #
+####################
+_EXCEPTION_SUBPROCESS: tuple = (CalledProcessError, TimeoutExpired)
+EXCEPTION_BY_FUNCTION: Dict[str, tuple] = {
+    "avsub.new.check_for_updates": (ValueError, urllib.error.URLError),
+    "avsub.ffmpeg.check": (FileNotFoundError, *_EXCEPTION_SUBPROCESS),
+}
+
+################
+# Error Number #
+################
+ENOTEMPTY: int = errno.ENOTEMPTY  # Directory not empty
+EINVAL: int = errno.EINVAL  # Invalid argument

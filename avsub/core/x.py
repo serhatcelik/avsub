@@ -8,16 +8,21 @@
 Global "over control" variables (Xs) for handling external modules.
 """
 
-A_TEMP = None
-CMD_TO_SHOW = None
-DEL_ON_EXIT = dict()  # Container for files to be deleted on exit
-DEL_ON_EXIT_TEMP = dict()  # Container for TEMP files to be deleted on exit
-FATAL_FFMPEG = None
-FULL_CLEAN_AFTER_STOP = False
-NOT_PROCESSED = dict()  # Container for unprocessed items
-OPTS = None  # Parsed command-line arguments
-RUN = True  # Value that determines whether the program will continue to run
-RUN_FFMPEG = True  # Value that determines whether FFmpeg will be executed
-SIGNAL_NUMBER = None  # Captured signal number
-SUCCEEDED = dict()  # Container for successfully completed items
-THE_TEMP = None  # TEMP folder for storing all other TEMP folders
+import argparse
+from typing import Dict, List
+
+A_TEMP: str
+CMD_TO_SHOW: str
+DEL_ON_EXIT: Dict[str, str] = {}  # Files to be deleted on exit
+DEL_ON_EXIT_TEMP: Dict[str, str] = {}  # TEMP files to be deleted on exit
+DEL_ON_EXIT_TEMP_FOLDER: List[str] = []  # TEMP folders to be deleted on exit
+FATAL_FFMPEG: Dict[str, str] = {}  # Encountered fatal FFmpeg errors
+FULL_CLEAN_AFTER_STOP: bool = False
+LOG_FILE: str
+NOT_PROCESSED: Dict[str, str] = {}  # Unprocessed items
+OPTS: argparse.Namespace  # Parsed command-line arguments
+RUN: bool = True  # Value that decides whether the program will continue to run
+RUN_FFMPEG: bool = True  # # Value that decides whether FFmpeg will be executed
+SIGNAL_NUMBER: int  # Captured signal number
+SUCCEEDED: Dict[str, str] = {}  # Successfully completed items
+THE_TEMP: str  # TEMP folder for storing all other TEMP folders
