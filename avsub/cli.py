@@ -25,7 +25,7 @@ EXAMPLES
   avsub "input.mp4" - -C 35
 
   7) Do not copy subtitle stream and metadata from input to output
-  avsub "input.mp4" - --remove sub chapters
+  avsub "input.mp4" - --remove sub metadata
 
   8) Extract a portion of video from 02:01:00 (or 7260) to 02:01:05 (or 7265)
   avsub "input.mp4" - --trim 02:01:00 02:01:05
