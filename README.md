@@ -58,7 +58,7 @@ avsub "input.mp4" mp3 -A
 avsub "input.mp4" - -C 35
 
 # Do not copy subtitle stream and metadata from input to output
-avsub "input.mp4" - --remove sub chapters
+avsub "input.mp4" - --remove sub metadata
 
 # Embed subtitle into video with primary color red and outline color blue
 avsub "input.mp4" - -e "input.srt" --color1 red --color2 blue
