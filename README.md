@@ -60,10 +60,10 @@ avsub "input.mp4" - -C 35
 # Do not copy subtitle stream and metadata from input to output
 avsub "input.mp4" - --remove sub metadata
 
-# Embed subtitle into video with primary color red and outline color blue
+# Embed subtitle into video (hardsub) with primary color red and outline color blue
 avsub "input.mp4" - -e "input.srt" --color1 red --color2 blue
 
-# Embed subtitle into video (hardsub) with font name Arial and font size 25
+# Embed subtitle into video with font name Arial and font size 25
 avsub "input.mp4" - -e "input.srt" --font "Arial" --size 25
 
 # Provide a custom FFmpeg argument list -at your own risk- to limit the output bit rate
