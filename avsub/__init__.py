@@ -12,7 +12,7 @@ import os
 import sys
 
 NT, POSIX = "nt", "posix"
-_ALL_OPERATING_SYSTEMS = NT, POSIX
+_ALL_OPERATING_SYSTEMS = [NT, POSIX]
 OS = {_: os.name == _ for _ in _ALL_OPERATING_SYSTEMS}
 
 _MAJOR = 3
