@@ -2,6 +2,16 @@
 # History of the AVsub #
 ########################
 
+AVsub 2.2.1 [2021.09.08]
+------------------------
+- F2210: Fixed another "OSError: [WinError 123]" that could occur due to incorrectly entered or non-existent pathname.
+- F2211: Fixed the error of printing the output folder even there is no such folder.
+- Code improvements.
+- Added some extra error handling.
+- Documentation has been improved.
+- Typo fixes.
+
+
 AVsub 2.2.0 [2021.08.27]
 ------------------------
 - F2200: Fixed the "OSError: [WinError 123]" that could occur due to incorrectly entered pathname.
