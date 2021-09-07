@@ -15,7 +15,7 @@ from subprocess import check_call, run
 from typing import Dict, List, Set, Union
 
 from avsub import NT, OS, POSIX
-from avsub.core import consts, x
+from avsub.core import consts, errors, x
 from avsub.str import Str
 
 
@@ -93,12 +93,10 @@ def dcleaner(*args: List[str]) -> None:  # avsub: N2204
             try:
                 if folder is not None:
                     os.rmdir(Str(folder).abs())
-            except (FileNotFoundError, PermissionError):
-                continue
             except OSError as err:
-                if err.errno == consts.ENOTEMPTY:
-                    continue
-                raise
+                if errors.osraise(errors.ENOENT, errors.ENOTEMPTY, err=err):
+                    raise
+                continue
 
 
 def dopen(folder: str) -> None:
@@ -121,18 +119,18 @@ def fcleaner(*args: Dict[str, str]) -> None:
         for output in container.values():
             try:
                 os.remove(Str(output).abs())
-            except (FileNotFoundError, PermissionError):
-                continue
             except OSError as err:
-                if err.errno == consts.EINVAL:
-                    continue
-                raise
+                if errors.osraise(errors.ENOENT, err=err):
+                    raise
+                continue
 
 
 def get_files(parent: str) -> Union[list, List[str]]:
     try:
         files: List[str] = Str(parent).listdir()
-    except (FileNotFoundError, NotADirectoryError, PermissionError) as err:
+    except OSError as err:
+        if errors.osraise(errors.ENOENT, errors.ENOTDIR, err=err):
+            raise
         print(err)
         return []
 

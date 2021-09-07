@@ -8,7 +8,6 @@
 This file contains constants.
 """
 
-import errno
 import signal
 import urllib.error
 from collections import defaultdict as safedict
@@ -52,9 +51,3 @@ EXCEPTION_BY_FUNCTION: Dict[str, tuple] = {
     "avsub.new.check_for_updates": (ValueError, urllib.error.URLError),
     "avsub.ffmpeg.check": (FileNotFoundError, *_EXCEPTION_SUBPROCESS),
 }
-
-################
-# Error Number #
-################
-ENOTEMPTY: int = errno.ENOTEMPTY  # Directory not empty
-EINVAL: int = errno.EINVAL  # Invalid argument

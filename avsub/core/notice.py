@@ -25,4 +25,4 @@ along with AVsub.  If not, see <https://www.gnu.org/licenses/>.
 AUTHOR = "Serhat Çelik"
 LICENSE = "GPLv3"
 URL = "https://github.com/serhatcelik/avsub"
-VERSION = "2.2.0"
+VERSION = "2.2.1"
