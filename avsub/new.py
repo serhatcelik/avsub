@@ -8,7 +8,7 @@
 This module is used to check for updates.
 """
 
-import urllib.request as request
+from urllib import request
 
 from avsub.core import notice
 from avsub.core.tools import Repeater

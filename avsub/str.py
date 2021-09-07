@@ -10,7 +10,7 @@ import stat
 from typing import List
 
 from avsub import OS, POSIX
-from avsub.core import consts, x
+from avsub.core import errors, x
 
 
 class Str:
@@ -23,12 +23,10 @@ class Str:
     def attrs(self) -> int:
         try:
             return os.stat(self.abs()).st_file_attributes
-        except (FileNotFoundError, PermissionError):
-            return False
         except OSError as err:
-            if err.errno == consts.EINVAL:  # avsub: F2200
-                return False
-            raise
+            if errors.osraise(errors.ENOENT, err=err):
+                raise
+            return False
 
     def base(self) -> str:
         return os.path.basename(self.abs())

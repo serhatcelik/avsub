@@ -19,7 +19,7 @@ from datetime import datetime
 from typing import List
 
 from avsub import cli, ffmpeg, new
-from avsub.core import consts, x
+from avsub.core import consts, errors, x
 from avsub.core.tools import dcleaner, dopen, fcleaner, get_files
 from avsub.core.tools import is_a_foreground, is_a_tty, mark_as_not_processed
 from avsub.str import Str
@@ -79,7 +79,9 @@ def main() -> None:
         os.makedirs(x.THE_TEMP, exist_ok=True)
         x.A_TEMP = tempfile.mkdtemp(prefix="avsub-", dir=x.THE_TEMP)
         x.DEL_ON_EXIT_TEMP_FOLDER.append(x.A_TEMP)
-    except (FileNotFoundError, PermissionError) as err:
+    except OSError as err:
+        if errors.osraise(errors.ENOENT, err=err):  # avsub: F2210
+            raise
         print(err)
         print("[F] Required TEMP folders could not be created")
         sys.exit(3)
@@ -97,7 +99,9 @@ def main() -> None:
 
             try:
                 shutil.copyfile(Str(x.OPTS.embed).abs(), tempsub)
-            except (FileNotFoundError, PermissionError) as err:
+            except OSError as err:
+                if errors.osraise(errors.ENOENT, err=err):
+                    raise
                 print(err)
                 print("[F] Required TEMP subtitle could not be created")
                 dcleaner(x.DEL_ON_EXIT_TEMP_FOLDER)
@@ -174,7 +178,9 @@ def logger() -> int:
                 log.reverse()  # avsub: C2200
                 for message in log:
                     file.write(message + "\n")
-        except (FileNotFoundError, PermissionError) as err:
+        except OSError as err:
+            if errors.osraise(errors.ENOENT, err=err):
+                raise
             print("[!] Logging error:", err)
         else:
             print("[*] Results saved: '%s'" % file.name)
@@ -204,13 +210,14 @@ def clean() -> None:
     failed: int = len(x.DEL_ON_EXIT) + len(x.NOT_PROCESSED)
     fatal: int = len(x.FATAL_FFMPEG)
     total: int = succeeded + failed
+    folder: str = x.A_TEMP if (x.A_TEMP and Str(x.A_TEMP).isdir()) else ""  # avsub: F2211
 
     print("SUMMARY")
     print("-------")
     print("Total:", total)
     print("Successful:", succeeded)
     print("Unsuccessful:", failed, "(%d fatal)" % fatal)
-    print("Output folder: '%s'" % x.A_TEMP)
+    print("Output folder: '%s'" % folder)
     print(line)
     print("Thanks for using AVsub|")
     print("----------------------+\a")
