@@ -173,8 +173,8 @@ def logger() -> int:
         try:
             with open(x.LOG_FILE, "a", encoding="utf-8", errors=xml) as file:
                 date: str = datetime.now().strftime("%m/%d/%Y - %H:%M:%S")
-                line: str = Str("-").line(col=len(date))
-                file.write("+{0}+\n|{1}|\n+{0}+\n".format(line, date))
+                line: str = Str("=").line(col=len(date))
+                file.write("{0}\n{1}\n{0}\n".format(line, date))
                 log.reverse()  # avsub: C2200
                 for message in log:
                     file.write(message + "\n")
