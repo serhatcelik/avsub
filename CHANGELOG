@@ -2,6 +2,16 @@
 # History of the AVsub #
 ########################
 
+AVsub 2.2.2 [2021.09.22]
+------------------------
+- F2220: Fixed the "FileExistsError" that could occur when providing an existing file for the "-o/--output" option.
+- F2221: Fixed the error where the "repeater" feature could not print the last error message.
+- Code improvements.
+- Added some extra error handling.
+- User interface has been improved.
+- PEP 8 compliance.
+
+
 AVsub 2.2.1 [2021.09.08]
 ------------------------
 - F2210: Fixed another "OSError: [WinError 123]" that could occur due to incorrectly entered or non-existent pathname.
