@@ -1,6 +1,7 @@
 # coding=utf-8
-
+#
 # This file is part of AVsub
+# See https://github.com/serhatcelik/avsub for more information
 # Released under the GNU General Public License v3.0
 # Copyright (C) Serhat Çelik
 
@@ -12,17 +13,19 @@ import signal
 import urllib.error
 from collections import defaultdict as safedict
 from subprocess import CalledProcessError, TimeoutExpired
-from typing import DefaultDict, Dict, List, Optional
-
-from avsub import NT, OS, POSIX
+from typing import DefaultDict, Dict, List
 
 ##########
 # Signal #
 ##########
-_SIGBREAK: Optional[int] = signal.SIGBREAK if OS[NT] else None
-_SIGINT: int = signal.SIGINT  # Interrupt from keyboard
-_SIGQUIT: Optional[int] = signal.SIGQUIT if OS[POSIX] else None
-ALL_SIGNALS: List[int] = [_ for _ in (_SIGINT, _SIGQUIT, _SIGBREAK) if _]
+_SIGBREAK: str = "SIGBREAK"
+_SIGINT: str = "SIGINT"  # Interrupt from keyboard
+_SIGQUIT: str = "SIGQUIT"  # Quit from keyboard
+_ALL_SIGNALS: List[str] = [_SIGBREAK, _SIGINT, _SIGQUIT]
+SIGNALS: List[int] = []
+for sig in _ALL_SIGNALS:
+    if hasattr(signal, sig):
+        SIGNALS.append(getattr(signal, sig).value)
 
 ###################
 # Argument Choice #
@@ -32,7 +35,7 @@ ALIGN: Dict[str, int] = {
     "bleft": 1, "bottom": 2, "bright": 3,
     "tleft": 5, "top": 6, "tright": 7,
     "mleft": 9, "middle": 10, "mright": 11,
-}  # Subtitle positions (Alignments) on screen
+}  # Subtitle positions (Alignment) on screen
 C1: Dict[str, str] = {
     "black": "&H000000&", "blue": "&HFF0000&", "brown": "&H2A2AA5&",
     "gray": "&H808080&", "green": "&H008000&", "orange": "&H00A5FF&",
@@ -40,7 +43,7 @@ C1: Dict[str, str] = {
     "white": "&HFFFFFF&", "yellow": "&H00FFFF&",
 }  # HTML PrimaryColour codes in BBGGRR format
 C2: Dict[str, str] = C1  # HTML OutlineColour codes in BBGGRR format
-CRF: range = range(52)  # Constant Rate Factor values for video compression
+CRF: range = range(0, 51 + 1)  # Constant Rate Factor values for compression
 LOGLEVEL: DefaultDict[int, int] = safedict(lambda: 40, {0: 16, 1: 24, 2: 32})
 
 ####################

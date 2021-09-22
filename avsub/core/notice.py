@@ -1,6 +1,7 @@
 # coding=utf-8
-
+#
 # This file is part of AVsub
+# See https://github.com/serhatcelik/avsub for more information
 # Released under the GNU General Public License v3.0
 # Copyright (C) Serhat Çelik
 
@@ -25,4 +26,4 @@ along with AVsub.  If not, see <https://www.gnu.org/licenses/>.
 AUTHOR = "Serhat Çelik"
 LICENSE = "GPLv3"
 URL = "https://github.com/serhatcelik/avsub"
-VERSION = "2.2.1"
+VERSION = "2.2.2"

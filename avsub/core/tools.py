@@ -1,14 +1,21 @@
 # coding=utf-8
-
+#
 # This file is part of AVsub
+# See https://github.com/serhatcelik/avsub for more information
 # Released under the GNU General Public License v3.0
 # Copyright (C) Serhat Çelik
+
+"""
+General utility classes and functions.
+"""
 
 import ctypes
 import os
 import re
+import signal
 import stat
 import sys
+import threading
 import time
 from subprocess import CalledProcessError, DEVNULL as NULL, TimeoutExpired
 from subprocess import check_call, run
@@ -19,40 +26,24 @@ from avsub.core import consts, errors, x
 from avsub.str import Str
 
 
-class Repeater:
-    def __init__(self, retry: int, countdown: int):
-        self.retry: int = retry
-        self.countdown: int = countdown
-        self.i: int = 0
+class SigHandler:
+    _handler = None
 
-    def __call__(self, func):
-        def wrapper(*args, **kwargs):
-            try:
-                return func(*args, **kwargs)
-            except consts.EXCEPTION_BY_FUNCTION[self.f_name(func)] as err:
-                if self.i == self.retry:
-                    return False
+    def __init__(self, signals: List[int]) -> None:
+        self._signals: List[int] = signals
 
-                print("[!]", err)
-                print(self.r_message())
+    def _handle(self) -> None:
+        for sig in self._signals:
+            if threading.current_thread() is threading.main_thread():
+                signal.signal(sig, self._handler)
 
-                start: float = time.monotonic()
-                while time.monotonic() - start < self.countdown:
-                    continue
+    def capture(self, func) -> None:
+        self._handler = func
+        self._handle()
 
-                self.i += 1
-
-                return wrapper(*args, **kwargs)
-
-        return wrapper
-
-    def r_message(self) -> str:
-        pbar: str = "[%*d/%d]" % (len(str(self.retry)), self.i + 1, self.retry)
-        return "[*] Retrying %s in %d seconds..." % (pbar, self.countdown)
-
-    @staticmethod
-    def f_name(func) -> str:
-        return ".".join([func.__module__, func.__name__])
+    def ignore(self) -> None:
+        self._handler = signal.SIG_IGN
+        self._handle()
 
 
 def avsubprocess(cmd: List[str], call: bool = False, timeout: int = 5) -> None:
@@ -87,8 +78,14 @@ def create_output(parent: str, file: str) -> str:
     return Str(parent).join(".".join([basename_no_ext, Str(file).extout()]))
 
 
-def dcleaner(*args: List[str]) -> None:  # avsub: N2204
-    for container in args:
+def create_progress(current: int, total: Union[int, list]) -> str:
+    if isinstance(total, int):
+        return "[%*d/%d]" % (len(str(total)), current + 1, total)
+    return "[%*d/%d]" % (len(str(len(total))), current + 1, len(total))
+
+
+def dcleaner(*containers: List[str]) -> None:  # avsub: N2204
+    for container in containers:
         for folder in container:
             try:
                 if folder is not None:
@@ -106,7 +103,7 @@ def dopen(folder: str) -> None:
             x.OPTS.no_open_dir == "empty" and Str(folder).isfull(),
         ]):
             if OS[NT]:
-                os.startfile(Str(folder).abs(), "open")  # pylint: disable=E1101
+                os.startfile(Str(folder).abs())  # pylint: disable=no-member
             else:  # avsub: C2005
                 try:
                     avsubprocess(["xdg-open", Str(folder).abs()], call=True)
@@ -114,8 +111,8 @@ def dopen(folder: str) -> None:
                     pass
 
 
-def fcleaner(*args: Dict[str, str]) -> None:
-    for container in args:
+def fcleaner(*containers: Dict[str, str]) -> None:
+    for container in containers:
         for output in container.values():
             try:
                 os.remove(Str(output).abs())
@@ -152,7 +149,8 @@ def get_files(parent: str) -> Union[list, List[str]]:
 
 def is_a_foreground() -> bool:
     if OS[POSIX]:
-        return os.getpgrp() == os.tcgetpgrp(sys.stdout.fileno())  # pylint: disable=E1101
+        fd_: int = sys.stdout.fileno()
+        return os.getpgrp() == os.tcgetpgrp(fd_)  # pylint: disable=no-member
     return True
 
 
@@ -162,7 +160,7 @@ def is_a_tty() -> bool:
 
 def is_user_admin() -> bool:
     if OS[POSIX]:
-        return os.geteuid() == 0  # pylint: disable=E1101
+        return os.geteuid() == 0  # pylint: disable=no-member
     return ctypes.windll.shell32.IsUserAnAdmin() != 0
 
 
@@ -175,3 +173,22 @@ def mark_as_hidden(file: str) -> None:
 def mark_as_not_processed(parent: str, files: List[str]) -> None:
     for file in files:
         x.NOT_PROCESSED.update({file: create_output(parent=parent, file=file)})
+
+
+def repeater(retry: int, countdown: int):
+    def decorator(func):
+        def wrapper(*args, **kwargs):
+            f_name: str = ".".join([func.__module__, func.__name__])
+            for i in range(retry + 1):
+                try:
+                    return func(*args, **kwargs)
+                except consts.EXCEPTION_BY_FUNCTION[f_name] as err:
+                    print("[!]", err)  # avsub: F2221
+                    if i == retry:
+                        break
+                    pbar: str = create_progress(i, total=retry)
+                    print("[*] Retrying %s in %d secs..." % (pbar, countdown))
+                    time.sleep(countdown)
+            return False
+        return wrapper
+    return decorator

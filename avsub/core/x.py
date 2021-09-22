@@ -1,6 +1,7 @@
 # coding=utf-8
-
+#
 # This file is part of AVsub
+# See https://github.com/serhatcelik/avsub for more information
 # Released under the GNU General Public License v3.0
 # Copyright (C) Serhat Çelik
 
@@ -8,7 +9,7 @@
 Global "over control" variables (Xs) for handling external modules.
 """
 
-import argparse
+from argparse import Namespace
 from typing import Dict, List
 
 A_TEMP: str
@@ -20,7 +21,7 @@ FATAL_FFMPEG: Dict[str, str] = {}  # Encountered fatal FFmpeg errors
 FULL_CLEAN_AFTER_STOP: bool = False
 LOG_FILE: str
 NOT_PROCESSED: Dict[str, str] = {}  # Unprocessed items
-OPTS: argparse.Namespace  # Parsed command-line arguments
+OPTS: Namespace  # Parsed command-line arguments
 RUN: bool = True  # Value that decides whether the program will continue to run
 RUN_FFMPEG: bool = True  # # Value that decides whether FFmpeg will be executed
 SIGNAL_NUMBER: int  # Captured signal number
