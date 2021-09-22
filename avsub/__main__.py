@@ -1,6 +1,7 @@
 # coding=utf-8
-
+#
 # This file is part of AVsub
+# See https://github.com/serhatcelik/avsub for more information
 # Released under the GNU General Public License v3.0
 # Copyright (C) Serhat Çelik
 
@@ -8,20 +9,20 @@
 AVsub - A simplified command-line interface for FFmpeg.
 """
 
-import argparse
 import os
 import shutil
-import signal
-import string
 import sys
 import tempfile
+from argparse import ArgumentParser
 from datetime import datetime
+from string import Template
 from typing import List
 
 from avsub import cli, ffmpeg, new
 from avsub.core import consts, errors, x
-from avsub.core.tools import dcleaner, dopen, fcleaner, get_files
+from avsub.core.tools import SigHandler, dcleaner, dopen, fcleaner, get_files
 from avsub.core.tools import is_a_foreground, is_a_tty, mark_as_not_processed
+from avsub.ffmpeg import FFmpeg
 from avsub.str import Str
 
 
@@ -43,7 +44,7 @@ def checker() -> None:
             sys.exit(2)
         sys.exit(0)
 
-    parser: argparse.ArgumentParser = cli.create_parser()
+    parser: ArgumentParser = cli.create_parser()
     x.OPTS = parser.parse_args()
 
     gotcha: bool = False
@@ -66,12 +67,10 @@ def checker() -> None:
 
 
 def main() -> None:
-    for sig in consts.ALL_SIGNALS:
-        signal.signal(sig, stop)
-
+    SigHandler(consts.SIGNALS).capture(stop)
     checker()
 
-    fff: ffmpeg.FFmpeg = ffmpeg.FFmpeg()
+    fff: FFmpeg = ffmpeg.FFmpeg()
     fff.build()
 
     try:
@@ -79,8 +78,8 @@ def main() -> None:
         os.makedirs(x.THE_TEMP, exist_ok=True)
         x.A_TEMP = tempfile.mkdtemp(prefix="avsub-", dir=x.THE_TEMP)
         x.DEL_ON_EXIT_TEMP_FOLDER.append(x.A_TEMP)
-    except OSError as err:
-        if errors.osraise(errors.ENOENT, err=err):  # avsub: F2210
+    except OSError as err:  # avsub: F2210,F2220
+        if errors.osraise(errors.EEXIST, errors.ENOENT, err=err):
             raise
         print(err)
         print("[F] Required TEMP folders could not be created")
@@ -127,12 +126,11 @@ def main() -> None:
 
 
 def stop(*args) -> None:
-    for sig in consts.ALL_SIGNALS:
-        signal.signal(sig, signal.SIG_IGN)  # Simply ignore the signal "sig"
+    SigHandler(consts.SIGNALS).ignore()
 
     x.RUN = False  # Tell the program to stop
 
-    if args and args[0]:
+    if args:
         x.SIGNAL_NUMBER = args[0]
 
     if not x.FULL_CLEAN_AFTER_STOP:
@@ -146,23 +144,23 @@ def logger() -> int:
     status: int = 0
 
     for member in x.SUCCEEDED:
-        msg: string.Template = string.Template("[+] Job completed: '$member'")
+        msg: Template = Template("[+] Job completed: '$member'")
         print(msg.substitute(member=Str(member).base()))
         log.append(msg.substitute(member=Str(member).abs()))
     for member in x.DEL_ON_EXIT:
         if member in x.FATAL_FFMPEG:  # avsub: C2203
             continue
-        msg: string.Template = string.Template("[-] Not completed: '$member'")
+        msg: Template = Template("[-] Not completed: '$member'")
         print(msg.substitute(member=Str(member).base()))
         log.append(msg.substitute(member=Str(member).abs()))
         status: int = 2
     for member in x.NOT_PROCESSED:
-        msg: string.Template = string.Template("[ ] Not processed: '$member'")
+        msg: Template = Template("[ ] Not processed: '$member'")
         print(msg.substitute(member=Str(member).base()))
         log.append(msg.substitute(member=Str(member).abs()))
         status: int = 2
     for member in x.FATAL_FFMPEG:
-        msg: string.Template = string.Template("[F] Fatal, FFmpeg: '$member'")
+        msg: Template = Template("[F] Fatal, FFmpeg: '$member'")
         print(msg.substitute(member=Str(member).base()))
         log.append(msg.substitute(member=Str(member).abs()))
         status: int = 3
@@ -189,12 +187,10 @@ def logger() -> int:
 
 
 def clean() -> None:
-    line: str = Str("-").line()
-
     print("\n")
-    print(line)
+    print(Str("-").line())
     status: int = logger()
-    print(line)
+    print(Str("-").line())
 
     if hasattr(x, "SIGNAL_NUMBER"):
         print("[x] Received a signal:", x.SIGNAL_NUMBER)
@@ -204,13 +200,14 @@ def clean() -> None:
         if x.OPTS.no_open_dir != "never" and not x.OPTS.log:
             dcleaner(x.DEL_ON_EXIT_TEMP_FOLDER)
         print("DONE")
-        print(line)
+        print(Str("-").line())
 
     succeeded: int = len(x.SUCCEEDED)
     failed: int = len(x.DEL_ON_EXIT) + len(x.NOT_PROCESSED)
     fatal: int = len(x.FATAL_FFMPEG)
     total: int = succeeded + failed
-    folder: str = x.A_TEMP if (x.A_TEMP and Str(x.A_TEMP).isdir()) else ""  # avsub: F2211
+    folder: str = x.A_TEMP if (x.A_TEMP and Str(x.A_TEMP).isdir()) else ""
+    thanks: str = "Thanks for using AVsub"
 
     print("SUMMARY")
     print("-------")
@@ -218,9 +215,8 @@ def clean() -> None:
     print("Successful:", succeeded)
     print("Unsuccessful:", failed, "(%d fatal)" % fatal)
     print("Output folder: '%s'" % folder)
-    print(line)
-    print("Thanks for using AVsub|")
-    print("----------------------+\a")
+    print(Str("-").line())
+    print("{0}|\n{1}+\a".format(thanks, Str("-").line(col=len(thanks))))
 
     dopen(x.A_TEMP)
     sys.exit(status)  # Exit status (0: All is well, 2: Error, 3: Fatal)

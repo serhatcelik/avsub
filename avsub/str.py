@@ -1,8 +1,13 @@
 # coding=utf-8
-
+#
 # This file is part of AVsub
+# See https://github.com/serhatcelik/avsub for more information
 # Released under the GNU General Public License v3.0
 # Copyright (C) Serhat Çelik
+
+"""
+This module provides ways to manipulate strings effectively.
+"""
 
 import os
 import re
@@ -14,7 +19,7 @@ from avsub.core import errors, x
 
 
 class Str:
-    def __init__(self, s: str):
+    def __init__(self, s: str) -> None:
         self._s: str = s
 
     def abs(self) -> str:
@@ -69,7 +74,8 @@ class Str:
         return os.path.join(self.abs(), *[Str(_).base() for _ in args])
 
     def line(self, col: int = 0) -> str:
-        return self._s * (col if col != 0 else os.get_terminal_size().columns)
+        columns: int = col if col != 0 else os.get_terminal_size().columns - 1
+        return self._s * columns
 
     def listdir(self) -> List[str]:
         return [Str(self._s).join(_) for _ in os.listdir(self.abs())]

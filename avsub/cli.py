@@ -1,6 +1,7 @@
 # coding=utf-8
-
+#
 # This file is part of AVsub
+# See https://github.com/serhatcelik/avsub for more information
 # Released under the GNU General Public License v3.0
 # Copyright (C) Serhat Çelik
 
@@ -52,8 +53,8 @@ ABOUT
   See https://github.com/serhatcelik/avsub for more information.
 """
 
-import argparse
 import tempfile
+from argparse import ArgumentParser, Namespace, RawTextHelpFormatter
 from typing import List
 
 from avsub import NT, OS
@@ -62,14 +63,14 @@ from avsub.core.tools import convert_trim, is_user_admin
 from avsub.str import Str
 
 
-def create_parser() -> argparse.ArgumentParser:
-    parser: argparse.ArgumentParser = argparse.ArgumentParser(
+def create_parser() -> ArgumentParser:
+    parser: ArgumentParser = ArgumentParser(
         prog="avsub",
         usage="%(prog)s [<input> <extension> [<extra_option> ...]]",
         description=f"AVsub - A simplified command-line interface for FFmpeg\n"
                     f"Created by {notice.AUTHOR} "
                     f"(with the help of my family and a friend)",
-        epilog=__doc__, formatter_class=argparse.RawTextHelpFormatter,
+        epilog=__doc__, formatter_class=RawTextHelpFormatter,
         prefix_chars="+-",
     )
 
@@ -267,17 +268,17 @@ def create_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def check_opts(opts: argparse.Namespace) -> List[list]:
+def check_opts(opts: Namespace) -> List[list]:
     return [
         [
             all([Str(opts.input).iscwd() and opts.input != ".",
-                 all(_ not in opts.input for _ in ("/", "\\"))]),
+                 all(_ not in opts.input for _ in ["/", "\\"])]),
             "input ~ '%s': This is current folder, use '.'" % opts.input,
             "!",
         ],
         [
             all([Str(opts.temp).iscwd() and opts.temp != ".",
-                 all(_ not in opts.temp for _ in ("/", "\\"))]),
+                 all(_ not in opts.temp for _ in ["/", "\\"])]),
             "-o/--output ~ '%s': This is current folder, use '.'" % opts.temp,
             "!",
         ],
@@ -367,25 +368,25 @@ def check_opts(opts: argparse.Namespace) -> List[list]:
             "W",
         ],
         [
-            sum(1 for _ in ("audio", "video", "sub") if _ in opts.remove) == 3,
+            sum(1 for _ in ["audio", "video", "sub"] if _ in opts.remove) == 3,
             "--remove audio video sub: Output contains no stream",
             "W",
         ],
         [
             all([bool(opts.acodec) and opts.acodec != "copy",
-                 any(_ in opts.copy for _ in ("audio", "all"))]),
+                 any(_ in opts.copy for _ in ["audio", "all"])]),
             "+a: BAN: -c/--copy {audio | all}: Mutually exclusive group",
             "W",
         ],
         [
             all([bool(opts.vcodec) and opts.vcodec != "copy",
-                 any(_ in opts.copy for _ in ("video", "all"))]),
+                 any(_ in opts.copy for _ in ["video", "all"])]),
             "+v: BAN: -c/--copy {video | all}: Mutually exclusive group",
             "W",
         ],
         [
             all([bool(opts.scodec) and opts.scodec != "copy",
-                 any(_ in opts.copy for _ in ("sub", "all"))]),
+                 any(_ in opts.copy for _ in ["sub", "all"])]),
             "+s: BAN: -c/--copy {sub | all}: Mutually exclusive group",
             "W",
         ],

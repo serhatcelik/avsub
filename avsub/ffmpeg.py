@@ -1,6 +1,7 @@
 # coding=utf-8
-
+#
 # This file is part of AVsub
+# See https://github.com/serhatcelik/avsub for more information
 # Released under the GNU General Public License v3.0
 # Copyright (C) Serhat Çelik
 
@@ -13,8 +14,8 @@ from subprocess import CalledProcessError
 from typing import List
 
 from avsub.core import consts, x
-from avsub.core.tools import Repeater, avsubprocess, convert_trim
-from avsub.core.tools import mark_as_hidden
+from avsub.core.tools import avsubprocess, convert_trim, create_progress
+from avsub.core.tools import mark_as_hidden, repeater
 from avsub.str import Str
 
 
@@ -138,7 +139,7 @@ class FFmpeg:
         self.cmd += ["-filter:v", filter_v]
 
 
-@Repeater(retry=2, countdown=3)  # avsub: C2201
+@repeater(retry=2, countdown=3)  # avsub: C2201
 def check() -> bool:
     avsubprocess(["ffmpeg", "-version"], call=True, timeout=8)
     return True
@@ -160,7 +161,7 @@ def execute(cmd: List[str], files: List[str]) -> None:
                 x.DEL_ON_EXIT.update({file: x.NOT_PROCESSED.pop(file)})
 
         if x.RUN:  # avsub: F2002
-            pbar: str = "[%*d/%d]" % (len(str(len(files))), i + 1, len(files))
+            pbar: str = create_progress(i, total=files)
             base: str = Str(file).base()
             extout: str = Str(file).extout()
             print("[*] Running %s: '%s' -> %s" % (pbar, base, extout))
@@ -171,8 +172,6 @@ def execute(cmd: List[str], files: List[str]) -> None:
                 print("%s \"%s\" -i \"%s\"" % (x.CMD_TO_SHOW, output, file))
                 print(line)
 
-        new_cmd: List[str] = cmd + [output, "-i", file]
-
         try:
             # If an exit signal has already been caught...
             if not x.RUN:
@@ -180,7 +179,7 @@ def execute(cmd: List[str], files: List[str]) -> None:
             if not x.RUN_FFMPEG:  # avsub: F2000
                 print("File '%s' already exists, passing" % output)
                 continue
-            avsubprocess(new_cmd)
+            avsubprocess(cmd + [output, "-i", file])
         except CalledProcessError:
             # Note: Output will be deleted on exit
             continue
