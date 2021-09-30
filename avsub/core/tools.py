@@ -5,9 +5,9 @@
 # Released under the GNU General Public License v3.0
 # Copyright (C) Serhat Çelik
 
-"""
-General utility classes and functions.
-"""
+"""General utility classes and functions."""
+
+from __future__ import absolute_import
 
 import ctypes
 import os
@@ -21,15 +21,18 @@ from subprocess import CalledProcessError, DEVNULL as NULL, TimeoutExpired
 from subprocess import check_call, run
 from typing import Dict, List, Set, Union
 
-from avsub import NT, OS, POSIX
+from avsub import OS
 from avsub.core import consts, errors, x
 from avsub.str import Str
 
 
 class SigHandler:
+    """Docstring."""
+
     _handler = None
 
     def __init__(self, signals: List[int]) -> None:
+        """Docstring."""
         self._signals: List[int] = signals
 
     def _handle(self) -> None:
@@ -38,15 +41,18 @@ class SigHandler:
                 signal.signal(sig, self._handler)
 
     def capture(self, func) -> None:
+        """Docstring."""
         self._handler = func
         self._handle()
 
     def ignore(self) -> None:
+        """Docstring."""
         self._handler = signal.SIG_IGN
         self._handle()
 
 
 def avsubprocess(cmd: List[str], call: bool = False, timeout: int = 5) -> None:
+    """Docstring."""
     if call:
         check_call(cmd, timeout=timeout, stdin=NULL, stdout=NULL, stderr=NULL)
     else:
@@ -54,6 +60,7 @@ def avsubprocess(cmd: List[str], call: bool = False, timeout: int = 5) -> None:
 
 
 def convert_trim() -> Union[str, List[int]]:  # avsub: N2201
+    """Docstring."""
     if all(_.isdigit() for _ in x.OPTS.trim):
         first: int = int(x.OPTS.trim[0])
         last: int = int(x.OPTS.trim[1])
@@ -74,17 +81,20 @@ def convert_trim() -> Union[str, List[int]]:  # avsub: N2201
 
 
 def create_output(parent: str, file: str) -> str:
+    """Docstring."""
     basename_no_ext: str = Str(Str(file).base()).noext()
     return Str(parent).join(".".join([basename_no_ext, Str(file).extout()]))
 
 
 def create_progress(current: int, total: Union[int, list]) -> str:
+    """Docstring."""
     if isinstance(total, int):
-        return "[%*d/%d]" % (len(str(total)), current + 1, total)
-    return "[%*d/%d]" % (len(str(len(total))), current + 1, len(total))
+        return f"[{(current + 1):>{len(str(total))}}/{total}]"
+    return f"[{(current + 1):>{len(str(len(total)))}}/{len(total)}]"
 
 
 def dcleaner(*containers: List[str]) -> None:  # avsub: N2204
+    """Docstring."""
     for container in containers:
         for folder in container:
             try:
@@ -97,12 +107,13 @@ def dcleaner(*containers: List[str]) -> None:  # avsub: N2204
 
 
 def dopen(folder: str) -> None:
+    """Docstring."""
     if folder is not None and Str(folder).isdir():
         if any([
             x.OPTS.no_open_dir == "never",
             x.OPTS.no_open_dir == "empty" and Str(folder).isfull(),
         ]):
-            if OS[NT]:
+            if OS.nt:
                 os.startfile(Str(folder).abs())  # pylint: disable=no-member
             else:  # avsub: C2005
                 try:
@@ -112,6 +123,7 @@ def dopen(folder: str) -> None:
 
 
 def fcleaner(*containers: Dict[str, str]) -> None:
+    """Docstring."""
     for container in containers:
         for output in container.values():
             try:
@@ -123,6 +135,7 @@ def fcleaner(*containers: Dict[str, str]) -> None:
 
 
 def get_files(parent: str) -> Union[list, List[str]]:
+    """Docstring."""
     try:
         files: List[str] = Str(parent).listdir()
     except OSError as err:
@@ -148,34 +161,40 @@ def get_files(parent: str) -> Union[list, List[str]]:
 
 
 def is_a_foreground() -> bool:
-    if OS[POSIX]:
+    """Docstring."""
+    if OS.posix:
         fd_: int = sys.stdout.fileno()
         return os.getpgrp() == os.tcgetpgrp(fd_)  # pylint: disable=no-member
     return True
 
 
 def is_a_tty() -> bool:
+    """Docstring."""
     return sys.stdin.isatty() and sys.stdout.isatty() and sys.stderr.isatty()
 
 
-def is_user_admin() -> bool:
-    if OS[POSIX]:
+def is_user_an_admin() -> bool:
+    """Docstring."""
+    if OS.posix:
         return os.geteuid() == 0  # pylint: disable=no-member
     return ctypes.windll.shell32.IsUserAnAdmin() != 0
 
 
 def mark_as_hidden(file: str) -> None:
+    """Docstring."""
     current: int = Str(file).attrs()
     changed: int = current | stat.FILE_ATTRIBUTE_HIDDEN
     ctypes.windll.kernel32.SetFileAttributesW(Str(file).abs(), changed)
 
 
 def mark_as_not_processed(parent: str, files: List[str]) -> None:
+    """Docstring."""
     for file in files:
         x.NOT_PROCESSED.update({file: create_output(parent=parent, file=file)})
 
 
-def repeater(retry: int, countdown: int):
+def repeater(retry: int, countdown: float):
+    """Docstring."""
     def decorator(func):
         def wrapper(*args, **kwargs):
             f_name: str = ".".join([func.__module__, func.__name__])
@@ -187,7 +206,7 @@ def repeater(retry: int, countdown: int):
                     if i == retry:
                         break
                     pbar: str = create_progress(i, total=retry)
-                    print("[*] Retrying %s in %d secs..." % (pbar, countdown))
+                    print(f"[*] Retrying {pbar} in {countdown} secs...")
                     time.sleep(countdown)
             return False
         return wrapper

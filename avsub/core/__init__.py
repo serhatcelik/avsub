@@ -4,3 +4,5 @@
 # See https://github.com/serhatcelik/avsub for more information
 # Released under the GNU General Public License v3.0
 # Copyright (C) Serhat Çelik
+
+"""Core modules."""

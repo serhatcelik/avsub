@@ -5,9 +5,9 @@
 # Released under the GNU General Public License v3.0
 # Copyright (C) Serhat Çelik
 
-"""
-Setup script for AVsub.
-"""
+"""Setup script for AVsub."""
+
+from __future__ import absolute_import
 
 import setuptools
 
@@ -21,6 +21,7 @@ setuptools.setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     author=__import__("avsub.core.notice", fromlist="notice").AUTHOR,
+    author_email=__import__("avsub.core.notice", fromlist="notice").EMAIL,
     url=__import__("avsub.core.notice", fromlist="notice").URL,
     download_url="https://github.com/serhatcelik/avsub/releases/latest",
     packages=setuptools.find_packages(),

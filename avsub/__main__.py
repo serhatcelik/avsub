@@ -5,9 +5,11 @@
 # Released under the GNU General Public License v3.0
 # Copyright (C) Serhat Çelik
 
-"""
-AVsub - A simplified command-line interface for FFmpeg.
-"""
+"""AVsub - A simplified command-line interface for FFmpeg."""
+
+# pylint: disable=consider-using-f-string
+
+from __future__ import absolute_import
 
 import os
 import shutil
@@ -27,6 +29,7 @@ from avsub.str import Str
 
 
 def setup_py_main() -> None:
+    """Docstring."""
     if is_a_tty() and is_a_foreground():
         main()
         if x.RUN:
@@ -37,6 +40,7 @@ def setup_py_main() -> None:
 
 
 def checker() -> None:
+    """Docstring."""
     if len(sys.argv) == 1:
         print("[*] No options specified, checking for updates...")
         if not new.check_for_updates():
@@ -53,7 +57,7 @@ def checker() -> None:
         if x.OPTS.bypass and priority == "W":
             continue
         if condition:
-            print("[%s]" % priority, error)
+            print(f"[{priority}]", error)
             gotcha: bool = True  # avsub: C2006
 
     if gotcha:
@@ -67,6 +71,7 @@ def checker() -> None:
 
 
 def main() -> None:
+    """Docstring."""
     SigHandler(consts.SIGNALS).capture(stop)
     checker()
 
@@ -85,7 +90,7 @@ def main() -> None:
         print("[F] Required TEMP folders could not be created")
         sys.exit(3)
     else:
-        x.LOG_FILE = Str(x.THE_TEMP).join("%s.log" % x.A_TEMP)
+        x.LOG_FILE = Str(x.THE_TEMP).join(f"{x.A_TEMP}.log")
 
     # MANUAL OPERATION?
     if Str(x.OPTS.input).isfile():
@@ -126,6 +131,7 @@ def main() -> None:
 
 
 def stop(*args) -> None:
+    """Docstring."""
     SigHandler(consts.SIGNALS).ignore()
 
     x.RUN = False  # Tell the program to stop
@@ -140,6 +146,7 @@ def stop(*args) -> None:
 
 
 def logger() -> int:
+    """Docstring."""
     log: List[str] = []
     status: int = 0
 
@@ -187,6 +194,7 @@ def logger() -> int:
 
 
 def clean() -> None:
+    """Docstring."""
     print("\n")
     print(Str("-").line())
     status: int = logger()

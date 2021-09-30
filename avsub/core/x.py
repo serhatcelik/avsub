@@ -5,9 +5,9 @@
 # Released under the GNU General Public License v3.0
 # Copyright (C) Serhat Çelik
 
-"""
-Global "over control" variables (Xs) for handling external modules.
-"""
+"""Global "over control" variables (Xs) for handling external modules."""
+
+from __future__ import absolute_import
 
 from argparse import Namespace
 from typing import Dict, List

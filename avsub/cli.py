@@ -19,7 +19,7 @@ EXAMPLES
   4) Convert mkv to mp4 with audio codec aac and video codec h264
   avsub "input.mkv" mp4 +a aac +v h264
 
-  5) Convert mp4 to mp3 and choose audio stream only
+  5) Convert mp4 to mp3 and choose audio stream (not other streams)
   avsub "input.mp4" mp3 -A
 
   6) Compress video with CRF (Constant Rate Factor) value of 35
@@ -28,14 +28,14 @@ EXAMPLES
   7) Do not copy subtitle stream and metadata from input to output
   avsub "input.mp4" - --remove sub metadata
 
-  8) Extract a portion of video from 02:01:00 (or 7260) to 02:01:05 (or 7265)
+  8) Extract a part of video from 02:01:00 (or 7260) to 02:01:05 (or 7265)
   avsub "input.mp4" - --trim 02:01:00 02:01:05
 
-  9) Embed subtitle into video with primary color red and outline color blue
-  avsub "input.mp4" - -e "input.srt" --color1 red --color2 blue
-
-  10) Embed subtitle into video with font name Arial and font size 25
+  9) Embed subtitle into video (hardsub) with font name Arial and font size 25
   avsub "input.mp4" - -e "input.srt" --font "Arial" --size 25
+
+  10) Embed subtitle into video with primary color red and outline color blue
+  avsub "input.mp4" - -e "input.srt" --color1 red --color2 blue
 
 NOTES
   1) Valid Characters for File Extensions
@@ -53,17 +53,20 @@ ABOUT
   See https://github.com/serhatcelik/avsub for more information.
 """
 
+from __future__ import absolute_import
+
 import tempfile
 from argparse import ArgumentParser, Namespace, RawTextHelpFormatter
 from typing import List
 
-from avsub import NT, OS
+from avsub import OS
 from avsub.core import consts, notice
-from avsub.core.tools import convert_trim, is_user_admin
+from avsub.core.tools import convert_trim, is_user_an_admin
 from avsub.str import Str
 
 
 def create_parser() -> ArgumentParser:
+    """Docstring."""
     parser: ArgumentParser = ArgumentParser(
         prog="avsub",
         usage="%(prog)s [<input> <extension> [<extra_option> ...]]",
@@ -130,7 +133,7 @@ def create_parser() -> ArgumentParser:
     )
     parser.add_argument(
         "--no-map-all", dest="no_map_all", action="store_true", default=False,
-        help="do not choose all streams, may cause data loss",
+        help="do not choose all streams, may cause data loss!",
     )
     parser.add_argument(
         "--remove", metavar="<stream>", dest="remove", action="store",
@@ -157,8 +160,8 @@ def create_parser() -> ArgumentParser:
     )
     parser.add_argument(
         "--trim", metavar=("<from>", "<to>"), dest="trim", action="store",
-        nargs=2, default=None, type=str,
-        help="extract a portion of input from <from> to <to>, see example 8",
+        nargs=2, default=None,
+        help="extract a part of input from <from> to <to>, see example 8",
     )
     parser.add_argument(
         "+v", metavar="<codec>", dest="vcodec", action="store", default=None,
@@ -179,12 +182,12 @@ def create_parser() -> ArgumentParser:
     group_hardsub.add_argument(
         "--color1", metavar="<color>", dest="c1", action="store", default=None,
         choices=consts.C1,
-        help="set %(metavar)s as subtitle primary color, see example 9",
+        help="set %(metavar)s as subtitle primary color, see example 10",
     )  # avsub: C2003
     group_hardsub.add_argument(
         "--color2", metavar="<color>", dest="c2", action="store", default=None,
         choices=consts.C2,
-        help="set %(metavar)s as subtitle outline color, see example 9",
+        help="set %(metavar)s as subtitle outline color, see example 10",
     )  # avsub: C2003
     group_hardsub.add_argument(
         "-e", "--embed", metavar="<subtitle>", dest="embed", action="store",
@@ -193,7 +196,7 @@ def create_parser() -> ArgumentParser:
     )
     group_hardsub.add_argument(
         "--font", metavar="<name>", dest="font", action="store", default=None,
-        help="set %(metavar)s as subtitle font name, see example 10",
+        help="set %(metavar)s as subtitle font name, see example 9",
     )  # avsub: C2003
     group_hardsub.add_argument(
         "--position", metavar="<position>", dest="align", action="store",
@@ -202,7 +205,7 @@ def create_parser() -> ArgumentParser:
     )  # avsub: C2003
     group_hardsub.add_argument(
         "--size", metavar="<value>", dest="size", action="store", default=None,
-        type=int, help="set %(metavar)s as subtitle font size, see example 10",
+        type=int, help="set %(metavar)s as subtitle font size, see example 9",
     )  # avsub: C2003
 
     #########################
@@ -243,7 +246,7 @@ def create_parser() -> ArgumentParser:
     )  # avsub: N2200
     group_independent.add_argument(
         "--no-open-dir", metavar="<mode>", dest="no_open_dir", action="store",
-        nargs="?", default="empty" if OS[NT] else "always", const="always",
+        nargs="?", default="empty" if OS.nt else "always", const="always",
         choices=["never", "empty", "always"],
         help="set %(metavar)s to change the output folder opening behavior;\n"
              "\tDEFAULT: %(default)s\n"
@@ -269,27 +272,28 @@ def create_parser() -> ArgumentParser:
 
 
 def check_opts(opts: Namespace) -> List[list]:
+    """Docstring."""
     return [
         [
             all([Str(opts.input).iscwd() and opts.input != ".",
                  all(_ not in opts.input for _ in ["/", "\\"])]),
-            "input ~ '%s': This is current folder, use '.'" % opts.input,
+            f"input ~ '{opts.input}': This is current folder, use '.'",
             "!",
         ],
         [
             all([Str(opts.temp).iscwd() and opts.temp != ".",
                  all(_ not in opts.temp for _ in ["/", "\\"])]),
-            "-o/--output ~ '%s': This is current folder, use '.'" % opts.temp,
+            f"-o/--output ~ '{opts.temp}': This is current folder, use '.'",
             "!",
         ],
         [
             not Str(opts.input).exists(),
-            "input ~ '%s': No such file or folder" % opts.input,
+            f"input ~ '{opts.input}': No such file or folder",
             "!",
         ],
         [
             not Str(opts.ext).isext(),
-            "extension ~ '%s': Contains invalid chars, see note 1" % opts.ext,
+            f"extension ~ '{opts.ext}': Contains invalid chars, see note 1",
             "!",
         ],
         [
@@ -304,31 +308,31 @@ def check_opts(opts: Namespace) -> List[list]:
         ],
         [
             opts.embed and not Str(opts.embed).isfile(),
-            "-e/--embed ~ '%s': No such file" % opts.embed,
+            f"-e/--embed ~ '{opts.embed}': No such file",
             "!",
         ],
         [
             opts.embed and Str(opts.input).isdir(),
-            "-e/--embed: BAN: input ~ '%s': This is a folder" % opts.input,
+            f"-e/--embed: BAN: input ~ '{opts.input}': This is a folder",
             "!",
         ],
         [
             not opts.hidden and Str(opts.input).ishidden(),
-            "-H/--hidden: BAN: input ~ '%s': Protected X" % opts.input,
+            f"-H/--hidden: BAN: input ~ '{opts.input}': Protected X",
             "!",
         ],
         [
             not opts.hidden and opts.embed and Str(opts.embed).ishidden(),
-            "-H/--hidden: BAN: -e/--embed ~ '%s': Protected X" % opts.embed,
+            f"-H/--hidden: BAN: -e/--embed ~ '{opts.embed}': Protected X",
             "!",
         ],
         [
             not opts.hidden and Str(opts.temp).ishidden(),
-            "-H/--hidden: BAN: -o/--output ~ '%s': Protected X" % opts.temp,
+            f"-H/--hidden: BAN: -o/--output ~ '{opts.temp}': Protected X",
             "!",
         ],
         [
-            is_user_admin(),
+            is_user_an_admin(),
             "Privileged access detected, exiting by default, see note 2",
             "W",
         ],  # avsub: C2202

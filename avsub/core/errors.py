@@ -5,9 +5,9 @@
 # Released under the GNU General Public License v3.0
 # Copyright (C) Serhat Çelik
 
-"""
-Constants and utility functions for OSError exception.
-"""
+"""Constants and utility functions for OSError exception."""
+
+from __future__ import absolute_import
 
 import errno
 
@@ -21,7 +21,8 @@ ENOTEMPTY: int = errno.ENOTEMPTY  # Directory not empty
 
 
 def osraise(*errnos: int, err: OSError) -> bool:
+    """Docstring."""
     if err.errno in [*errnos, _EACCES, _EINVAL, _EPERM]:
         return False
-    print("[Errno %s]" % str(err.errno))
+    print(f"[Errno {err.errno}]")
     return True  # Will raise

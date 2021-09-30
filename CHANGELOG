@@ -2,6 +2,16 @@
 # History of the AVsub #
 ########################
 
+AVsub
+-----
+- Code improvements.
+- Performance improvements.
+- Quality improvements.
+- User interface has been improved.
+- Type annotations have been improved.
+- Documentation has been improved.
+
+
 AVsub 2.2.2 [2021.09.22]
 ------------------------
 - F2220: Fixed the "FileExistsError" that could occur when providing an existing file for the "-o/--output" option.

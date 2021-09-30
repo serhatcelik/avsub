@@ -5,9 +5,11 @@
 # Released under the GNU General Public License v3.0
 # Copyright (C) Serhat Çelik
 
-"""
-This module provides ways to use FFmpeg effectively.
-"""
+"""This module provides ways to use FFmpeg effectively."""
+
+# pylint: disable=consider-using-f-string
+
+from __future__ import absolute_import
 
 import inspect
 from subprocess import CalledProcessError
@@ -20,6 +22,8 @@ from avsub.str import Str
 
 
 class FFmpeg:
+    """Docstring."""
+
     cmd: List[str] = ["ffmpeg", "-n", "-hide_banner", "-stats"]
     _f_style: List[str] = []
 
@@ -98,29 +102,30 @@ class FFmpeg:
             self.cmd += ["-ss", str(first), "-to", str(last)]
 
     def _add_fontname_to_force_style___(self) -> None:
-        self._f_style += ["FontName=%s" % x.OPTS.font] if x.OPTS.font else []
+        self._f_style += [f"FontName={x.OPTS.font}"] if x.OPTS.font else []
 
     def _add_fontsize_to_force_style___(self) -> None:
         if x.OPTS.size is not None:  # avsub: F2201
             # Note: Used abs() to prevent "Assertion failed" error from FFmpeg
-            self._f_style += ["FontSize=%s" % abs(x.OPTS.size)]
+            self._f_style += [f"FontSize={abs(x.OPTS.size)}"]
 
     def _add_alignment_to_force_style___(self) -> None:
         if x.OPTS.align is not None:
-            self._f_style += ["Alignment=%s" % str(consts.ALIGN[x.OPTS.align])]
+            self._f_style += [f"Alignment={str(consts.ALIGN[x.OPTS.align])}"]
 
     def _add_borderstyle_to_force_style___(self) -> None:
-        self._f_style += ["BorderStyle=%s" % x.OPTS.box] if x.OPTS.box else []
+        self._f_style += [f"BorderStyle={x.OPTS.box}"] if x.OPTS.box else []
 
     def _add_primarycolour_to_force_style___(self) -> None:
         if x.OPTS.c1 is not None:
-            self._f_style += ["PrimaryColour=%s" % consts.C1[x.OPTS.c1]]
+            self._f_style += [f"PrimaryColour={consts.C1[x.OPTS.c1]}"]
 
     def _add_outlinecolour_to_force_style___(self) -> None:
         if x.OPTS.c2 is not None:
-            self._f_style += ["OutlineColour=%s" % consts.C2[x.OPTS.c2]]
+            self._f_style += [f"OutlineColour={consts.C2[x.OPTS.c2]}"]
 
     def build(self) -> None:
+        """Docstring."""
         for member in inspect.getmembers(self, predicate=inspect.ismethod):
             if member[0].endswith("___"):
                 member[-1]()  # Call the method of the FFmpeg class
@@ -130,7 +135,8 @@ class FFmpeg:
         x.CMD_TO_SHOW = " ".join(self.cmd)
 
     def build_hardsub(self, subpath: str) -> None:
-        filter_v: str = "subtitles=%s" % subpath
+        """Docstring."""
+        filter_v: str = f"subtitles=filename={subpath}"
 
         if self._f_style:
             filter_v += ":force_style='%s'" % ",".join(self._f_style)
@@ -141,11 +147,13 @@ class FFmpeg:
 
 @repeater(retry=2, countdown=3)  # avsub: C2201
 def check() -> bool:
+    """Docstring."""
     avsubprocess(["ffmpeg", "-version"], call=True, timeout=8)
     return True
 
 
 def execute(cmd: List[str], files: List[str]) -> None:
+    """Docstring."""
     for i, file in enumerate(files):
         # Note: Output base name is the same as input base name
         output: str = x.NOT_PROCESSED[file]
@@ -169,7 +177,7 @@ def execute(cmd: List[str], files: List[str]) -> None:
             if x.OPTS.show_ffmpeg:
                 line: str = Str("~").line()
                 print(line)
-                print("%s \"%s\" -i \"%s\"" % (x.CMD_TO_SHOW, output, file))
+                print(f"{x.CMD_TO_SHOW} \"{output}\" -i \"{file}\"")
                 print(line)
 
         try:
@@ -177,7 +185,7 @@ def execute(cmd: List[str], files: List[str]) -> None:
             if not x.RUN:
                 return
             if not x.RUN_FFMPEG:  # avsub: F2000
-                print("File '%s' already exists, passing" % output)
+                print(f"File '{output}' already exists, passing")
                 continue
             avsubprocess(cmd + [output, "-i", file])
         except CalledProcessError:
