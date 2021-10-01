@@ -295,12 +295,12 @@ def check_opts(opts: Namespace) -> List[list]:
             not Str(opts.temp).isdir(),
             f"-o/--output ~ '{opts.temp}': No such folder",
             "!",
-        ],  # avsub: C????
+        ],  # avsub: C2231
         [
             not Str(opts.temp).issafe(),
             f"-o/--output ~ '{opts.temp}': Contains unsafe whitespace chars",
             "!",
-        ],  # avsub: C????
+        ],  # avsub: C2230
         [
             not Str(opts.ext).isext(),
             f"extension ~ '{opts.ext}': Contains invalid chars, see note 1",

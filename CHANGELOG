@@ -2,10 +2,10 @@
 # History of the AVsub #
 ########################
 
-AVsub
------
-- C????: Option "-o/--output" now requires a folder where the basename does not contain spaces.
-- C????: Option "-o/--output" now requires an existing folder to operate.
+AVsub 2.2.3 [2021.10.01]
+------------------------
+- C2230: Option "-o/--output" now requires a folder where the basename does not contain spaces.
+- C2231: Option "-o/--output" now requires an existing folder to operate.
 - Code improvements.
 - Performance improvements.
 - Quality improvements.
