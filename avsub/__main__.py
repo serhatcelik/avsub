@@ -29,7 +29,7 @@ from avsub.str import Str
 
 
 def setup_py_main() -> None:
-    """Docstring."""
+    """Main function for setup script."""
     if is_a_tty() and is_a_foreground():
         main()
         if x.RUN:
@@ -71,12 +71,12 @@ def checker() -> None:
 
 
 def main() -> None:
-    """Docstring."""
+    """Main function."""
     SigHandler(consts.SIGNALS).capture(stop)
     checker()
 
     fff: FFmpeg = ffmpeg.FFmpeg()
-    fff.build()
+    fff.build()  # Start creating the ultimate FFmpeg command
 
     try:
         x.THE_TEMP = Str(x.OPTS.temp).abs()
@@ -194,7 +194,7 @@ def logger() -> int:
 
 
 def clean() -> None:
-    """Docstring."""
+    """Show the log, do the cleaning and exit the program."""
     print("\n")
     print(Str("-").line())
     status: int = logger()

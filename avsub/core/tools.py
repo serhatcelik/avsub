@@ -71,7 +71,7 @@ class SigHandler:
 
 
 def avsubprocess(cmd: List[str], call: bool = False, timeout: int = 5) -> None:
-    """Docstring."""
+    """A custom subprocess for AVsub."""
     if call:
         check_call(cmd, timeout=timeout, stdin=NULL, stdout=NULL, stderr=NULL)
     else:
@@ -100,7 +100,7 @@ def convert_trim() -> Union[str, List[str]]:  # avsub: N2201
 
 
 def create_output(parent: str, file: str) -> str:
-    """Docstring."""
+    """Create an output from input for the ultimate FFmpeg command."""
     basename_no_ext: str = Str(Str(file).base()).noext()
     return Str(parent).join(".".join([basename_no_ext, Str(file).extout()]))
 
@@ -113,7 +113,7 @@ def create_progress(current: int, total: Union[int, list]) -> str:
 
 
 def dcleaner(*containers: List[str]) -> None:  # avsub: N2204
-    """Docstring."""
+    """Delete folders that to be deleted on exit."""
     for container in containers:
         for folder in container:
             try:
@@ -126,7 +126,7 @@ def dcleaner(*containers: List[str]) -> None:  # avsub: N2204
 
 
 def dopen(folder: str) -> None:
-    """Docstring."""
+    """Open a folder."""
     if folder is not None and Str(folder).isdir():
         if any([
             x.OPTS.no_open_dir == "never",
@@ -142,7 +142,7 @@ def dopen(folder: str) -> None:
 
 
 def fcleaner(*containers: Dict[str, str]) -> None:
-    """Docstring."""
+    """Delete files that to be deleted on exit."""
     for container in containers:
         for output in container.values():
             try:

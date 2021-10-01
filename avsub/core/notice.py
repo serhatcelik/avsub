@@ -27,5 +27,5 @@ along with AVsub.  If not, see <https://www.gnu.org/licenses/>.
 AUTHOR = "Serhat Çelik"
 EMAIL = "prjctsrht@gmail.com"  # noqa: F841
 LICENSE = "GPLv3"  # noqa: F841
-URL = "https://github.com/serhatcelik/avsub"
+URL = "https://github.com/serhatcelik/avsub"  # noqa: F841
 VERSION = ""

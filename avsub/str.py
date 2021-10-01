@@ -26,11 +26,11 @@ class Str:
         self._s: str = s
 
     def abs(self) -> str:
-        """Docstring."""
-        return os.path.abspath(self._s)  # Will be normalized and absolutized
+        """Normalize and absolutize the given string."""
+        return os.path.abspath(self._s)
 
     def attrs(self) -> Union[bool, int]:
-        """Docstring."""
+        """Retrieve file attributes from the given string."""
         try:
             return os.stat(self.abs()).st_file_attributes
         except OSError as err:
@@ -43,35 +43,35 @@ class Str:
         return os.path.basename(self.abs())
 
     def endsext(self, ext: str) -> bool:
-        """Docstring."""
+        """Check if the given string ends with the given extension."""
         return self._s.endswith("." + ext.strip("."))
 
     def exists(self) -> bool:
-        """Docstring."""
+        """Check if the given string exists."""
         return os.path.exists(self.abs())
 
     def ext(self) -> str:
-        """Docstring."""
+        """Retrieve file extension from the given string."""
         return os.path.splitext(self.base())[-1].strip(".")
 
     def extout(self) -> str:
-        """Docstring."""
+        """Determine file extension from the given string."""
         return self.ext() if x.OPTS.ext == "-" else x.OPTS.ext
 
     def iscwd(self) -> bool:
-        """Docstring."""
+        """Check if the given string is the working directory."""
         return self.abs() == Str(".").abs()
 
     def isdir(self) -> bool:
-        """Docstring."""
+        """Check if the given string is an existing folder."""
         return os.path.isdir(self.abs())
 
     def isext(self) -> bool:
-        """Docstring."""
+        """Check if the given string is a valid extension."""
         return bool(re.match(r"^[a-zA-Z0-9_-]+$", self._s))  # avsub: C2011
 
     def isfile(self) -> bool:
-        """Docstring."""
+        """Check if the given string is an existing file."""
         return os.path.isfile(self.abs())
 
     def isfull(self) -> bool:
@@ -81,13 +81,13 @@ class Str:
         return False
 
     def ishidden(self) -> bool:
-        """Docstring."""
+        """Check if the given string is hidden."""
         if OS.posix:
             return self.base().startswith(".")
         return bool(self.attrs() & stat.FILE_ATTRIBUTE_HIDDEN)
 
     def issafe(self, char: str = " ") -> bool:
-        """Docstring."""
+        """Check if the given string contains the given unsafe char."""
         return char not in self.base()
 
     def join(self, *args: str) -> str:
@@ -95,7 +95,7 @@ class Str:
         return os.path.join(self.abs(), *[Str(_).base() for _ in args])
 
     def line(self, col: int = 0) -> str:
-        """Docstring."""
+        """Create a horizontal line from the given string."""
         columns: int = col if col != 0 else os.get_terminal_size().columns - 1
         return self._s * columns
 
@@ -104,5 +104,5 @@ class Str:
         return [Str(self._s).join(_) for _ in os.listdir(self.abs())]
 
     def noext(self) -> str:
-        """Docstring."""
+        """Remove file extension from the given string."""
         return os.path.splitext(self._s)[0]

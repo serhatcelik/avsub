@@ -124,7 +124,7 @@ class FFmpeg:
             self._f_style += [f"OutlineColour={consts.C2[x.OPTS.c2]}"]
 
     def build(self) -> None:
-        """Docstring."""
+        """Update the ultimate FFmpeg command."""
         for member in inspect.getmembers(self, predicate=inspect.ismethod):
             if member[0].endswith("___"):
                 member[-1]()  # Call the method of the FFmpeg class
@@ -152,7 +152,7 @@ def check() -> bool:
 
 
 def execute(cmd: List[str], files: List[str]) -> None:
-    """Docstring."""
+    """Finish creating the ultimate FFmpeg command and execute it."""
     for i, file in enumerate(files):
         # Note: Output base name is the same as input base name
         output: str = x.NOT_PROCESSED[file]

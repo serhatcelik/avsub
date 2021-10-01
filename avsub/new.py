@@ -17,7 +17,7 @@ from avsub.core.tools import repeater
 
 @repeater(retry=3, countdown=5)
 def check_for_updates() -> bool:
-    """Docstring."""
+    """Check if there is a new version for AVsub."""
     with request.urlopen(notice.URL + "/releases/latest/", timeout=10) as rep:  # nosec
         if rep.url != notice.URL + "/releases/tag/" + notice.VERSION:
             latest: str = rep.url.strip(notice.URL + "/releases/tag/")

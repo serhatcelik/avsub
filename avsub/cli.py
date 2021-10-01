@@ -66,7 +66,7 @@ from avsub.str import Str
 
 
 def create_parser() -> ArgumentParser:
-    """Docstring."""
+    """Create a parser to parse command-line arguments."""
     parser: ArgumentParser = ArgumentParser(
         prog="avsub",
         usage="%(prog)s [<input> <extension> [<extra_option> ...]]",
@@ -272,7 +272,7 @@ def create_parser() -> ArgumentParser:
 
 
 def check_opts(opts: Namespace) -> List[list]:
-    """Docstring."""
+    """Check for parsed command-line arguments."""
     return [
         [
             all([Str(opts.input).iscwd() and opts.input != ".",
