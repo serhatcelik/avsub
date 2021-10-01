@@ -58,7 +58,7 @@ def checker() -> None:
             continue
         if condition:
             print(f"[{priority}]", error)
-            gotcha: bool = True  # avsub: C2006
+            gotcha = True  # avsub: C2006
 
     if gotcha:
         sys.exit(2)
@@ -117,7 +117,7 @@ def main() -> None:
     # AUTOMATIC OPERATION?
     else:
         print("[*] Getting files...")
-        files: List[str] = get_files(parent=x.OPTS.input)
+        files = get_files(parent=x.OPTS.input)
         if not files:
             print("[-] Exiting, no files to process with current options")
             dcleaner(x.DEL_ON_EXIT_TEMP_FOLDER)
@@ -157,20 +157,20 @@ def logger() -> int:
     for member in x.DEL_ON_EXIT:
         if member in x.FATAL_FFMPEG:  # avsub: C2203
             continue
-        msg: Template = Template("[-] Not completed: '$member'")
+        msg = Template("[-] Not completed: '$member'")
         print(msg.substitute(member=Str(member).base()))
         log.append(msg.substitute(member=Str(member).abs()))
-        status: int = 2
+        status = 2
     for member in x.NOT_PROCESSED:
-        msg: Template = Template("[ ] Not processed: '$member'")
+        msg = Template("[ ] Not processed: '$member'")
         print(msg.substitute(member=Str(member).base()))
         log.append(msg.substitute(member=Str(member).abs()))
-        status: int = 2
+        status = 2
     for member in x.FATAL_FFMPEG:
-        msg: Template = Template("[F] Fatal, FFmpeg: '$member'")
+        msg = Template("[F] Fatal, FFmpeg: '$member'")
         print(msg.substitute(member=Str(member).base()))
         log.append(msg.substitute(member=Str(member).abs()))
-        status: int = 3
+        status = 3
 
     xml: str = "xmlcharrefreplace"
 

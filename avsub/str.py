@@ -86,6 +86,10 @@ class Str:
             return self.base().startswith(".")
         return bool(self.attrs() & stat.FILE_ATTRIBUTE_HIDDEN)
 
+    def issafe(self, char: str = " ") -> bool:
+        """Docstring."""
+        return char not in self.base()
+
     def join(self, *args: str) -> str:
         """Docstring."""
         return os.path.join(self.abs(), *[Str(_).base() for _ in args])

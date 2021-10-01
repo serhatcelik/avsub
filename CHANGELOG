@@ -4,9 +4,12 @@
 
 AVsub
 -----
+- C????: Option "-o/--output" now requires a folder where the basename does not contain spaces.
+- C????: Option "-o/--output" now requires an existing folder to operate.
 - Code improvements.
 - Performance improvements.
 - Quality improvements.
+- Contradictory option check has been improved.
 - User interface has been improved.
 - Type annotations have been improved.
 - Documentation has been improved.

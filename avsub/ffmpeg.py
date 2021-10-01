@@ -96,10 +96,9 @@ class FFmpeg:
 
     def _add_trim_to_cmd___(self) -> None:
         if x.OPTS.trim is not None:
-            first: int
-            last: int
-            first, last = convert_trim()
-            self.cmd += ["-ss", str(first), "-to", str(last)]
+            first: str = convert_trim()[0]
+            last: str = convert_trim()[-1]
+            self.cmd += ["-ss", first, "-to", last]
 
     def _add_fontname_to_force_style___(self) -> None:
         self._f_style += [f"FontName={x.OPTS.font}"] if x.OPTS.font else []

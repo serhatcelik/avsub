@@ -21,9 +21,28 @@ from subprocess import CalledProcessError, DEVNULL as NULL, TimeoutExpired
 from subprocess import check_call, run
 from typing import Dict, List, Set, Union
 
-from avsub import OS
 from avsub.core import consts, errors, x
 from avsub.str import Str
+
+
+def repeater(retry: int, countdown: float):
+    """Docstring."""
+    def decorator(func):
+        def wrapper(*args, **kwargs):
+            f_name: str = ".".join([func.__module__, func.__name__])
+            for i in range(retry + 1):
+                try:
+                    return func(*args, **kwargs)
+                except consts.EXCEPTION_BY_FUNCTION[f_name] as err:
+                    print("[!]", err)  # avsub: F2221
+                    if i == retry:
+                        break
+                    pbar: str = create_progress(i, total=retry)
+                    print(f"[*] Retrying {pbar} in {countdown} secs...")
+                    time.sleep(countdown)
+            return False
+        return wrapper
+    return decorator
 
 
 class SigHandler:
@@ -59,12 +78,12 @@ def avsubprocess(cmd: List[str], call: bool = False, timeout: int = 5) -> None:
         run(cmd, check=True, stdin=NULL)
 
 
-def convert_trim() -> Union[str, List[int]]:  # avsub: N2201
+def convert_trim() -> Union[str, List[str]]:  # avsub: N2201
     """Docstring."""
     if all(_.isdigit() for _ in x.OPTS.trim):
         first: int = int(x.OPTS.trim[0])
         last: int = int(x.OPTS.trim[1])
-        return "smaller" if last <= first else [first, last]
+        return "smaller" if last <= first else [str(first), str(last)]
 
     if all(bool(re.match(r"^\d+:[0-5]?\d:[0-5]?\d$", _)) for _ in x.OPTS.trim):
         hour_f: int = int(x.OPTS.trim[0].split(":")[0])
@@ -75,7 +94,7 @@ def convert_trim() -> Union[str, List[int]]:  # avsub: N2201
         sec_l: int = int(x.OPTS.trim[1].split(":")[2])
         secs_f: int = hour_f * 3600 + min_f * 60 + sec_f
         secs_l: int = hour_l * 3600 + min_l * 60 + sec_l
-        return "smaller" if secs_l <= secs_f else [secs_f, secs_l]
+        return "smaller" if secs_l <= secs_f else [str(secs_f), str(secs_l)]
 
     return "syntax"  # Error type
 
@@ -113,8 +132,8 @@ def dopen(folder: str) -> None:
             x.OPTS.no_open_dir == "never",
             x.OPTS.no_open_dir == "empty" and Str(folder).isfull(),
         ]):
-            if OS.nt:
-                os.startfile(Str(folder).abs())  # pylint: disable=no-member
+            if hasattr(os, "startfile"):
+                getattr(os, "startfile")(Str(folder).abs())
             else:  # avsub: C2005
                 try:
                     avsubprocess(["xdg-open", Str(folder).abs()], call=True)
@@ -162,9 +181,9 @@ def get_files(parent: str) -> Union[list, List[str]]:
 
 def is_a_foreground() -> bool:
     """Docstring."""
-    if OS.posix:
+    if hasattr(os, "getpgrp") and hasattr(os, "tcgetpgrp"):
         fd_: int = sys.stdout.fileno()
-        return os.getpgrp() == os.tcgetpgrp(fd_)  # pylint: disable=no-member
+        return getattr(os, "getpgrp")() == getattr(os, "tcgetpgrp")(fd_)
     return True
 
 
@@ -175,8 +194,8 @@ def is_a_tty() -> bool:
 
 def is_user_an_admin() -> bool:
     """Docstring."""
-    if OS.posix:
-        return os.geteuid() == 0  # pylint: disable=no-member
+    if hasattr(os, "geteuid"):
+        return getattr(os, "geteuid")() == 0
     return ctypes.windll.shell32.IsUserAnAdmin() != 0
 
 
@@ -191,23 +210,3 @@ def mark_as_not_processed(parent: str, files: List[str]) -> None:
     """Docstring."""
     for file in files:
         x.NOT_PROCESSED.update({file: create_output(parent=parent, file=file)})
-
-
-def repeater(retry: int, countdown: float):
-    """Docstring."""
-    def decorator(func):
-        def wrapper(*args, **kwargs):
-            f_name: str = ".".join([func.__module__, func.__name__])
-            for i in range(retry + 1):
-                try:
-                    return func(*args, **kwargs)
-                except consts.EXCEPTION_BY_FUNCTION[f_name] as err:
-                    print("[!]", err)  # avsub: F2221
-                    if i == retry:
-                        break
-                    pbar: str = create_progress(i, total=retry)
-                    print(f"[*] Retrying {pbar} in {countdown} secs...")
-                    time.sleep(countdown)
-            return False
-        return wrapper
-    return decorator
