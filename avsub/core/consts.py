@@ -10,10 +10,14 @@
 from __future__ import absolute_import
 
 import signal
+import tempfile
 import urllib.error
 from collections import defaultdict as safedict
 from subprocess import CalledProcessError, TimeoutExpired
 from typing import DefaultDict, Dict, List, Tuple
+
+from avsub.core import notice
+from avsub.str import Str
 
 ##########
 # Signal #
@@ -51,6 +55,21 @@ LOGLEVEL: DefaultDict[int, int] = safedict(lambda: 40, {0: 16, 1: 24, 2: 32})
 ####################
 _EXCEPTION_SUBPROCESS: tuple = (CalledProcessError, TimeoutExpired)
 EXCEPTION_BY_FUNCTION: Dict[str, tuple] = {
-    "avsub.new.check_for_updates": (ValueError, urllib.error.URLError),
+    "avsub.new.check_for_updates": urllib.error.URLError,
     "avsub.ffmpeg.check": (FileNotFoundError, *_EXCEPTION_SUBPROCESS),
 }
+
+############
+# Location #
+############
+DEF_TEMP: str = Str(tempfile.gettempdir()).join("AVsub")
+
+###################
+# Version Control #
+###################
+_URL_MAIN: str = notice.URL
+_URL_RAW: str = "https://raw.githubusercontent.com/serhatcelik/avsub"
+_URL_RELEASES: str = _URL_MAIN + "/releases"
+URL_LATEST: str = _URL_RELEASES + "/latest"
+URL_TAG: str = _URL_RELEASES + "/tag/"  # Do not remove the trailing slash!
+URL_YANKED: str = _URL_RAW + "/main/yanked.txt"

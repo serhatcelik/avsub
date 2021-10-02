@@ -55,7 +55,6 @@ ABOUT
 
 from __future__ import absolute_import
 
-import tempfile
 from argparse import ArgumentParser, Namespace, RawTextHelpFormatter
 from typing import List
 
@@ -260,7 +259,7 @@ def create_parser() -> ArgumentParser:
     )
     group_independent.add_argument(
         "-o", "--output", metavar="<folder>", dest="temp", action="store",
-        default=Str(tempfile.gettempdir()).join("AVsub"),
+        default=consts.DEF_TEMP,
         help="set %(metavar)s as the parent of the output folder",
     )  # avsub: N2100
     group_independent.add_argument(
@@ -292,10 +291,10 @@ def check_opts(opts: Namespace) -> List[list]:
             "!",
         ],
         [
-            not Str(opts.temp).isdir(),
+            Str(opts.temp).neq(consts.DEF_TEMP) and not Str(opts.temp).isdir(),
             f"-o/--output ~ '{opts.temp}': No such folder",
             "!",
-        ],  # avsub: C2231
+        ],  # avsub: C2231,F2240
         [
             not Str(opts.temp).issafe(),
             f"-o/--output ~ '{opts.temp}': Contains unsafe whitespace chars",

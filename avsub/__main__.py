@@ -43,6 +43,8 @@ def checker() -> None:
     """Docstring."""
     if len(sys.argv) == 1:
         print("[*] No options specified, checking for updates...")
+        if new.check_for_yanked():  # avsub: N2240
+            print("[!] You are using a yanked version, please use another")
         if not new.check_for_updates():
             print("[!] Could not check for updates, try again later")
             sys.exit(2)

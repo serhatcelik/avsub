@@ -46,6 +46,10 @@ class Str:
         """Check if the given string ends with the given extension."""
         return self._s.endswith("." + ext.strip("."))
 
+    def eq(self, value: str) -> bool:
+        """Docstring."""
+        return self.abs() == Str(value).abs()
+
     def exists(self) -> bool:
         """Check if the given string exists."""
         return os.path.exists(self.abs())
@@ -60,7 +64,7 @@ class Str:
 
     def iscwd(self) -> bool:
         """Check if the given string is the working directory."""
-        return self.abs() == Str(".").abs()
+        return self.eq(".")
 
     def isdir(self) -> bool:
         """Check if the given string is an existing folder."""
@@ -102,6 +106,10 @@ class Str:
     def listdir(self) -> List[str]:
         """Docstring."""
         return [Str(self._s).join(_) for _ in os.listdir(self.abs())]
+
+    def neq(self, value: str) -> bool:
+        """Docstring."""
+        return self.abs() != Str(value).abs()
 
     def noext(self) -> str:
         """Remove file extension from the given string."""
