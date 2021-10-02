@@ -2,8 +2,8 @@
 # History of the AVsub #
 ########################
 
-AVsub 2.2.4
------------
+AVsub 2.2.4 [2021.10.03]
+------------------------
 - F2240: Fixed the error where the required temporary folders could not be created when option "-o/--output" is not used.
 - N2240: Now it is checked whether the current version is a yanked version.
 - Code improvements.
