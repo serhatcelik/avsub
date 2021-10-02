@@ -55,7 +55,7 @@ LOGLEVEL: DefaultDict[int, int] = safedict(lambda: 40, {0: 16, 1: 24, 2: 32})
 ####################
 _EXCEPTION_SUBPROCESS: tuple = (CalledProcessError, TimeoutExpired)
 EXCEPTION_BY_FUNCTION: Dict[str, tuple] = {
-    "avsub.new.check_for_updates": urllib.error.URLError,
+    "avsub.new.check_for_updates": (ValueError, urllib.error.URLError),
     "avsub.ffmpeg.check": (FileNotFoundError, *_EXCEPTION_SUBPROCESS),
 }
 
