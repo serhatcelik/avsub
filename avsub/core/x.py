@@ -24,6 +24,6 @@ NOT_PROCESSED: Dict[str, str] = {}  # Unprocessed items
 OPTS: Namespace  # Parsed command-line arguments
 RUN: bool = True  # Value that decides whether the program will continue to run
 RUN_FFMPEG: bool = True  # # Value that decides whether FFmpeg will be executed
-SIGNAL_NUMBER: int  # Captured signal number
+SIG_INFO: list  # Captured signal name and number
 SUCCEEDED: Dict[str, str] = {}  # Successfully completed items
 THE_TEMP: str  # TEMP folder for storing all other TEMP folders

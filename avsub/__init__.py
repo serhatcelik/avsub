@@ -17,8 +17,8 @@ import sys
 
 _Os = collections.namedtuple("_Os", ("nt", "posix"))
 _MAJOR = 3
-_MINOR_MIN = 6  # avsub: P2000
-_MINOR_MAX = 9
+_MINOR_MIN = 6
+_MINOR_MAX = 10  # avsub: P3000
 
 ###############
 # Requirement #
@@ -36,7 +36,7 @@ _MAJOR_NOW = sys.version_info[0]
 _MINOR_NOW = sys.version_info[1]
 _PYTHON_NOW = "%d.%d" % (_MAJOR_NOW, _MINOR_NOW)
 
-if _OS_NOW not in _OS_REQ:  # avsub: N2203
+if _OS_NOW not in _OS_REQ:
     print("[!] Unsupported operating system for AVsub:", _OS_NOW)
     sys.exit(2)
 if _MAJOR_NOW != _MAJOR_REQ or _MINOR_NOW not in _MINOR_REQ:

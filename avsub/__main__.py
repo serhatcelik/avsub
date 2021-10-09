@@ -11,7 +11,6 @@
 
 from __future__ import absolute_import
 
-import os
 import shutil
 import sys
 import tempfile
@@ -22,8 +21,10 @@ from typing import List
 
 from avsub import cli, ffmpeg, new
 from avsub.core import consts, errors, x
-from avsub.core.tools import SigHandler, dcleaner, dopen, fcleaner, get_files
-from avsub.core.tools import is_a_foreground, is_a_tty, mark_as_not_processed
+from avsub.core.consts import U8, XML
+from avsub.core.tools import SigHandler, dcleaner, dmaker, dopen, fcleaner
+from avsub.core.tools import get_files, is_a_foreground, is_a_tty
+from avsub.core.tools import mark_as_not_processed
 from avsub.ffmpeg import FFmpeg
 from avsub.str import Str
 
@@ -43,7 +44,7 @@ def checker() -> None:
     """Docstring."""
     if len(sys.argv) == 1:
         print("[*] No options specified, checking for updates...")
-        if new.check_for_yanked():  # avsub: N2240
+        if new.check_for_yanked():
             print("[!] You are using a yanked version, please use another")
         if not new.check_for_updates():
             print("[!] Could not check for updates, try again later")
@@ -60,13 +61,13 @@ def checker() -> None:
             continue
         if condition:
             print(f"[{priority}]", error)
-            gotcha = True  # avsub: C2006
+            gotcha = True
 
     if gotcha:
         sys.exit(2)
 
     print("[*] Starting a run test for FFmpeg...")
-    if not ffmpeg.check():  # avsub: N2102
+    if not ffmpeg.check():
         print("[F] Could not execute FFmpeg")
         if not x.OPTS.no_err_exit:
             sys.exit(3)
@@ -82,17 +83,17 @@ def main() -> None:
 
     try:
         x.THE_TEMP = Str(x.OPTS.temp).abs()
-        os.makedirs(x.THE_TEMP, exist_ok=True)
+        dmaker(x.THE_TEMP, consts.DIR_CONF, consts.DIR_LOG)  # avsub: C3000
         x.A_TEMP = tempfile.mkdtemp(prefix="avsub-", dir=x.THE_TEMP)
         x.DEL_ON_EXIT_TEMP_FOLDER.append(x.A_TEMP)
-    except OSError as err:  # avsub: F2210,F2220
+    except OSError as err:
         if errors.osraise(errors.EEXIST, errors.ENOENT, err=err):
             raise
         print(err)
         print("[F] Required TEMP folders could not be created")
         sys.exit(3)
     else:
-        x.LOG_FILE = Str(x.THE_TEMP).join(f"{x.A_TEMP}.log")
+        x.LOG_FILE = Str(consts.DIR_LOG).join(f"{x.A_TEMP}.log")
 
     # MANUAL OPERATION?
     if Str(x.OPTS.input).isfile():
@@ -139,7 +140,10 @@ def stop(*args) -> None:
     x.RUN = False  # Tell the program to stop
 
     if args:
-        x.SIGNAL_NUMBER = args[0]
+        for name, number in consts.SIGNALS.items():
+            if args[0] == number:
+                x.SIG_INFO = [name, number]
+                break
 
     if not x.FULL_CLEAN_AFTER_STOP:
         fcleaner(x.DEL_ON_EXIT_TEMP)
@@ -157,7 +161,7 @@ def logger() -> int:
         print(msg.substitute(member=Str(member).base()))
         log.append(msg.substitute(member=Str(member).abs()))
     for member in x.DEL_ON_EXIT:
-        if member in x.FATAL_FFMPEG:  # avsub: C2203
+        if member in x.FATAL_FFMPEG:
             continue
         msg = Template("[-] Not completed: '$member'")
         print(msg.substitute(member=Str(member).base()))
@@ -174,15 +178,13 @@ def logger() -> int:
         log.append(msg.substitute(member=Str(member).abs()))
         status = 3
 
-    xml: str = "xmlcharrefreplace"
-
     if x.OPTS.log:
         try:
-            with open(x.LOG_FILE, "a", encoding="utf-8", errors=xml) as file:
+            with open(x.LOG_FILE, "a", encoding=U8, errors=XML) as file:
                 date: str = datetime.now().strftime("%m/%d/%Y - %H:%M:%S")
                 line: str = Str("=").line(col=len(date))
                 file.write("{0}\n{1}\n{0}\n".format(line, date))
-                log.reverse()  # avsub: C2200
+                log.reverse()
                 for message in log:
                     file.write(message + "\n")
         except OSError as err:
@@ -190,7 +192,7 @@ def logger() -> int:
                 raise
             print("[!] Logging error:", err)
         else:
-            print("[*] Results saved: '%s'" % file.name)
+            print("[*] Results saved:", f"'{file.name}'")
 
     return status
 
@@ -202,8 +204,8 @@ def clean() -> None:
     status: int = logger()
     print(Str("-").line())
 
-    if hasattr(x, "SIGNAL_NUMBER"):
-        print("[x] Received a signal:", x.SIGNAL_NUMBER)
+    if hasattr(x, "SIG_INFO"):
+        print("[x] Received a signal:", x.SIG_INFO[1], f"({x.SIG_INFO[0]})")
     if status != 0 or x.DEL_ON_EXIT_TEMP:
         print("[*] Cleaning, please do not interrupt", end="...", flush=True)
         fcleaner(x.DEL_ON_EXIT, x.DEL_ON_EXIT_TEMP)
@@ -217,16 +219,16 @@ def clean() -> None:
     fatal: int = len(x.FATAL_FFMPEG)
     total: int = succeeded + failed
     folder: str = x.A_TEMP if (x.A_TEMP and Str(x.A_TEMP).isdir()) else ""
-    thanks: str = "Thanks for using AVsub"
 
     print("SUMMARY")
-    print("-------")
+    print("--------------")
     print("Total:", total)
     print("Successful:", succeeded)
-    print("Unsuccessful:", failed, "(%d fatal)" % fatal)
-    print("Output folder: '%s'" % folder)
+    print("Unsuccessful:", failed, f"({fatal} fatal)")
+    print("Output folder:", f"'{folder}'")
     print(Str("-").line())
-    print("{0}|\n{1}+\a".format(thanks, Str("-").line(col=len(thanks))))
+    print("THANKS | FOR | USING | AVSUB\a")
+    print(Str("-").line())
 
     dopen(x.A_TEMP)
     sys.exit(status)  # Exit status (0: All is well, 2: Error, 3: Fatal)

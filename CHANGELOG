@@ -2,6 +2,18 @@
 # History of the AVsub #
 ########################
 
+AVsub 3.0.0
+-----------
+- P3000: Added Python version 3.10 support.
+- N3000: Files that succeed in automatic operations are now cached, so only unsuccessful files are processed when repeated.
+- N3001: Added a command-line option that allows users to clear cache information.
+- C3000: All other log files are now collected under one main log folder.
+- Removed: C2230
+- Code improvements.
+- User interface has been improved.
+- PEP 8 compliance.
+
+
 AVsub 2.2.4 [2021.10.03]
 ------------------------
 - F2240: Fixed the error where the required temporary folders could not be created when option "-o/--output" is not used.

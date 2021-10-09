@@ -22,6 +22,7 @@ from subprocess import check_call, run
 from typing import Dict, List, Set, Union
 
 from avsub.core import consts, errors, x
+from avsub.core.consts import U8, XML
 from avsub.str import Str
 
 
@@ -34,7 +35,7 @@ def repeater(retry: int, countdown: float):
                 try:
                     return func(*args, **kwargs)
                 except consts.EXCEPTION_BY_FUNCTION[f_name] as err:
-                    print("[!]", err)  # avsub: F2221
+                    print("[!]", err)
                     if i == retry:
                         break
                     pbar: str = create_progress(i, total=retry)
@@ -50,12 +51,12 @@ class SigHandler:
 
     _handler = None
 
-    def __init__(self, signals: List[int]) -> None:
+    def __init__(self, signals: Dict[str, int]) -> None:
         """Docstring."""
-        self._signals: List[int] = signals
+        self._signals: Dict[str, int] = signals
 
     def _handle(self) -> None:
-        for sig in self._signals:
+        for sig in self._signals.values():
             if threading.current_thread() is threading.main_thread():
                 signal.signal(sig, self._handler)
 
@@ -78,7 +79,7 @@ def avsubprocess(cmd: List[str], call: bool = False, timeout: int = 5) -> None:
         run(cmd, check=True, stdin=NULL)
 
 
-def convert_trim() -> Union[str, List[str]]:  # avsub: N2201
+def convert_trim() -> Union[str, List[str]]:
     """Docstring."""
     if all(_.isdigit() for _ in x.OPTS.trim):
         first: int = int(x.OPTS.trim[0])
@@ -112,7 +113,7 @@ def create_progress(current: int, total: Union[int, list]) -> str:
     return f"[{(current + 1):>{len(str(len(total)))}}/{len(total)}]"
 
 
-def dcleaner(*containers: List[str]) -> None:  # avsub: N2204
+def dcleaner(*containers: List[str]) -> None:
     """Delete folders that to be deleted on exit."""
     for container in containers:
         for folder in container:
@@ -125,6 +126,12 @@ def dcleaner(*containers: List[str]) -> None:  # avsub: N2204
                 continue
 
 
+def dmaker(*folders: str, exist_ok: bool = True) -> None:
+    """Make folders."""
+    for folder in folders:
+        os.makedirs(folder, exist_ok=exist_ok)
+
+
 def dopen(folder: str) -> None:
     """Open a folder."""
     if folder is not None and Str(folder).isdir():
@@ -134,7 +141,7 @@ def dopen(folder: str) -> None:
         ]):
             if hasattr(os, "startfile"):
                 getattr(os, "startfile")(Str(folder).abs())
-            else:  # avsub: C2005
+            else:
                 try:
                     avsubprocess(["xdg-open", Str(folder).abs()], call=True)
                 except (FileNotFoundError, CalledProcessError, TimeoutExpired):
@@ -166,6 +173,9 @@ def get_files(parent: str) -> Union[list, List[str]]:
     hidden: bool = x.OPTS.hidden
     exclude: Set[str] = set(x.OPTS.exclude)
     only: Set[str] = set(x.OPTS.only)
+    if x.OPTS.clear_cache:
+        fcleaner({consts.FILE_CACHE: consts.FILE_CACHE})
+    done: Set[str] = set(get_files_from_cache())
 
     for member in files.copy():
         if any([
@@ -173,10 +183,22 @@ def get_files(parent: str) -> Union[list, List[str]]:
             all([not hidden, Str(member).ishidden()]),
             all([bool(exclude), any(Str(member).endsext(_) for _ in exclude)]),
             all([bool(only), not any(Str(member).endsext(_) for _ in only)]),
+            Str(member).sha256() in done,
         ]):
             files.remove(member)
 
     return files
+
+
+def get_files_from_cache() -> Union[list, List[str]]:
+    """Docstring."""
+    try:
+        with open(consts.FILE_CACHE, "r", encoding=U8) as cache:
+            return [_.strip() for _ in cache.readlines()]
+    except OSError as err:
+        if errors.osraise(errors.ENOENT, err=err):
+            raise
+        return []
 
 
 def is_a_foreground() -> bool:
@@ -210,3 +232,13 @@ def mark_as_not_processed(parent: str, files: List[str]) -> None:
     """Docstring."""
     for file in files:
         x.NOT_PROCESSED.update({file: create_output(parent=parent, file=file)})
+
+
+def save_to_cache_as_done(file: str) -> None:
+    """Docstring."""
+    try:
+        with open(consts.FILE_CACHE, "a", encoding=U8, errors=XML) as cache:
+            cache.write(Str(file).sha256() + "\n")
+    except OSError as err:
+        if errors.osraise(errors.ENOENT, err=err):
+            raise

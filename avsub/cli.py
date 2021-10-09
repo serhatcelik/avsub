@@ -44,6 +44,9 @@ NOTES
   2) Privileged Access
   AVsub forbids privileged access by default.
 
+  3) No Files to Process with Current Options
+  Clearing the cache information may resolve this situation.
+
 ISSUES
   1) Pathname with Bad Characters #1 [wontfix]
   A pathname containing bad characters may cause the operation to fail.
@@ -140,7 +143,7 @@ def create_parser() -> ArgumentParser:
         choices=["audio", "video", "sub", "data", "metadata", "chapters"],
         help="do not copy %(metavar)s from input to output, see example 7;\n"
              "\tCHOICES: %(choices)s".expandtabs(2),
-    )  # avsub: N2202
+    )
     parser.add_argument(
         "+s", metavar="<codec>", dest="scodec", action="store", default=None,
         help="set %(metavar)s as output subtitle codec",
@@ -152,7 +155,7 @@ def create_parser() -> ArgumentParser:
         help="set %(metavar)s as video encoding speed;\n"
              "\tCONSTANT: %(const)s\n"
              "\tCHOICES: %(choices)s".expandtabs(2),
-    )  # avsub: N2001,C2000
+    )
     mutual_group_0.add_argument(
         "-S", "--subtitle", dest="osubtitle", action="store_const", default=[],
         const=["-an", "-vn", "-dn"], help="choose subtitle stream only",
@@ -177,17 +180,17 @@ def create_parser() -> ArgumentParser:
     group_hardsub.add_argument(
         "-b", "--box", dest="box", action="store_const", default=None,
         const="3", help="add an opaque box around subtitle",
-    )  # avsub: C2003
+    )
     group_hardsub.add_argument(
         "--color1", metavar="<color>", dest="c1", action="store", default=None,
         choices=consts.C1,
         help="set %(metavar)s as subtitle primary color, see example 10",
-    )  # avsub: C2003
+    )
     group_hardsub.add_argument(
         "--color2", metavar="<color>", dest="c2", action="store", default=None,
         choices=consts.C2,
         help="set %(metavar)s as subtitle outline color, see example 10",
-    )  # avsub: C2003
+    )
     group_hardsub.add_argument(
         "-e", "--embed", metavar="<subtitle>", dest="embed", action="store",
         default=None,
@@ -196,16 +199,16 @@ def create_parser() -> ArgumentParser:
     group_hardsub.add_argument(
         "--font", metavar="<name>", dest="font", action="store", default=None,
         help="set %(metavar)s as subtitle font name, see example 9",
-    )  # avsub: C2003
+    )
     group_hardsub.add_argument(
         "--position", metavar="<position>", dest="align", action="store",
         default=None, choices=consts.ALIGN,
         help="set %(metavar)s as subtitle alignment",
-    )  # avsub: C2003
+    )
     group_hardsub.add_argument(
         "--size", metavar="<value>", dest="size", action="store", default=None,
         type=int, help="set %(metavar)s as subtitle font size, see example 9",
-    )  # avsub: C2003
+    )
 
     #########################
     # Independent Arguments #
@@ -214,6 +217,11 @@ def create_parser() -> ArgumentParser:
         "-B", "--bypass", dest="bypass", action="store_true", default=False,
         help="ignore warnings, not recommended!",
     )
+    group_independent.add_argument(
+        "--clear-cache", dest="clear_cache", action="store_true",
+        default=False,
+        help="clear cache info for successfully completed files, see note 3",
+    )  # avsub: N3001
     mutual_group_1.add_argument(
         "--exclude", metavar="<extension>", dest="exclude", action="store",
         nargs="+", default=[],
@@ -238,11 +246,11 @@ def create_parser() -> ArgumentParser:
     group_independent.add_argument(
         "-l", "--log", dest="log", action="store_true", default=False,
         help="log results to a file inside the parent of the output folder",
-    )  # avsub: N2101
+    )
     group_independent.add_argument(
         "--no-err-exit", dest="no_err_exit", action="store_true",
         default=False, help="continue when fatal ffmpeg error is encountered",
-    )  # avsub: N2200
+    )
     group_independent.add_argument(
         "--no-open-dir", metavar="<mode>", dest="no_open_dir", action="store",
         nargs="?", default="empty" if OS.nt else "always", const="always",
@@ -251,7 +259,7 @@ def create_parser() -> ArgumentParser:
              "\tDEFAULT: %(default)s\n"
              "\tCONSTANT: %(const)s\n"
              "\tCHOICES: %(choices)s".expandtabs(2),
-    )  # avsub: C2001,C2002,C2010
+    )
     mutual_group_1.add_argument(
         "--only", metavar="<extension>", dest="only", action="store",
         nargs="+", default=[],
@@ -259,9 +267,9 @@ def create_parser() -> ArgumentParser:
     )
     group_independent.add_argument(
         "-o", "--output", metavar="<folder>", dest="temp", action="store",
-        default=consts.DEF_TEMP,
+        default=consts.DEF_THE_TEMP,
         help="set %(metavar)s as the parent of the output folder",
-    )  # avsub: N2100
+    )
     group_independent.add_argument(
         "-v", "--version", dest="version", action="version", default=None,
         version=notice.VERSION, help="show program version and exit",
@@ -291,15 +299,11 @@ def check_opts(opts: Namespace) -> List[list]:
             "!",
         ],
         [
-            Str(opts.temp).neq(consts.DEF_TEMP) and not Str(opts.temp).isdir(),
+            all([Str(opts.temp).abs() != Str(consts.DEF_THE_TEMP).abs(),
+                 not Str(opts.temp).isdir()]),
             f"-o/--output ~ '{opts.temp}': No such folder",
             "!",
-        ],  # avsub: C2231,F2240
-        [
-            not Str(opts.temp).issafe(),
-            f"-o/--output ~ '{opts.temp}': Contains unsafe whitespace chars",
-            "!",
-        ],  # avsub: C2230
+        ],
         [
             not Str(opts.ext).isext(),
             f"extension ~ '{opts.ext}': Contains invalid chars, see note 1",
@@ -344,7 +348,7 @@ def check_opts(opts: Namespace) -> List[list]:
             is_user_an_admin(),
             "Privileged access detected, exiting by default, see note 2",
             "W",
-        ],  # avsub: C2202
+        ],
         [
             opts.embed and ("video" in opts.copy or "all" in opts.copy),
             "-e/--embed: BAN: -c/--copy {video | all}: Forbidden option",

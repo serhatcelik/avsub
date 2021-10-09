@@ -26,10 +26,10 @@ _SIGBREAK: str = "SIGBREAK"
 _SIGINT: str = "SIGINT"  # Interrupt from keyboard
 _SIGQUIT: str = "SIGQUIT"  # Quit from keyboard
 _ALL_SIGNALS: Tuple[str, ...] = (_SIGBREAK, _SIGINT, _SIGQUIT)
-SIGNALS: List[int] = []
+SIGNALS: Dict[str, int] = {}
 for sig in _ALL_SIGNALS:
     if hasattr(signal, sig) and hasattr(getattr(signal, sig), "value"):
-        SIGNALS.append(getattr(signal, sig).value)
+        SIGNALS.update({sig: getattr(signal, sig).value})
 
 ###################
 # Argument Choice #
@@ -62,7 +62,10 @@ EXCEPTION_BY_FUNCTION: Dict[str, tuple] = {
 ############
 # Location #
 ############
-DEF_TEMP: str = Str(tempfile.gettempdir()).join("AVsub")
+DEF_THE_TEMP: str = Str(tempfile.gettempdir()).join("AVsub")
+DIR_CONF: str = Str(DEF_THE_TEMP).join("Conf")
+DIR_LOG: str = Str(DEF_THE_TEMP).join("Logs")
+FILE_CACHE: str = Str(DIR_CONF).join("done.cache")
 
 ###################
 # Version Control #
@@ -73,3 +76,9 @@ _URL_RELEASES: str = _URL_MAIN + "/releases"
 URL_LATEST: str = _URL_RELEASES + "/latest"
 URL_TAG: str = _URL_RELEASES + "/tag/"  # Do not remove the trailing slash!
 URL_YANKED: str = _URL_RAW + "/main/yanked.txt"
+
+#####################
+# Encoding Handling #
+#####################
+U8: str = "utf-8"
+XML: str = "xmlcharrefreplace"  # Chars are replaced with the XML reference

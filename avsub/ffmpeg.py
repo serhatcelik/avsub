@@ -17,7 +17,7 @@ from typing import List
 
 from avsub.core import consts, x
 from avsub.core.tools import avsubprocess, convert_trim, create_progress
-from avsub.core.tools import mark_as_hidden, repeater
+from avsub.core.tools import mark_as_hidden, repeater, save_to_cache_as_done
 from avsub.str import Str
 
 
@@ -104,7 +104,7 @@ class FFmpeg:
         self._f_style += [f"FontName={x.OPTS.font}"] if x.OPTS.font else []
 
     def _add_fontsize_to_force_style___(self) -> None:
-        if x.OPTS.size is not None:  # avsub: F2201
+        if x.OPTS.size is not None:
             # Note: Used abs() to prevent "Assertion failed" error from FFmpeg
             self._f_style += [f"FontSize={abs(x.OPTS.size)}"]
 
@@ -144,7 +144,7 @@ class FFmpeg:
         self.cmd += ["-filter:v", filter_v]
 
 
-@repeater(retry=2, countdown=3)  # avsub: C2201
+@repeater(retry=2, countdown=3)
 def check() -> bool:
     """Docstring."""
     avsubprocess(["ffmpeg", "-version"], call=True, timeout=8)
@@ -163,15 +163,15 @@ def execute(cmd: List[str], files: List[str]) -> None:
             x.RUN_FFMPEG = False
         else:
             x.RUN_FFMPEG = True
-            if x.RUN:  # avsub: F2001
+            if x.RUN:
                 # Note: Output is no longer marked as "not processed"
                 x.DEL_ON_EXIT.update({file: x.NOT_PROCESSED.pop(file)})
 
-        if x.RUN:  # avsub: F2002
+        if x.RUN:
             pbar: str = create_progress(i, total=files)
             base: str = Str(file).base()
             extout: str = Str(file).extout()
-            print("[*] Running %s: '%s' -> %s" % (pbar, base, extout))
+            print("[*] Running", f"{pbar}: '{base}' -> {extout}")
             print("[*] Press Ctrl+C to stop")
             if x.OPTS.show_ffmpeg:
                 line: str = Str("~").line()
@@ -183,7 +183,7 @@ def execute(cmd: List[str], files: List[str]) -> None:
             # If an exit signal has already been caught...
             if not x.RUN:
                 return
-            if not x.RUN_FFMPEG:  # avsub: F2000
+            if not x.RUN_FFMPEG:
                 print(f"File '{output}' already exists, passing")
                 continue
             avsubprocess(cmd + [output, "-i", file])
@@ -200,4 +200,5 @@ def execute(cmd: List[str], files: List[str]) -> None:
         # Note: Output will not be deleted on exit
         x.SUCCEEDED.update({file: x.DEL_ON_EXIT.pop(file)})
         if Str(file).ishidden():
-            mark_as_hidden(output)  # avsub: N2000
+            mark_as_hidden(output)
+        save_to_cache_as_done(file)  # avsub: N3000
