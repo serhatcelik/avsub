@@ -194,7 +194,7 @@ def get_files_from_cache() -> Union[list, List[str]]:
     """Docstring."""
     try:
         with open(consts.FILE_CACHE, "r", encoding=U8) as cache:
-            return [_.strip() for _ in cache.readlines()]
+            return [hash_.strip() for hash_ in cache.readlines()]
     except OSError as err:
         if errors.osraise(errors.ENOENT, err=err):
             raise
@@ -215,21 +215,21 @@ def is_a_tty() -> bool:
 
 
 def is_user_an_admin() -> bool:
-    """Docstring."""
+    """Check if the current user is an administrator."""
     if hasattr(os, "geteuid"):
         return getattr(os, "geteuid")() == 0
     return ctypes.windll.shell32.IsUserAnAdmin() != 0
 
 
 def mark_as_hidden(file: str) -> None:
-    """Docstring."""
+    """Mark the given file as hidden."""
     current: int = Str(file).attrs()
     changed: int = current | stat.FILE_ATTRIBUTE_HIDDEN
     ctypes.windll.kernel32.SetFileAttributesW(Str(file).abs(), changed)
 
 
 def mark_as_not_processed(parent: str, files: List[str]) -> None:
-    """Docstring."""
+    """Mark the given files as unprocessed."""
     for file in files:
         x.NOT_PROCESSED.update({file: create_output(parent=parent, file=file)})
 

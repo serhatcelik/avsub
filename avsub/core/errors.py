@@ -21,8 +21,8 @@ ENOTEMPTY: int = errno.ENOTEMPTY  # Directory not empty
 
 
 def osraise(*errnos: int, err: OSError) -> bool:
-    """Docstring."""
+    """Determine whether to re-raise the given exception."""
     if err.errno in [*errnos, _EACCES, _EINVAL, _EPERM]:
         return False
     print(f"[Errno {err.errno}]")
-    return True  # Will raise
+    return True  # Will re-raise
