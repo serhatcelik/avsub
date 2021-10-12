@@ -7,8 +7,6 @@
 
 """AVsub - A simplified command-line interface for FFmpeg."""
 
-# pylint: disable=consider-using-f-string
-
 from __future__ import absolute_import
 
 import shutil
@@ -134,7 +132,7 @@ def main() -> None:
 
 
 def stop(*args) -> None:
-    """Docstring."""
+    """Stop the main thread of the program."""
     SigHandler(consts.SIGNALS).ignore()
 
     x.RUN = False  # Tell the program to stop
@@ -152,7 +150,7 @@ def stop(*args) -> None:
 
 
 def logger() -> int:
-    """Docstring."""
+    """Print results to the terminal and then save them to a file."""
     log: List[str] = []
     status: int = 0
 
@@ -183,7 +181,7 @@ def logger() -> int:
             with open(x.LOG_FILE, "a", encoding=U8, errors=XML) as file:
                 date: str = datetime.now().strftime("%m/%d/%Y - %H:%M:%S")
                 line: str = Str("=").line(col=len(date))
-                file.write("{0}\n{1}\n{0}\n".format(line, date))
+                file.write(f"{line}\n{date}\n{line}\n")
                 log.reverse()
                 for message in log:
                     file.write(message + "\n")

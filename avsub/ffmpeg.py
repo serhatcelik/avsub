@@ -7,8 +7,6 @@
 
 """This module provides ways to use FFmpeg effectively."""
 
-# pylint: disable=consider-using-f-string
-
 from __future__ import absolute_import
 
 import inspect
@@ -134,19 +132,19 @@ class FFmpeg:
         x.CMD_TO_SHOW = " ".join(self.cmd)
 
     def build_hardsub(self, subpath: str) -> None:
-        """Docstring."""
+        """Update the ultimate FFmpeg command for hardsub operation."""
         filter_v: str = f"subtitles=filename={subpath}"
 
         if self._f_style:
-            filter_v += ":force_style='%s'" % ",".join(self._f_style)
+            filter_v += f":force_style='{','.join(self._f_style)}'"
 
-        x.CMD_TO_SHOW = "%s -filter:v \"%s\"" % (" ".join(self.cmd), filter_v)
+        x.CMD_TO_SHOW = f"{' '.join(self.cmd)} -filter:v \"{filter_v}\""
         self.cmd += ["-filter:v", filter_v]
 
 
 @repeater(retry=2, countdown=3)
 def check() -> bool:
-    """Docstring."""
+    """Start a run test for FFmpeg."""
     avsubprocess(["ffmpeg", "-version"], call=True, timeout=8)
     return True
 

@@ -310,12 +310,12 @@ def check_opts(opts: Namespace) -> List[list]:
             "!",
         ],
         [
-            any(not Str(_).isext() for _ in opts.exclude),
+            any(not Str(ext).isext() for ext in opts.exclude),
             "extension: BAN: --exclude: Contains bad extensions, see note 1",
             "!",
         ],
         [
-            any(not Str(_).isext() for _ in opts.only),
+            any(not Str(ext).isext() for ext in opts.only),
             "extension: BAN: --only: Contains bad extensions, see note 1",
             "!",
         ],
@@ -391,19 +391,19 @@ def check_opts(opts: Namespace) -> List[list]:
         ],
         [
             all([bool(opts.acodec) and opts.acodec != "copy",
-                 any(_ in opts.copy for _ in ["audio", "all"])]),
+                 any(stream in opts.copy for stream in ["audio", "all"])]),
             "+a: BAN: -c/--copy {audio | all}: Mutually exclusive group",
             "W",
         ],
         [
             all([bool(opts.vcodec) and opts.vcodec != "copy",
-                 any(_ in opts.copy for _ in ["video", "all"])]),
+                 any(stream in opts.copy for stream in ["video", "all"])]),
             "+v: BAN: -c/--copy {video | all}: Mutually exclusive group",
             "W",
         ],
         [
             all([bool(opts.scodec) and opts.scodec != "copy",
-                 any(_ in opts.copy for _ in ["sub", "all"])]),
+                 any(stream in opts.copy for stream in ["sub", "all"])]),
             "+s: BAN: -c/--copy {sub | all}: Mutually exclusive group",
             "W",
         ],

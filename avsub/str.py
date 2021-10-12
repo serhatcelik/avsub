@@ -40,7 +40,7 @@ class Str:
             return False
 
     def base(self) -> str:
-        """Docstring."""
+        """Return the basename of the given string."""
         return os.path.basename(self.abs())
 
     def endsext(self, ext: str) -> bool:
@@ -88,7 +88,7 @@ class Str:
         return bool(self.attrs() & stat.FILE_ATTRIBUTE_HIDDEN)
 
     def join(self, *args: str) -> str:
-        """Docstring."""
+        """Join one or more string components intelligently."""
         return os.path.join(self.abs(), *[Str(_).base() for _ in args])
 
     def line(self, col: int = 0) -> str:
@@ -98,7 +98,7 @@ class Str:
 
     def listdir(self) -> List[str]:
         """Docstring."""
-        return [Str(self._s).join(_) for _ in os.listdir(self.abs())]
+        return [Str(self._s).join(member) for member in os.listdir(self.abs())]
 
     def noext(self) -> str:
         """Remove file extension from the given string."""

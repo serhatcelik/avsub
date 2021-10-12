@@ -43,4 +43,4 @@ if _MAJOR_NOW != _MAJOR_REQ or _MINOR_NOW not in _MINOR_REQ:
     print("[!] Expected Python %s, got Python %s" % (_PYTHON_REQ, _PYTHON_NOW))
     sys.exit(2)
 
-OS = _Os(*[_ == os.name for _ in _Os._fields])
+OS = _Os(*[name == os.name for name in _Os._fields])
