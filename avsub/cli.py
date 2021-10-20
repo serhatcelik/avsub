@@ -44,9 +44,6 @@ NOTES
   2) Privileged Access
   AVsub forbids privileged access by default.
 
-  3) No Files to Process with Current Options
-  Clearing the cache information may resolve this situation.
-
 ISSUES
   1) Pathname with Bad Characters #1 [wontfix]
   A pathname containing bad characters may cause the operation to fail.
@@ -217,11 +214,6 @@ def create_parser() -> ArgumentParser:
         "-B", "--bypass", dest="bypass", action="store_true", default=False,
         help="ignore warnings, not recommended!",
     )
-    group_independent.add_argument(
-        "--clear-cache", dest="clear_cache", action="store_true",
-        default=False,
-        help="clear cache info for successfully completed files, see note 3",
-    )  # avsub: N3001
     mutual_group_1.add_argument(
         "--exclude", metavar="<extension>", dest="exclude", action="store",
         nargs="+", default=[],

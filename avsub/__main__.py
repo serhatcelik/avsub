@@ -81,7 +81,7 @@ def main() -> None:
 
     try:
         x.THE_TEMP = Str(x.OPTS.temp).abs()
-        dmaker(x.THE_TEMP, consts.DIR_CONF, consts.DIR_LOG)  # avsub: C3000
+        dmaker(x.THE_TEMP, consts.DIR_LOG)  # avsub: C3000
         x.A_TEMP = tempfile.mkdtemp(prefix="avsub-", dir=x.THE_TEMP)
         x.DEL_ON_EXIT_TEMP_FOLDER.append(x.A_TEMP)
     except OSError as err:

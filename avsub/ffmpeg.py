@@ -7,6 +7,8 @@
 
 """This module provides ways to use FFmpeg effectively."""
 
+# pylint: disable=consider-using-f-string
+
 from __future__ import absolute_import
 
 import inspect
@@ -15,7 +17,7 @@ from typing import List
 
 from avsub.core import consts, x
 from avsub.core.tools import avsubprocess, convert_trim, create_progress
-from avsub.core.tools import mark_as_hidden, repeater, save_to_cache_as_done
+from avsub.core.tools import mark_as_hidden, repeater
 from avsub.str import Str
 
 
@@ -136,9 +138,9 @@ class FFmpeg:
         filter_v: str = f"subtitles=filename={subpath}"
 
         if self._f_style:
-            filter_v += f":force_style='{','.join(self._f_style)}'"
+            filter_v += ":force_style='%s'" % ",".join(self._f_style)
 
-        x.CMD_TO_SHOW = f"{' '.join(self.cmd)} -filter:v \"{filter_v}\""
+        x.CMD_TO_SHOW = "%s -filter:v \"%s\"" % (" ".join(self.cmd), filter_v)
         self.cmd += ["-filter:v", filter_v]
 
 
@@ -199,4 +201,3 @@ def execute(cmd: List[str], files: List[str]) -> None:
         x.SUCCEEDED.update({file: x.DEL_ON_EXIT.pop(file)})
         if Str(file).ishidden():
             mark_as_hidden(output)
-        save_to_cache_as_done(file)  # avsub: N3000
