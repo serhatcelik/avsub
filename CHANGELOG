@@ -5,8 +5,6 @@
 AVsub 3.0.0
 -----------
 - P3000: Added Python version 3.10 support.
-- N3000: Files that succeed in automatic operations are now cached, so only unsuccessful files are processed when repeated.
-- N3001: Added a command-line option that allows users to clear cache information.
 - C3000: All other log files are now collected under one main log folder.
 - Removed: C2230
 - Drop support for Windows 7.
