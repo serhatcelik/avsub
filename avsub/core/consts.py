@@ -63,9 +63,7 @@ EXCEPTION_BY_FUNCTION: Dict[str, tuple] = {
 # Location #
 ############
 DEF_THE_TEMP: str = Str(tempfile.gettempdir()).join("AVsub")
-DIR_CONF: str = Str(DEF_THE_TEMP).join("Conf")
 DIR_LOG: str = Str(DEF_THE_TEMP).join("Logs")
-FILE_CACHE: str = Str(DIR_CONF).join("done.cache")
 
 ###################
 # Version Control #

@@ -22,7 +22,6 @@ from subprocess import check_call, run
 from typing import Dict, List, Set, Union
 
 from avsub.core import consts, errors, x
-from avsub.core.consts import U8, XML
 from avsub.str import Str
 
 
@@ -173,9 +172,6 @@ def get_files(parent: str) -> Union[list, List[str]]:
     hidden: bool = x.OPTS.hidden
     exclude: Set[str] = set(x.OPTS.exclude)
     only: Set[str] = set(x.OPTS.only)
-    if x.OPTS.clear_cache:
-        fcleaner({consts.FILE_CACHE: consts.FILE_CACHE})
-    done: Set[str] = set(get_files_from_cache())
 
     for member in files.copy():
         if any([
@@ -183,22 +179,10 @@ def get_files(parent: str) -> Union[list, List[str]]:
             all([not hidden, Str(member).ishidden()]),
             all([bool(exclude), any(Str(member).endsext(_) for _ in exclude)]),
             all([bool(only), not any(Str(member).endsext(_) for _ in only)]),
-            Str(member).sha256() in done,
         ]):
             files.remove(member)
 
     return files
-
-
-def get_files_from_cache() -> Union[list, List[str]]:
-    """Docstring."""
-    try:
-        with open(consts.FILE_CACHE, "r", encoding=U8) as cache:
-            return [hash_.strip() for hash_ in cache.readlines()]
-    except OSError as err:
-        if errors.osraise(errors.ENOENT, err=err):
-            raise
-        return []
 
 
 def is_a_foreground() -> bool:
@@ -232,13 +216,3 @@ def mark_as_not_processed(parent: str, files: List[str]) -> None:
     """Mark the given files as unprocessed."""
     for file in files:
         x.NOT_PROCESSED.update({file: create_output(parent=parent, file=file)})
-
-
-def save_to_cache_as_done(file: str) -> None:
-    """Docstring."""
-    try:
-        with open(consts.FILE_CACHE, "a", encoding=U8, errors=XML) as cache:
-            cache.write(Str(file).sha256() + "\n")
-    except OSError as err:
-        if errors.osraise(errors.ENOENT, err=err):
-            raise
