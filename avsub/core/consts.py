@@ -13,7 +13,7 @@ import signal
 import tempfile
 import urllib.error
 from collections import defaultdict as safedict
-from subprocess import CalledProcessError, TimeoutExpired
+from subprocess import CalledProcessError, TimeoutExpired  # nosec
 from typing import DefaultDict, Dict, List, Tuple
 
 from avsub.core import notice

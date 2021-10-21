@@ -12,7 +12,7 @@
 from __future__ import absolute_import
 
 import inspect
-from subprocess import CalledProcessError
+from subprocess import CalledProcessError  # nosec
 from typing import List
 
 from avsub.core import consts, x

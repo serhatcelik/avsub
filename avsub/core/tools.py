@@ -17,8 +17,8 @@ import stat
 import sys
 import threading
 import time
-from subprocess import CalledProcessError, DEVNULL as NULL, TimeoutExpired
-from subprocess import check_call, run
+from subprocess import CalledProcessError, TimeoutExpired  # nosec
+from subprocess import DEVNULL as NULL, check_call, run  # nosec
 from typing import Dict, List, Set, Union
 
 from avsub.core import consts, errors, x
