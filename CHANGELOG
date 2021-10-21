@@ -12,6 +12,7 @@ AVsub 3.0.0
 - Removed: C2230
 - Drop support for Windows 7.
 - Code improvements.
+- Quality improvements.
 - User interface has been improved.
 - PEP 8 compliance.
 
