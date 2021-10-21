@@ -17,7 +17,7 @@ from typing import List
 
 from avsub.core import consts, x
 from avsub.core.tools import avsubprocess, convert_trim, create_progress
-from avsub.core.tools import mark_as_hidden, repeater
+from avsub.core.tools import mark_as_hidden, repeater, save_to_cache_as_done
 from avsub.str import Str
 
 
@@ -201,3 +201,4 @@ def execute(cmd: List[str], files: List[str]) -> None:
         x.SUCCEEDED.update({file: x.DEL_ON_EXIT.pop(file)})
         if Str(file).ishidden():
             mark_as_hidden(output)
+        save_to_cache_as_done(file)  # avsub: N3000

@@ -9,6 +9,7 @@
 
 from __future__ import absolute_import
 
+import hashlib
 import os
 import re
 import stat
@@ -102,3 +103,7 @@ class Str:
     def noext(self) -> str:
         """Remove file extension from the given string."""
         return os.path.splitext(self._s)[0]
+
+    def sha256(self) -> str:
+        """Calculate SHA256 hash of the giving string."""
+        return hashlib.sha256(self._s.encode("utf-8")).hexdigest()
