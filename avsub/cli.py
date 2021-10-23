@@ -84,7 +84,6 @@ def create_parser() -> ArgumentParser:
 
     mutual_group_0 = parser.add_mutually_exclusive_group()
     mutual_group_1 = group_independent.add_mutually_exclusive_group()
-    mutual_group_2 = group_independent.add_mutually_exclusive_group()
 
     ########################
     # Positional Arguments #
@@ -218,7 +217,7 @@ def create_parser() -> ArgumentParser:
         "-B", "--bypass", dest="bypass", action="store_true", default=False,
         help="ignore warnings, not recommended!",
     )
-    mutual_group_2.add_argument(
+    group_independent.add_argument(
         "--clear-cache", dest="clear_cache", action="store_true",
         default=False,
         help="clear cache info for successfully completed files, see note 3",
@@ -271,7 +270,7 @@ def create_parser() -> ArgumentParser:
         default=consts.DEF_THE_TEMP,
         help="set %(metavar)s as the parent of the output folder",
     )
-    mutual_group_2.add_argument(
+    group_independent.add_argument(
         "--use-cache", dest="use_cache", action="store_true", default=False,
         help="use cache info to process only unsuccessful files",
     )  # avsub: N3001

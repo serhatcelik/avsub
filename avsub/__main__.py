@@ -21,7 +21,7 @@ from avsub import cli, ffmpeg, new
 from avsub.core import consts, errors, x
 from avsub.core.consts import U8, XML
 from avsub.core.tools import SigHandler, dcleaner, dmaker, dopen, fcleaner
-from avsub.core.tools import get_files, is_a_foreground, is_a_tty
+from avsub.core.tools import clear_cache, get_files, is_a_foreground, is_a_tty
 from avsub.core.tools import mark_as_not_processed
 from avsub.ffmpeg import FFmpeg
 from avsub.str import Str
@@ -47,6 +47,10 @@ def checker() -> None:
         if not new.check_for_updates():
             print("[!] Could not check for updates, try again later")
             sys.exit(2)
+        sys.exit(0)
+    if any(cmd in sys.argv for cmd in Str("clear-cache").abbrevs(start=1)):
+        clear_cache()
+        print("[+] Cache cleared")
         sys.exit(0)
 
     parser: ArgumentParser = cli.create_parser()

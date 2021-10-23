@@ -79,6 +79,11 @@ def avsubprocess(cmd: List[str], call: bool = False, timeout: int = 5) -> None:
         run(cmd, check=True, stdin=NULL)
 
 
+def clear_cache() -> None:
+    """Clear cache information."""
+    fcleaner({consts.FILE_CACHE: consts.FILE_CACHE})
+
+
 def convert_trim() -> Union[str, List[str]]:
     """Docstring."""
     if all(_.isdigit() for _ in x.OPTS.trim):
@@ -173,8 +178,6 @@ def get_files(parent: str) -> Union[list, List[str]]:
     hidden: bool = x.OPTS.hidden
     exclude: Set[str] = set(x.OPTS.exclude)
     only: Set[str] = set(x.OPTS.only)
-    if x.OPTS.clear_cache:
-        fcleaner({consts.FILE_CACHE: consts.FILE_CACHE})
     done: Set[str] = set(get_files_from_cache())
     use: bool = x.OPTS.use_cache
 
