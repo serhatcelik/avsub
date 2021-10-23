@@ -13,34 +13,47 @@ from __future__ import absolute_import, print_function
 
 import collections
 import os
+import platform
 import sys
 
-_Os = collections.namedtuple("_Os", ("nt", "posix"))
-_MAJOR = 3
-_MINOR_MIN = 6
-_MINOR_MAX = 10  # avsub: P3000
+_OS = collections.namedtuple("_OS", ("nt", "posix"))
+_NT_RELEASE = ("10", "11")
+_PY_VERSION = (3, (6, 10))  # avsub: P3000
 
 ###############
 # Requirement #
 ###############
-_OS_REQ = _Os._fields
-_MAJOR_REQ = _MAJOR
-_MINOR_REQ = list(range(_MINOR_MIN, _MINOR_MAX + 1))
-_PYTHON_REQ = "%d.%d-%d" % (_MAJOR_REQ, _MINOR_REQ[0], _MINOR_REQ[-1])
+_REQ_OS = _OS._fields
+
+_REQ_NT_RELEASE = _NT_RELEASE
+_REQ_NT = "%s-%s" % (_REQ_NT_RELEASE[0], _REQ_NT_RELEASE[-1])
+
+_REQ_PY_MAJOR = _PY_VERSION[0]
+_REQ_PY_MINOR = list(range(_PY_VERSION[1][0], _PY_VERSION[1][-1] + 1))
+_REQ_PY = "%d.%d-%d" % (_REQ_PY_MAJOR, _REQ_PY_MINOR[0], _REQ_PY_MINOR[-1])
 
 ###########
 # Current #
 ###########
-_OS_NOW = os.name
-_MAJOR_NOW = sys.version_info[0]
-_MINOR_NOW = sys.version_info[1]
-_PYTHON_NOW = "%d.%d" % (_MAJOR_NOW, _MINOR_NOW)
+_NOW_OS = os.name
 
-if _OS_NOW not in _OS_REQ:
-    print("[!] Unsupported operating system for AVsub:", _OS_NOW)
+_NOW_NT_RELEASE = platform.release()
+_NOW_NT = _NOW_NT_RELEASE
+
+_NOW_PY_MAJOR = sys.version_info[0]
+_NOW_PY_MINOR = sys.version_info[1]
+_NOW_PY = "%d.%d" % (_NOW_PY_MAJOR, _NOW_PY_MINOR)
+
+if _NOW_PY_MAJOR != _REQ_PY_MAJOR or _NOW_PY_MINOR not in _REQ_PY_MINOR:
+    print("[!] Expected Python %s, got Python %s instead" % (_REQ_PY, _NOW_PY))
     sys.exit(2)
-if _MAJOR_NOW != _MAJOR_REQ or _MINOR_NOW not in _MINOR_REQ:
-    print("[!] Expected Python %s, got Python %s" % (_PYTHON_REQ, _PYTHON_NOW))
+if _NOW_OS not in _REQ_OS:
+    print("[!] Unsupported operating system for AVsub:", _NOW_OS)
     sys.exit(2)
 
-OS = _Os(*[name == os.name for name in _Os._fields])
+OS = _OS(*[name == os.name for name in _OS._fields])
+
+# Do this check after Python check! (prevent false positive)
+if OS.nt and _NOW_NT_RELEASE not in _REQ_NT_RELEASE:
+    print("[!] Expected Win %s, got Win %s instead" % (_REQ_NT, _NOW_NT))
+    sys.exit(2)

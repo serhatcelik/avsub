@@ -32,8 +32,6 @@ setuptools.setup(
         "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
         "Natural Language :: English",
         "Operating System :: Microsoft :: Windows",
-        "Operating System :: Microsoft :: Windows :: Windows 8",
-        "Operating System :: Microsoft :: Windows :: Windows 8.1",
         "Operating System :: Microsoft :: Windows :: Windows 10",
         "Operating System :: POSIX",
         "Operating System :: POSIX :: Linux",
