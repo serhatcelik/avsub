@@ -62,7 +62,7 @@ setuptools.setup(
             "avsub = avsub.__main__:setup_py_main",
         ],
     },
-    python_requires="~=3.6",
+    python_requires=">=3.6, <3.11",
     project_urls={
         "Source Code": __import__("avsub.core.notice", fromlist="notice").URL,
         "Bug Tracker": "https://github.com/serhatcelik/avsub/issues",
