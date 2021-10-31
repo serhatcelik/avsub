@@ -20,7 +20,7 @@ from avsub.core import errors, x
 
 
 class Str:
-    """Docstring."""
+    """Base class for string manipulation."""
 
     def __init__(self, s: str) -> None:
         """Docstring."""
@@ -80,7 +80,7 @@ class Str:
         return os.path.isfile(self.abs())
 
     def isfull(self) -> bool:
-        """Docstring."""
+        """Check if the given string, which is a folder, is full."""
         for _, folders, files in os.walk(self.abs()):
             return any([bool(folders), bool(files)])
         return False
@@ -101,7 +101,7 @@ class Str:
         return self._s * columns
 
     def listdir(self) -> List[str]:
-        """Docstring."""
+        """List the members of the given string, which is a folder."""
         return [Str(self._s).join(member) for member in os.listdir(self.abs())]
 
     def noext(self) -> str:

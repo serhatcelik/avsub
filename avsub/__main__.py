@@ -39,7 +39,7 @@ def setup_py_main() -> None:
 
 
 def checker() -> None:
-    """Docstring."""
+    """Controller function."""
     if len(sys.argv) == 1:
         print("[*] No options specified, checking for updates...")
         if new.check_for_yanked():

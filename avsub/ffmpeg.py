@@ -22,7 +22,7 @@ from avsub.str import Str
 
 
 class FFmpeg:
-    """Docstring."""
+    """Base class for FFmpeg."""
 
     cmd: List[str] = ["ffmpeg", "-n", "-hide_banner", "-stats"]
     _f_style: List[str] = []
