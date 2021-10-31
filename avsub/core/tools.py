@@ -27,7 +27,7 @@ from avsub.str import Str
 
 
 def repeater(retry: int, countdown: float):
-    """Docstring."""
+    """Repetitive task handler."""
     def decorator(func):
         def wrapper(*args, **kwargs):
             f_name: str = ".".join([func.__module__, func.__name__])
@@ -47,7 +47,7 @@ def repeater(retry: int, countdown: float):
 
 
 class SigHandler:
-    """Docstring."""
+    """Signal handler."""
 
     _handler = None
 
@@ -61,12 +61,12 @@ class SigHandler:
                 signal.signal(sig, self._handler)
 
     def capture(self, func) -> None:
-        """Docstring."""
+        """Enable signal capture."""
         self._handler = func
         self._handle()
 
     def ignore(self) -> None:
-        """Docstring."""
+        """Disable signal capture."""
         self._handler = signal.SIG_IGN
         self._handle()
 
@@ -85,7 +85,7 @@ def clear_cache() -> None:
 
 
 def convert_trim() -> Union[str, List[str]]:
-    """Docstring."""
+    """Check the syntax of the trim command."""
     if all(_.isdigit() for _ in x.OPTS.trim):
         first: int = int(x.OPTS.trim[0])
         last: int = int(x.OPTS.trim[1])
@@ -112,7 +112,7 @@ def create_output(parent: str, file: str) -> str:
 
 
 def create_progress(current: int, total: Union[int, list]) -> str:
-    """Docstring."""
+    """Create a fake progress bar."""
     if isinstance(total, int):
         return f"[{(current + 1):>{len(str(total))}}/{total}]"
     return f"[{(current + 1):>{len(str(len(total)))}}/{len(total)}]"
@@ -166,7 +166,7 @@ def fcleaner(*containers: Dict[str, str]) -> None:
 
 
 def get_files(parent: str) -> Union[list, List[str]]:
-    """Docstring."""
+    """Get the members of the given folder."""
     try:
         files: List[str] = Str(parent).listdir()
     except OSError as err:
@@ -195,7 +195,7 @@ def get_files(parent: str) -> Union[list, List[str]]:
 
 
 def get_files_from_cache() -> Union[list, List[str]]:
-    """Docstring."""
+    """Get hashes from the cache."""
     try:
         with open(consts.FILE_CACHE, "r", encoding=U8) as cache:
             return [hash_.strip() for hash_ in cache.readlines()]
@@ -206,7 +206,7 @@ def get_files_from_cache() -> Union[list, List[str]]:
 
 
 def is_a_foreground() -> bool:
-    """Docstring."""
+    """Check if a process is running in the foreground."""
     if hasattr(os, "getpgrp") and hasattr(os, "tcgetpgrp"):
         fd_: int = sys.stdout.fileno()
         return getattr(os, "getpgrp")() == getattr(os, "tcgetpgrp")(fd_)
@@ -214,7 +214,7 @@ def is_a_foreground() -> bool:
 
 
 def is_a_tty() -> bool:
-    """Docstring."""
+    """Check if all file objects are attached to a tty(-like) device."""
     return sys.stdin.isatty() and sys.stdout.isatty() and sys.stderr.isatty()
 
 
@@ -239,7 +239,7 @@ def mark_as_not_processed(parent: str, files: List[str]) -> None:
 
 
 def save_to_cache_as_done(file: str) -> None:
-    """Docstring."""
+    """Save the hash of the given file to the cache."""
     try:
         with open(consts.FILE_CACHE, "a", encoding=U8, errors=XML) as cache:
             cache.write(Str(file).sha256() + "\n")
