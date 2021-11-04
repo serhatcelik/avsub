@@ -5,8 +5,8 @@
 [![REQUIRES](https://img.shields.io/pypi/pyversions/avsub?label=Python&style=flat-square "REQUIRES")][7]
 [![LICENSE](https://img.shields.io/pypi/l/avsub?label=License&style=flat-square "LICENSE")][4]
 
-**AVsub is a simplified command-line interface for FFmpeg. It supports
-[Python 3][1] and requires [FFmpeg][2] to run, also intended to be
+**AVsub is a simplified command-line interface for [FFmpeg][2]. It supports
+[Python 3][1] and requires FFmpeg to run, also intended to be
 cross-platform, and runs on GNU/Linux and Microsoft Windows.**
 
 ## Preparation and Installation
