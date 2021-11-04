@@ -86,6 +86,6 @@ If you have found a bug or have a suggestion, please consider
 [3]: https://github.com/serhatcelik/avsub/wiki/Windows-PATH
 [4]: https://choosealicense.com/licenses/gpl-3.0/
 [5]: https://github.com/serhatcelik/avsub/issues
-[6]: https://github.com/serhatcelik/avsub/wiki#usage
+[6]: https://github.com/serhatcelik/avsub/wiki/Usage
 [7]: https://pypi.org/project/avsub/
 [8]: https://www.codacy.com/gh/serhatcelik/avsub
