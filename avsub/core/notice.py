@@ -8,7 +8,7 @@
 u"""
 AVsub - A simplified command-line interface for FFmpeg.
 
-Copyright (C) 2021  Serhat Çelik
+Copyright (C) 2021-2022  Serhat Çelik
 
 AVsub is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

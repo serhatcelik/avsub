@@ -2,14 +2,13 @@
 # History of the AVsub #
 ########################
 
-AVsub 3.0.0
+AVsub 2.3.0
 -----------
-- P3000: Added Python version 3.10 support.
-- N3000: Files that succeed in automatic operations are now cached.
-- N3001: Added a command-line option to use cache information, so only unsuccessful files are processed when repeated.
-- N3002: Added a command-line option that allows users to clear cache information.
-- C3000: All other log files are now collected under one main log folder.
-- C3001: All other temporary folders are now collected under another main temporary folder.
+- N2300: Files that succeed in automatic operations are now cached.
+- N2301: Added a command-line option to use cache information, so only unsuccessful files are processed when repeated.
+- N2302: Added a command-line option that allows users to clear cache information.
+- C2300: All other log files are now collected under one main log folder.
+- C2301: All other temporary folders are now collected under another main temporary folder.
 - Removed: C2230
 - Added support for Windows 11.
 - Drop support for Windows 7, 8 and 8.1.

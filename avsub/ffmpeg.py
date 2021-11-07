@@ -104,7 +104,7 @@ class FFmpeg:
         self._f_style += [f"FontName={x.OPTS.font}"] if x.OPTS.font else []
 
     def _add_fontsize_to_force_style___(self) -> None:
-        if x.OPTS.size is not None:
+        if x.OPTS.size is not None:  # avsub: F2201
             # Note: Used abs() to prevent "Assertion failed" error from FFmpeg
             self._f_style += [f"FontSize={abs(x.OPTS.size)}"]
 
@@ -144,7 +144,7 @@ class FFmpeg:
         self.cmd += ["-filter:v", filter_v]
 
 
-@repeater(retry=2, countdown=3)
+@repeater(retry=2, countdown=3)  # avsub: C2201
 def check() -> bool:
     """Start a run test for FFmpeg."""
     avsubprocess(["ffmpeg", "-version"], call=True, timeout=8)
@@ -163,11 +163,11 @@ def execute(cmd: List[str], files: List[str]) -> None:
             x.RUN_FFMPEG = False
         else:
             x.RUN_FFMPEG = True
-            if x.RUN:
+            if x.RUN:  # avsub: F2001
                 # Note: Output is no longer marked as "not processed"
                 x.DEL_ON_EXIT.update({file: x.NOT_PROCESSED.pop(file)})
 
-        if x.RUN:
+        if x.RUN:  # avsub: F2002
             pbar: str = create_progress(i, total=files)
             base: str = Str(file).base()
             extout: str = Str(file).extout()
@@ -183,7 +183,7 @@ def execute(cmd: List[str], files: List[str]) -> None:
             # If an exit signal has already been caught...
             if not x.RUN:
                 return
-            if not x.RUN_FFMPEG:
+            if not x.RUN_FFMPEG:  # avsub: F2000
                 print(f"File '{output}' already exists, passing")
                 continue
             avsubprocess(cmd + [output, "-i", file])
@@ -200,5 +200,5 @@ def execute(cmd: List[str], files: List[str]) -> None:
         # Note: Output will not be deleted on exit
         x.SUCCEEDED.update({file: x.DEL_ON_EXIT.pop(file)})
         if Str(file).ishidden():
-            mark_as_hidden(output)
-        save_to_cache_as_done(file)  # avsub: N3000
+            mark_as_hidden(output)  # avsub: N2000
+        save_to_cache_as_done(file)  # avsub: N2300

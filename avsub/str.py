@@ -73,7 +73,7 @@ class Str:
 
     def isext(self) -> bool:
         """Check if the given string is a valid extension."""
-        return bool(re.match(r"^[a-zA-Z0-9_-]+$", self._s))
+        return bool(re.match(r"^[a-zA-Z0-9_-]+$", self._s))  # avsub: C2011
 
     def isfile(self) -> bool:
         """Check if the given string is an existing file."""

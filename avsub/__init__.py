@@ -18,7 +18,7 @@ import sys
 
 _OS = collections.namedtuple("_OS", ("nt", "posix"))
 _NT_RELEASE = ("10", "11")
-_PY_VERSION = (3, (6, 10))  # avsub: P3000
+_MIN_PY = (3, 6)
 
 ###############
 # Requirement #
@@ -28,9 +28,9 @@ _REQ_OS = _OS._fields
 _REQ_NT_RELEASE = _NT_RELEASE
 _REQ_NT = "%s-%s" % (_REQ_NT_RELEASE[0], _REQ_NT_RELEASE[-1])
 
-_REQ_PY_MAJOR = _PY_VERSION[0]
-_REQ_PY_MINOR = list(range(_PY_VERSION[1][0], _PY_VERSION[1][-1] + 1))
-_REQ_PY = "%d.%d-%d" % (_REQ_PY_MAJOR, _REQ_PY_MINOR[0], _REQ_PY_MINOR[-1])
+_REQ_PY_MAJOR = _MIN_PY[0]
+_REQ_PY_MINOR = _MIN_PY[1]
+_REQ_PY = "%d.%d+" % (_REQ_PY_MAJOR, _REQ_PY_MINOR)
 
 ###########
 # Current #
@@ -44,10 +44,10 @@ _NOW_PY_MAJOR = sys.version_info[0]
 _NOW_PY_MINOR = sys.version_info[1]
 _NOW_PY = "%d.%d" % (_NOW_PY_MAJOR, _NOW_PY_MINOR)
 
-if _NOW_PY_MAJOR != _REQ_PY_MAJOR or _NOW_PY_MINOR not in _REQ_PY_MINOR:
+if _NOW_PY_MAJOR != _REQ_PY_MAJOR or _NOW_PY_MINOR < _REQ_PY_MINOR:
     print("[!] Expected Python %s, got Python %s instead" % (_REQ_PY, _NOW_PY))
     sys.exit(2)
-if _NOW_OS not in _REQ_OS:
+if _NOW_OS not in _REQ_OS:  # avsub: N2203
     print("[!] Unsupported operating system for AVsub:", _NOW_OS)
     sys.exit(2)
 

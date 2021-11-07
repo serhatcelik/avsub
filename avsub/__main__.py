@@ -42,7 +42,7 @@ def checker() -> None:
     """Controller function."""
     if len(sys.argv) == 1:
         print("[*] No options specified, checking for updates...")
-        if new.check_for_yanked():
+        if new.check_for_yanked():  # avsub: N2240
             print("[!] You are using a yanked version, please use another")
         if not new.check_for_updates():
             print("[!] Could not check for updates, try again later")
@@ -63,13 +63,13 @@ def checker() -> None:
             continue
         if condition:
             print(f"[{priority}]", error)
-            gotcha = True
+            gotcha = True  # avsub: C2006
 
     if gotcha:
         sys.exit(2)
 
     print("[*] Starting a run test for FFmpeg...")
-    if not ffmpeg.check():
+    if not ffmpeg.check():  # avsub: N2102
         print("[F] Could not execute FFmpeg")
         if not x.OPTS.no_err_exit:
             sys.exit(3)
@@ -88,7 +88,7 @@ def main() -> None:
         dmaker(x.THE_TEMP, consts.DIR_CONF, consts.DIR_LOG, consts.DIR_OPS)
         x.A_TEMP = tempfile.mkdtemp(prefix="avsub-", dir=consts.DIR_OPS)
         x.DEL_ON_EXIT_TEMP_FOLDER.append(x.A_TEMP)
-    except OSError as err:
+    except OSError as err:  # avsub: F2210,F2220
         if errors.osraise(errors.EEXIST, errors.ENOENT, err=err):
             raise
         print(err)
@@ -112,7 +112,7 @@ def main() -> None:
                 if errors.osraise(errors.ENOENT, err=err):
                     raise
                 print(err)
-                print("[F] Required TEMP subtitle could not be created")
+                print("[F] Required TEMP subtitle file could not be created")
                 dcleaner(x.DEL_ON_EXIT_TEMP_FOLDER)
                 sys.exit(3)
 
@@ -163,7 +163,7 @@ def logger() -> int:
         print(msg.substitute(member=Str(member).base()))
         log.append(msg.substitute(member=Str(member).abs()))
     for member in x.DEL_ON_EXIT:
-        if member in x.FATAL_FFMPEG:
+        if member in x.FATAL_FFMPEG:  # avsub: C2203
             continue
         msg = Template("[-] Not completed: '$member'")
         print(msg.substitute(member=Str(member).base()))
@@ -186,7 +186,7 @@ def logger() -> int:
                 date: str = datetime.now().strftime("%m/%d/%Y - %H:%M:%S")
                 line: str = Str("=").line(col=len(date))
                 file.write(f"{line}\n{date}\n{line}\n")
-                log.reverse()
+                log.reverse()  # avsub: C2200
                 for message in log:
                     file.write(message + "\n")
         except OSError as err:

@@ -35,7 +35,7 @@ def repeater(retry: int, countdown: float):
                 try:
                     return func(*args, **kwargs)
                 except consts.EXCEPTION_BY_FUNCTION[f_name] as err:
-                    print("[!]", err)
+                    print("[!]", err)  # avsub: F2221
                     if i == retry:
                         break
                     pbar: str = create_progress(i, total=retry)
@@ -84,7 +84,7 @@ def clear_cache() -> None:
     fcleaner({consts.FILE_CACHE: consts.FILE_CACHE})
 
 
-def convert_trim() -> Union[str, List[str]]:
+def convert_trim() -> Union[str, List[str]]:  # avsub: N2201
     """Check the syntax of the trim command."""
     if all(_.isdigit() for _ in x.OPTS.trim):
         first: int = int(x.OPTS.trim[0])
@@ -118,7 +118,7 @@ def create_progress(current: int, total: Union[int, list]) -> str:
     return f"[{(current + 1):>{len(str(len(total)))}}/{len(total)}]"
 
 
-def dcleaner(*containers: List[str]) -> None:
+def dcleaner(*containers: List[str]) -> None:  # avsub: N2204
     """Delete folders that to be deleted on exit."""
     for container in containers:
         for folder in container:
@@ -146,7 +146,7 @@ def dopen(folder: str) -> None:
         ]):
             if hasattr(os, "startfile"):
                 getattr(os, "startfile")(Str(folder).abs())
-            else:
+            else:  # avsub: C2005
                 try:
                     avsubprocess(["xdg-open", Str(folder).abs()], call=True)
                 except (FileNotFoundError, CalledProcessError, TimeoutExpired):
