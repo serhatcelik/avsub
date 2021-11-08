@@ -26,9 +26,9 @@ class Str:
         """Docstring."""
         self._s: str = s
 
-    def abbrevs(self, start: int = 0) -> List[str]:
+    def abbrevs(self, start: int = 0, pre: str = "-") -> List[str]:
         """Create abbreviated commands from the given string."""
-        return ["--" + self._s[:start + i + 1] for i in range(len(self._s))]
+        return [pre * 2 + self._s[:start + i + 1] for i in range(len(self._s))]
 
     def abs(self) -> str:
         """Normalize and absolutize the given string."""

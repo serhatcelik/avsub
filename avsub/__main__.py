@@ -85,7 +85,7 @@ def main() -> None:
 
     try:
         x.THE_TEMP = Str(x.OPTS.temp).abs()
-        dmaker(x.THE_TEMP, consts.DIR_CONF, consts.DIR_LOG, consts.DIR_OPS)
+        dmaker(x.THE_TEMP, consts.DIR_CONFS, consts.DIR_LOGS, consts.DIR_OPS)
         x.A_TEMP = tempfile.mkdtemp(prefix="avsub-", dir=consts.DIR_OPS)
         x.DEL_ON_EXIT_TEMP_FOLDER.append(x.A_TEMP)
     except OSError as err:  # avsub: F2210,F2220
@@ -95,7 +95,7 @@ def main() -> None:
         print("[F] Required TEMP folders could not be created")
         sys.exit(3)
     else:
-        x.LOG_FILE = Str(consts.DIR_LOG).join(f"{x.A_TEMP}.log")
+        x.LOG_FILE = Str(consts.DIR_LOGS).join(f"{x.A_TEMP}.log")
 
     # MANUAL OPERATION?
     if Str(x.OPTS.input).isfile():
