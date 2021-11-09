@@ -17,7 +17,7 @@ import platform
 import sys
 
 _OS = collections.namedtuple("_OS", ("nt", "posix"))
-_NT_RELEASE = ("10", "11")
+_MIN_NT = 10
 _MIN_PY = (3, 6)
 
 ###############
@@ -25,8 +25,8 @@ _MIN_PY = (3, 6)
 ###############
 _REQ_OS = _OS._fields
 
-_REQ_NT_RELEASE = _NT_RELEASE
-_REQ_NT = "%s-%s" % (_REQ_NT_RELEASE[0], _REQ_NT_RELEASE[-1])
+_REQ_NT_RELEASE = _MIN_NT
+_REQ_NT = "%d+" % _REQ_NT_RELEASE
 
 _REQ_PY_MAJOR = _MIN_PY[0]
 _REQ_PY_MINOR = _MIN_PY[1]
@@ -37,8 +37,8 @@ _REQ_PY = "%d.%d+" % (_REQ_PY_MAJOR, _REQ_PY_MINOR)
 ###########
 _NOW_OS = os.name
 
-_NOW_NT_RELEASE = platform.release()
-_NOW_NT = _NOW_NT_RELEASE
+_NOW_NT_RELEASE = int(platform.release())
+_NOW_NT = str(_NOW_NT_RELEASE)
 
 _NOW_PY_MAJOR = sys.version_info[0]
 _NOW_PY_MINOR = sys.version_info[1]
@@ -54,6 +54,6 @@ if _NOW_OS not in _REQ_OS:  # avsub: N2203
 OS = _OS(*[name == os.name for name in _OS._fields])
 
 # Do this check after Python check! (prevent false positive)
-if OS.nt and _NOW_NT_RELEASE not in _REQ_NT_RELEASE:
+if OS.nt and _NOW_NT_RELEASE < _REQ_NT_RELEASE:
     print("[!] Expected Win %s, got Win %s instead" % (_REQ_NT, _NOW_NT))
     sys.exit(2)
