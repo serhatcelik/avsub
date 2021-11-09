@@ -3,6 +3,12 @@
 ########################
 Yanked versions: 2.3.0, 2.2.3
 
+AVsub
+-----
+- Code improvements.
+- PEP 8 compliance.
+
+
 AVsub 2.3.1 [2021.11.10]
 ------------------------
 - F2301: Fixed the error where AVsub could not be used on GNU/Linux operating system.

@@ -22,7 +22,7 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     author=__import__("avsub.core.notice_", fromlist="notice_").AUTHOR,
     author_email=__import__("avsub.core.notice_", fromlist="notice_").EMAIL,
-    url=__import__("avsub.core.notice_", fromlist="notice_").URL,
+    url="https://github.com/serhatcelik/avsub",
     download_url="https://github.com/serhatcelik/avsub/releases/latest",
     packages=setuptools.find_packages(),
     classifiers=[
@@ -64,7 +64,7 @@ setuptools.setup(
     },
     python_requires="~=3.6",
     project_urls={
-        "Source Code": __import__("avsub.core.notice_", fromlist="notice_").URL,
+        "Source Code": "https://github.com/serhatcelik/avsub",
         "Bug Tracker": "https://github.com/serhatcelik/avsub/issues",
         "Documentation": "https://github.com/serhatcelik/avsub/wiki",
         "Say Thanks!": "https://saythanks.io/to/serhatcelik",
