@@ -37,7 +37,7 @@ _REQ_PY = "%d.%d+" % (_REQ_PY_MAJOR, _REQ_PY_MINOR)
 ###########
 _NOW_OS = os.name
 
-_NOW_NT_RELEASE = platform.release()
+_NOW_NT_RELEASE = platform.release()  # avsub: F2301
 _NOW_NT = _NOW_NT_RELEASE
 
 _NOW_PY_MAJOR = sys.version_info[0]
