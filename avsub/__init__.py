@@ -37,8 +37,8 @@ _REQ_PY = "%d.%d+" % (_REQ_PY_MAJOR, _REQ_PY_MINOR)
 ###########
 _NOW_OS = os.name
 
-_NOW_NT_RELEASE = int(platform.release())
-_NOW_NT = str(_NOW_NT_RELEASE)
+_NOW_NT_RELEASE = platform.release()
+_NOW_NT = _NOW_NT_RELEASE
 
 _NOW_PY_MAJOR = sys.version_info[0]
 _NOW_PY_MINOR = sys.version_info[1]
@@ -54,6 +54,6 @@ if _NOW_OS not in _REQ_OS:  # avsub: N2203
 OS = _OS(*[name == os.name for name in _OS._fields])
 
 # Do this check after Python check! (prevent false positive)
-if OS.nt and _NOW_NT_RELEASE < _REQ_NT_RELEASE:
+if OS.nt and int(_NOW_NT_RELEASE) < _REQ_NT_RELEASE:
     print("[!] Expected Win %s, got Win %s instead" % (_REQ_NT, _NOW_NT))
     sys.exit(2)

@@ -1,9 +1,16 @@
 ########################
 # History of the AVsub #
 ########################
+Yanked versions: 2.3.0, 2.2.3
 
-AVsub 2.3.0
------------
+AVsub 2.3.1 [2021.11.10]
+------------------------
+- F2301: Fixed the error where AVsub could not be used on GNU/Linux operating system.
+- Code improvements.
+
+
+AVsub 2.3.0 [2021.11.10] (yanked)
+---------------------------------
 - N2300: Files that succeed in automatic operations are now cached.
 - N2301: Added a command-line option to use cache information, so only unsuccessful files are processed when repeated.
 - N2302: Added a command-line option that allows users to clear cache information.
