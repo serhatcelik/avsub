@@ -16,7 +16,7 @@ from collections import defaultdict as safedict
 from subprocess import CalledProcessError, TimeoutExpired  # nosec
 from typing import DefaultDict, Dict, List, Tuple
 
-from avsub.core import notice
+from avsub.core import notice_
 from avsub.str import Str
 
 ##########
@@ -71,7 +71,7 @@ FILE_CACHE: str = Str(DIR_CONFS).join("done.cache")
 ###################
 # Version Control #
 ###################
-_URL_MAIN: str = notice.URL
+_URL_MAIN: str = notice_.URL
 _URL_RAW: str = "https://raw.githubusercontent.com/serhatcelik/avsub"
 _URL_RELEASES: str = _URL_MAIN + "/releases"
 URL_LATEST: str = _URL_RELEASES + "/latest"

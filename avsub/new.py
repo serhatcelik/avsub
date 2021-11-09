@@ -12,7 +12,7 @@ from __future__ import absolute_import
 import urllib.error
 from urllib.request import urlopen
 
-from avsub.core import consts, notice
+from avsub.core import consts, notice_
 from avsub.core.tools import repeater
 
 
@@ -20,7 +20,7 @@ from avsub.core.tools import repeater
 def check_for_updates() -> bool:
     """Check if there is a new version for AVsub."""
     with urlopen(consts.URL_LATEST, timeout=10) as rep:  # nosec
-        if rep.url != consts.URL_TAG + notice.VERSION:
+        if rep.url != consts.URL_TAG + notice_.VERSION:
             latest: str = rep.url.strip(consts.URL_TAG)
             print(f"[+] Recommended AVsub version is available ({latest})")
             return True
@@ -33,7 +33,7 @@ def check_for_yanked() -> bool:
     try:
         with urlopen(consts.URL_YANKED, timeout=10) as versions:  # nosec
             for yanked in versions.read().decode("utf-8").split():
-                if notice.VERSION == yanked:
+                if notice_.VERSION == yanked:
                     return True
     except urllib.error.URLError:
         pass

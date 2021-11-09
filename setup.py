@@ -16,13 +16,13 @@ with open("README.md", "r", encoding="utf-8") as readme:
 
 setuptools.setup(
     name="avsub",
-    version=__import__("avsub.core.notice", fromlist="notice").VERSION,
+    version=__import__("avsub.core.notice_", fromlist="notice_").VERSION,
     description="A simplified command-line interface for FFmpeg",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    author=__import__("avsub.core.notice", fromlist="notice").AUTHOR,
-    author_email=__import__("avsub.core.notice", fromlist="notice").EMAIL,
-    url=__import__("avsub.core.notice", fromlist="notice").URL,
+    author=__import__("avsub.core.notice_", fromlist="notice_").AUTHOR,
+    author_email=__import__("avsub.core.notice_", fromlist="notice_").EMAIL,
+    url=__import__("avsub.core.notice_", fromlist="notice_").URL,
     download_url="https://github.com/serhatcelik/avsub/releases/latest",
     packages=setuptools.find_packages(),
     classifiers=[
@@ -52,7 +52,7 @@ setuptools.setup(
             "executable": "/bin/custom_python",
         },
     },
-    license=__import__("avsub.core.notice", fromlist="notice").LICENSE,
+    license=__import__("avsub.core.notice_", fromlist="notice_").LICENSE,
     license_files=["LICENSE"],
     keywords=["avsub", "audio", "video", "subtitle", "ffmpeg"],
     platforms=["Linux", "Windows"],
@@ -64,7 +64,7 @@ setuptools.setup(
     },
     python_requires="~=3.6",
     project_urls={
-        "Source Code": __import__("avsub.core.notice", fromlist="notice").URL,
+        "Source Code": __import__("avsub.core.notice_", fromlist="notice_").URL,
         "Bug Tracker": "https://github.com/serhatcelik/avsub/issues",
         "Documentation": "https://github.com/serhatcelik/avsub/wiki",
         "Say Thanks!": "https://saythanks.io/to/serhatcelik",

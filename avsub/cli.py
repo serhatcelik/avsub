@@ -62,7 +62,7 @@ from argparse import ArgumentParser, Namespace, RawTextHelpFormatter
 from typing import List
 
 from avsub import OS
-from avsub.core import consts, notice
+from avsub.core import consts, notice_
 from avsub.core.tools import convert_trim, is_user_an_admin
 from avsub.str import Str
 
@@ -73,7 +73,7 @@ def create_parser() -> ArgumentParser:
         prog="avsub",
         usage="%(prog)s [<input> <extension> [<extra_option> ...]]",
         description=f"AVsub - A simplified command-line interface for FFmpeg\n"
-                    f"Created by {notice.AUTHOR} "
+                    f"Created by {notice_.AUTHOR} "
                     f"(with the help of my family and a friend)",
         epilog=__doc__, formatter_class=RawTextHelpFormatter,
         prefix_chars="+-",
@@ -241,7 +241,7 @@ def create_parser() -> ArgumentParser:
     )
     group_independent.add_argument(
         "-L", "--license", dest="license", action="version", default=None,
-        version=notice.__doc__, help="show copyright notice and exit",
+        version=notice_.__doc__, help="show copyright notice and exit",
     )
     group_independent.add_argument(
         "-l", "--log", dest="log", action="store_true", default=False,
@@ -276,7 +276,7 @@ def create_parser() -> ArgumentParser:
     )  # avsub: N2301
     group_independent.add_argument(
         "-v", "--version", dest="version", action="version", default=None,
-        version=notice.VERSION, help="show program version and exit",
+        version=notice_.VERSION, help="show program version and exit",
     )
 
     return parser
