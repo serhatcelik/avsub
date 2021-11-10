@@ -11,7 +11,7 @@ AVsub
 
 AVsub 2.3.1 [2021.11.10]
 ------------------------
-- F2301: Fixed the error where AVsub could not be used on GNU/Linux operating system.
+- F2310: Fixed the error where AVsub could not be used on GNU/Linux operating system.
 - Code improvements.
 
 
