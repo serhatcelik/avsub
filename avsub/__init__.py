@@ -37,9 +37,6 @@ _REQ_PY = "%d.%d+" % (_REQ_PY_MAJOR, _REQ_PY_MINOR)
 ###########
 _NOW_OS = os.name
 
-_NOW_NT_RELEASE = platform.release()  # avsub: F2310
-_NOW_NT = _NOW_NT_RELEASE
-
 _NOW_PY_MAJOR = sys.version_info[0]
 _NOW_PY_MINOR = sys.version_info[1]
 _NOW_PY = "%d.%d" % (_NOW_PY_MAJOR, _NOW_PY_MINOR)
@@ -51,9 +48,16 @@ if _NOW_OS not in _REQ_OS:  # avsub: N2203
     print("[!] Unsupported operating system for AVsub:", _NOW_OS)
     sys.exit(2)
 
-OS = _OS(*[name == os.name for name in _OS._fields])
+OS = _OS(*[name == _NOW_OS for name in _OS._fields])
 
-# Do this check after Python check! (prevent false positive)
-if OS.nt and int(_NOW_NT_RELEASE) < _REQ_NT_RELEASE:
-    print("[!] Expected Win %s, got Win %s instead" % (_REQ_NT, _NOW_NT))
-    sys.exit(2)
+# Do this check after Python check! (prevent false-positive)
+if OS.nt:
+    _NOW_NT_RELEASE = platform.release()
+    _NOW_NT = _NOW_NT_RELEASE
+
+    if not _NOW_NT_RELEASE.isdigit():  # avsub: C2320
+        print("[!] Unknown Windows release:", _NOW_NT_RELEASE)
+        sys.exit(2)
+    if int(_NOW_NT_RELEASE) < _REQ_NT_RELEASE:
+        print("[!] Expected Win %s, got Win %s instead" % (_REQ_NT, _NOW_NT))
+        sys.exit(2)

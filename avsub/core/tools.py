@@ -52,7 +52,7 @@ class SigHandler:
     _handler = None
 
     def __init__(self, signals: Dict[str, int]) -> None:
-        """Docstring."""
+        """Constructor method."""
         self._signals: Dict[str, int] = signals
 
     def _handle(self) -> None:

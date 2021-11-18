@@ -24,7 +24,7 @@ def check_for_updates() -> bool:
             latest: str = rep.url.strip(consts.URL_TAG)
             print(f"[+] Recommended AVsub version is available ({latest})")
             return True
-        print("[*] You have the latest version of AVsub")
+        print(f"[*] You have the latest version of AVsub ({notice_.VERSION})")
         return True
 
 

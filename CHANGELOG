@@ -3,8 +3,9 @@
 ########################
 Yanked versions: 2.3.0, 2.2.3
 
-AVsub
------
+AVsub 2.3.2
+-----------
+- C2320: Operating system check feature has been improved.
 - Code improvements.
 - PEP 8 compliance.
 

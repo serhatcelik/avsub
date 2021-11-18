@@ -13,7 +13,7 @@ import hashlib
 import os
 import re
 import stat
-from typing import List, Union
+from typing import List
 
 from avsub import OS
 from avsub.core import errors, x
@@ -23,7 +23,7 @@ class Str:
     """Base class for string manipulation."""
 
     def __init__(self, s: str) -> None:
-        """Docstring."""
+        """Constructor method."""
         self._s: str = s
 
     def abbrevs(self, start: int = 0, pre: str = "-") -> List[str]:
@@ -34,14 +34,14 @@ class Str:
         """Normalize and absolutize the given string."""
         return os.path.abspath(self._s)
 
-    def attrs(self) -> Union[bool, int]:
+    def attrs(self) -> int:
         """Retrieve file attributes from the given string."""
         try:
             return os.stat(self.abs()).st_file_attributes
         except OSError as err:
             if errors.osraise(errors.ENOENT, err=err):
                 raise
-            return False
+            return int(False)
 
     def base(self) -> str:
         """Return the basename of the given string."""

@@ -23,7 +23,6 @@ from avsub.core.consts import U8, XML
 from avsub.core.tools import SigHandler, dcleaner, dmaker, dopen, fcleaner
 from avsub.core.tools import clear_cache, get_files, is_a_foreground, is_a_tty
 from avsub.core.tools import mark_as_not_processed
-from avsub.ffmpeg import FFmpeg
 from avsub.str import Str
 
 
@@ -80,7 +79,7 @@ def main() -> None:
     SigHandler(consts.SIGNALS).capture(stop)
     checker()
 
-    fff: FFmpeg = ffmpeg.FFmpeg()
+    fff: ffmpeg.FFmpeg = ffmpeg.FFmpeg()
     fff.build()  # Start creating the ultimate FFmpeg command
 
     try:
