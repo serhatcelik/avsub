@@ -29,7 +29,9 @@ from avsub.str import Str
 def repeater(retry: int, countdown: float):
     """Repetitive task handler."""
     def decorator(func):
+        """Docstring."""
         def wrapper(*args, **kwargs):
+            """Docstring."""
             f_name: str = ".".join([func.__module__, func.__name__])
             for i in range(retry + 1):
                 try:
