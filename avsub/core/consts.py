@@ -66,7 +66,7 @@ DIR_THE_TEMP_DEF: str = Str(tempfile.gettempdir()).join("AVsub")
 DIR_CONFS: str = Str(DIR_THE_TEMP_DEF).join("Confs")
 DIR_LOGS: str = Str(DIR_THE_TEMP_DEF).join("Logs")  # avsub: C2300
 FILE_CACHE: str = Str(DIR_CONFS).join("done.cache")
-FILE_STARTUP: str = Str(DIR_CONFS).join("AVsub.bat")
+FILE_STARTUP: str = Str(DIR_CONFS).join("AVsub_.bat")  # _ prevents BAT loop
 
 ###################
 # Version Control #
