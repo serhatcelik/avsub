@@ -7,6 +7,8 @@
 
 """Module for Windows Registry manipulation."""
 
+from __future__ import absolute_import
+
 import winreg as reg
 
 from avsub.core import consts
