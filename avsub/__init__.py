@@ -55,7 +55,7 @@ if OS.nt:
     _NOW_NT_RELEASE = platform.release()
     _NOW_NT = _NOW_NT_RELEASE
 
-    if not _NOW_NT_RELEASE.isdigit():  # avsub: C2320
+    if not _NOW_NT_RELEASE.isdigit():  # avsub: C2400
         print("[!] Unknown Windows release:", _NOW_NT_RELEASE)
         sys.exit(2)
     if int(_NOW_NT_RELEASE) < _REQ_NT_RELEASE:

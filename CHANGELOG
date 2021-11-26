@@ -3,9 +3,11 @@
 ########################
 Yanked versions: 2.2.3, 2.3.0
 
-AVsub 2.3.2
+AVsub 2.4.0
 -----------
-- C2320: Operating system check feature has been improved.
+- F2400: Fixed the error that made "-o/--output" command useless.
+- N2400: Added functionality to automatically check for updates by creating a startup program (Windows only)
+- C2400: Operating system check feature has been improved.
 - Code improvements.
 - PEP 8 compliance.
 

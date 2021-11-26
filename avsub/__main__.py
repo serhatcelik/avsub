@@ -17,13 +17,15 @@ from datetime import datetime
 from string import Template
 from typing import List
 
-from avsub import cli, ffmpeg, new
+from avsub import OS, cli, ffmpeg, new
 from avsub.core import consts, errors, x
 from avsub.core.consts import U8, XML
 from avsub.core.tools import SigHandler, dcleaner, dmaker, dopen, fcleaner
 from avsub.core.tools import clear_cache, get_files, is_a_foreground, is_a_tty
-from avsub.core.tools import mark_as_not_processed
+from avsub.core.tools import create_startup_program, mark_as_not_processed
 from avsub.str import Str
+if OS.nt:
+    from avsub import registry
 
 
 def setup_py_main() -> None:
@@ -84,17 +86,23 @@ def main() -> None:
 
     try:
         x.THE_TEMP = Str(x.OPTS.temp).abs()
-        dmaker(x.THE_TEMP, consts.DIR_CONFS, consts.DIR_LOGS, consts.DIR_OPS)
-        x.A_TEMP = tempfile.mkdtemp(prefix="avsub-", dir=consts.DIR_OPS)
+        x.OUTS = Str(x.THE_TEMP).join("Outs")  # avsub: F2400
+        dmaker(x.THE_TEMP, x.OUTS, consts.DIR_CONFS, consts.DIR_LOGS)
+        x.A_TEMP = tempfile.mkdtemp(prefix="avsub-", dir=x.OUTS)
         x.DEL_ON_EXIT_TEMP_FOLDER.append(x.A_TEMP)
     except OSError as err:  # avsub: F2210,F2220
         if errors.osraise(errors.EEXIST, errors.ENOENT, err=err):
             raise
         print(err)
-        print("[F] Required TEMP folders could not be created")
+        print("[F] Required folders could not be created")
         sys.exit(3)
     else:
         x.LOG_FILE = Str(consts.DIR_LOGS).join(f"{x.A_TEMP}.log")
+
+    if OS.nt and create_startup_program():  # avsub: N2400
+        reg: registry.Registry = registry.Registry()
+        reg.set()
+        del reg
 
     # MANUAL OPERATION?
     if Str(x.OPTS.input).isfile():

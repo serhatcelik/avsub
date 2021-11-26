@@ -267,7 +267,7 @@ def create_parser() -> ArgumentParser:
     )
     group_independent.add_argument(
         "-o", "--output", metavar="<folder>", dest="temp", action="store",
-        default=consts.DEF_THE_TEMP,
+        default=consts.DIR_THE_TEMP_DEF,
         help="set %(metavar)s as the parent of the output folder",
     )  # avsub: N2100
     group_independent.add_argument(
@@ -303,7 +303,7 @@ def check_opts(opts: Namespace) -> List[list]:
             "!",
         ],
         [
-            all([Str(opts.temp).abs() != Str(consts.DEF_THE_TEMP).abs(),
+            all([Str(opts.temp).abs() != Str(consts.DIR_THE_TEMP_DEF).abs(),
                  not Str(opts.temp).isdir()]),
             f"-o/--output ~ '{opts.temp}': No such folder",
             "!",

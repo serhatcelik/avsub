@@ -62,11 +62,11 @@ EXCEPTION_BY_FUNCTION: Dict[str, tuple] = {
 ############
 # Location #
 ############
-DEF_THE_TEMP: str = Str(tempfile.gettempdir()).join("AVsub")
-DIR_CONFS: str = Str(DEF_THE_TEMP).join("Confs")
-DIR_LOGS: str = Str(DEF_THE_TEMP).join("Logs")  # avsub: C2300
-DIR_OPS: str = Str(DEF_THE_TEMP).join("Ops")  # avsub: C2301
+DIR_THE_TEMP_DEF: str = Str(tempfile.gettempdir()).join("AVsub")
+DIR_CONFS: str = Str(DIR_THE_TEMP_DEF).join("Confs")
+DIR_LOGS: str = Str(DIR_THE_TEMP_DEF).join("Logs")  # avsub: C2300
 FILE_CACHE: str = Str(DIR_CONFS).join("done.cache")
+FILE_STARTUP: str = Str(DIR_CONFS).join("AVsub.bat")
 
 ###################
 # Version Control #
@@ -83,3 +83,9 @@ URL_YANKED: str = _URL_RAW + "/main/yanked.txt"
 #####################
 U8: str = "utf-8"
 XML: str = "xmlcharrefreplace"  # Chars are replaced with the XML reference
+
+####################
+# Windows Registry #
+####################
+REG_KEY_RUN: str = "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run"
+REG_VAL_RUN: str = "\"" + FILE_STARTUP + "\""

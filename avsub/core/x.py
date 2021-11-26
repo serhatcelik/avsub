@@ -12,7 +12,7 @@ from __future__ import absolute_import
 from argparse import Namespace
 from typing import Dict, List
 
-A_TEMP: str
+A_TEMP: str  # TEMP folder for storing output files
 CMD_TO_SHOW: str
 DEL_ON_EXIT: Dict[str, str] = {}  # Files to be deleted on exit
 DEL_ON_EXIT_TEMP: Dict[str, str] = {}  # TEMP files to be deleted on exit
@@ -22,6 +22,7 @@ FULL_CLEAN_AFTER_STOP: bool = False
 LOG_FILE: str
 NOT_PROCESSED: Dict[str, str] = {}  # Unprocessed items
 OPTS: Namespace  # Parsed command-line arguments
+OUTS: str  # TEMP folder for storing output folders
 RUN: bool = True  # Value that decides whether the program will continue to run
 RUN_FFMPEG: bool = True  # # Value that decides whether FFmpeg will be executed
 SIG_INFO: list  # Captured signal name and number

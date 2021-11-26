@@ -29,9 +29,9 @@ from avsub.str import Str
 def repeater(retry: int, countdown: float):
     """Repetitive task handler."""
     def decorator(func):
-        """Docstring."""
+        """Decorator function."""
         def wrapper(*args, **kwargs):
-            """Docstring."""
+            """Wrapper function."""
             f_name: str = ".".join([func.__module__, func.__name__])
             for i in range(retry + 1):
                 try:
@@ -118,6 +118,20 @@ def create_progress(current: int, total: Union[int, list]) -> str:
     if isinstance(total, int):
         return f"[{(current + 1):>{len(str(total))}}/{total}]"
     return f"[{(current + 1):>{len(str(len(total)))}}/{len(total)}]"
+
+
+def create_startup_program() -> bool:
+    """Create a startup program to auto check for updates."""
+    try:
+        with open(consts.FILE_STARTUP, "w", encoding=U8) as bat:
+            bat.write("@echo off\n"
+                      "avsub\n"
+                      "pause\n")
+    except OSError as err:
+        if errors.osraise(errors.ENOENT, err=err):
+            raise
+        return False
+    return True
 
 
 def dcleaner(*containers: List[str]) -> None:  # avsub: N2204
