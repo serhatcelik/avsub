@@ -17,11 +17,16 @@ import stat
 import sys
 import threading
 import time
-from subprocess import CalledProcessError, TimeoutExpired  # nosec
-from subprocess import DEVNULL as NULL, check_call, run  # nosec
+from subprocess import CalledProcessError  # nosec
+from subprocess import DEVNULL as NULL  # nosec
+from subprocess import TimeoutExpired  # nosec
+from subprocess import check_call  # nosec
+from subprocess import run  # nosec
 from typing import Dict, List, Set, Union
 
-from avsub.core import consts, errors, x
+from avsub.core import consts
+from avsub.core import errors
+from avsub.core import x
 from avsub.core.consts import U8, XML
 from avsub.str import Str
 
@@ -122,10 +127,11 @@ def create_progress(current: int, total: Union[int, list]) -> str:
 
 def create_startup_program() -> bool:
     """Create a startup program to auto check for updates."""
+    if Str(consts.FILE_STARTUP).isfile():
+        return True
     try:
         with open(consts.FILE_STARTUP, "w", encoding=U8) as bat:
-            bat.write("@echo off\n"
-                      "avsub\n"
+            bat.write("avsub\n"
                       "pause\n")
     except OSError as err:
         if errors.osraise(errors.ENOENT, err=err):

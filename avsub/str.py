@@ -16,7 +16,8 @@ import stat
 from typing import List
 
 from avsub import OS
-from avsub.core import errors, x
+from avsub.core import errors
+from avsub.core import x
 
 
 class Str:

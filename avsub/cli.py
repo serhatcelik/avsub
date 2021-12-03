@@ -58,12 +58,16 @@ ABOUT
 
 from __future__ import absolute_import
 
-from argparse import ArgumentParser, Namespace, RawTextHelpFormatter
+from argparse import ArgumentParser
+from argparse import Namespace
+from argparse import RawTextHelpFormatter
 from typing import List
 
 from avsub import OS
-from avsub.core import consts, notice_
-from avsub.core.tools import convert_trim, is_user_an_admin
+from avsub.core import consts
+from avsub.core import notice_
+from avsub.core.tools import convert_trim
+from avsub.core.tools import is_user_an_admin
 from avsub.str import Str
 
 
@@ -72,7 +76,7 @@ def create_parser() -> ArgumentParser:
     parser: ArgumentParser = ArgumentParser(
         prog="avsub",
         usage="%(prog)s [<input> <extension> [<extra_option> ...]]",
-        description=f"AVsub - A simplified command-line interface for FFmpeg\n"
+        description=f"AVsub — A simplified command-line interface for FFmpeg\n"
                     f"Created by {notice_.AUTHOR} "
                     f"(with the help of my family and a friend)",
         epilog=__doc__, formatter_class=RawTextHelpFormatter,

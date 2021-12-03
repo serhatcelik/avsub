@@ -6,7 +6,7 @@
 # Copyright (C) Serhat Çelik
 
 u"""
-AVsub - A simplified command-line interface for FFmpeg.
+AVsub — A simplified command-line interface for FFmpeg.
 
 Copyright (C) 2021-2022  Serhat Çelik
 

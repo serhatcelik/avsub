@@ -5,7 +5,7 @@
 # Released under the GNU General Public License v3.0
 # Copyright (C) Serhat Çelik
 
-"""AVsub - A simplified command-line interface for FFmpeg."""
+"""AVsub — A simplified command-line interface for FFmpeg."""
 
 from __future__ import absolute_import
 
@@ -17,12 +17,25 @@ from datetime import datetime
 from string import Template
 from typing import List
 
-from avsub import OS, cli, ffmpeg, new
-from avsub.core import consts, errors, x
+from avsub import OS
+from avsub import cli
+from avsub import ffmpeg
+from avsub import new
+from avsub.core import consts
+from avsub.core import errors
+from avsub.core import x
 from avsub.core.consts import U8, XML
-from avsub.core.tools import SigHandler, dcleaner, dmaker, dopen, fcleaner
-from avsub.core.tools import clear_cache, get_files, is_a_foreground, is_a_tty
-from avsub.core.tools import create_startup_program, mark_as_not_processed
+from avsub.core.tools import SigHandler
+from avsub.core.tools import clear_cache
+from avsub.core.tools import create_startup_program
+from avsub.core.tools import dcleaner
+from avsub.core.tools import dmaker
+from avsub.core.tools import dopen
+from avsub.core.tools import fcleaner
+from avsub.core.tools import get_files
+from avsub.core.tools import is_a_foreground
+from avsub.core.tools import is_a_tty
+from avsub.core.tools import mark_as_not_processed
 from avsub.str import Str
 if OS.nt:
     from avsub import registry

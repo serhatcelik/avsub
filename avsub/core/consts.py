@@ -13,7 +13,8 @@ import signal
 import tempfile
 import urllib.error
 from collections import defaultdict as safedict
-from subprocess import CalledProcessError, TimeoutExpired  # nosec
+from subprocess import CalledProcessError  # nosec
+from subprocess import TimeoutExpired  # nosec
 from typing import DefaultDict, Dict, List, Tuple
 
 from avsub.core import notice_
@@ -66,7 +67,7 @@ DIR_THE_TEMP_DEF: str = Str(tempfile.gettempdir()).join("AVsub")
 DIR_CONFS: str = Str(DIR_THE_TEMP_DEF).join("Confs")
 DIR_LOGS: str = Str(DIR_THE_TEMP_DEF).join("Logs")  # avsub: C2300
 FILE_CACHE: str = Str(DIR_CONFS).join("done.cache")
-FILE_STARTUP: str = Str(DIR_CONFS).join("AVsub_.bat")  # _ prevents BAT loop
+FILE_STARTUP: str = Str(DIR_CONFS).join("Audio-Video-Subtitle.bat")
 
 ###################
 # Version Control #

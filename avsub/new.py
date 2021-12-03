@@ -12,7 +12,8 @@ from __future__ import absolute_import
 import urllib.error
 from urllib.request import urlopen
 
-from avsub.core import consts, notice_
+from avsub.core import consts
+from avsub.core import notice_
 from avsub.core.tools import repeater
 
 
