@@ -12,13 +12,13 @@ from __future__ import absolute_import
 import setuptools
 
 with open("README.md", "r", encoding="utf-8") as readme:
-    long_description = readme.read()
+    LONG_DESCRIPTION = readme.read()
 
 setuptools.setup(
     name="avsub",
     version=__import__("avsub.core.notice_", fromlist="notice_").VERSION,
     description="A simplified command-line interface for FFmpeg",
-    long_description=long_description,
+    long_description=LONG_DESCRIPTION,
     long_description_content_type="text/markdown",
     author=__import__("avsub.core.notice_", fromlist="notice_").AUTHOR,
     author_email=__import__("avsub.core.notice_", fromlist="notice_").EMAIL,
