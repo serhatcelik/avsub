@@ -86,9 +86,12 @@ def avsubprocess(cmd: List[str], call: bool = False, timeout: int = 5) -> None:
         run(cmd, check=True, stdin=NULL)
 
 
-def clear_cache() -> None:
+def clear_cache() -> str:
     """Clear cache information."""
-    fcleaner({consts.FILE_CACHE: consts.FILE_CACHE})
+    if "--clear-cache" in sys.argv:
+        fcleaner({consts.FILE_CACHE: consts.FILE_CACHE})
+        return "[+] Cache cleared"
+    return ""
 
 
 def convert_trim() -> Union[str, List[str]]:  # avsub: N2201
@@ -127,7 +130,7 @@ def create_progress(current: int, total: Union[int, list]) -> str:
 
 def create_startup_program() -> bool:
     """Create a startup program to auto check for updates."""
-    if Str(consts.FILE_STARTUP).isfile():
+    if Str(consts.FILE_STARTUP).isfile() and not x.OPTS.fix_startup:
         return True
     try:
         with open(consts.FILE_STARTUP, "w", encoding=U8) as bat:

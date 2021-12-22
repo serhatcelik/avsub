@@ -88,5 +88,5 @@ XML: str = "xmlcharrefreplace"  # Chars are replaced with the XML reference
 ####################
 # Windows Registry #
 ####################
-REG_KEY_RUN: str = "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run"
+REG_KEY_RUN: str = r"SOFTWARE\Microsoft\Windows\CurrentVersion\Run"
 REG_VAL_RUN: str = "\"" + FILE_STARTUP + "\""

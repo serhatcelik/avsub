@@ -26,7 +26,6 @@ from avsub.core import errors
 from avsub.core import x
 from avsub.core.consts import U8, XML
 from avsub.core.tools import SigHandler
-from avsub.core.tools import clear_cache
 from avsub.core.tools import create_startup_program
 from avsub.core.tools import dcleaner
 from avsub.core.tools import dmaker
@@ -61,10 +60,6 @@ def checker() -> None:
         if not new.check_for_updates():
             print("[!] Could not check for updates, try again later")
             sys.exit(2)
-        sys.exit(0)
-    if any(cmd in sys.argv for cmd in Str("clear-cache").abbrevs(start=1)):
-        clear_cache()
-        print("[+] Cache cleared")
         sys.exit(0)
 
     parser: ArgumentParser = cli.create_parser()

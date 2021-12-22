@@ -66,6 +66,7 @@ from typing import List
 from avsub import OS
 from avsub.core import consts
 from avsub.core import notice_
+from avsub.core.tools import clear_cache
 from avsub.core.tools import convert_trim
 from avsub.core.tools import is_user_an_admin
 from avsub.str import Str
@@ -80,7 +81,7 @@ def create_parser() -> ArgumentParser:
                     f"Created by {notice_.AUTHOR} "
                     f"(with the help of my family and a friend)",
         epilog=__doc__, formatter_class=RawTextHelpFormatter,
-        prefix_chars="+-",
+        prefix_chars="+-", allow_abbrev=False,  # avsub: C2500
     )
 
     group_hardsub = parser.add_argument_group("hardsub arguments")
@@ -222,8 +223,8 @@ def create_parser() -> ArgumentParser:
         help="ignore warnings, not recommended!",
     )
     group_independent.add_argument(
-        "--clear-cache", dest="clear_cache", action="store_true",
-        default=False,
+        "--clear-cache", dest="clear_cache", action="version", default=None,
+        version=clear_cache(),
         help="clear cache info for successfully completed files, see note 3",
     )  # avsub: N2302
     mutual_group_1.add_argument(
@@ -235,6 +236,10 @@ def create_parser() -> ArgumentParser:
         "-F", "--ffmpeg", dest="show_ffmpeg", action="store_true",
         default=False, help="show the ffmpeg command during processing",
     )
+    group_independent.add_argument(
+        "--fix-startup", dest="fix_startup", action="store_true",
+        default=False, help="repair startup program that checks for updates",
+    )  # avsub: N2500
     group_independent.add_argument(
         "-H", "--hidden", dest="hidden", action="store_true", default=False,
         help="include hidden/protected input, see example 2",

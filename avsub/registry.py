@@ -9,24 +9,41 @@
 
 from __future__ import absolute_import
 
-import winreg as reg
+from winreg import CloseKey
+from winreg import CreateKey
+from winreg import HKEYType
+from winreg import HKEY_CURRENT_USER
+from winreg import QueryValueEx
+from winreg import REG_SZ
+from winreg import SetValueEx
 
 from avsub.core import consts
+from avsub.core import x
 
 
 class Registry:
     """Base class for Windows Registry manipulation."""
 
-    _open: reg.HKEYType
+    _open: HKEYType
+    _v_name: str = "AVsub"
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Create and open the key."""
-        self._open = reg.CreateKey(reg.HKEY_CURRENT_USER, consts.REG_KEY_RUN)
+        self._open = CreateKey(HKEY_CURRENT_USER, consts.REG_KEY_RUN)
 
-    def set(self):
+    def _v_exists(self) -> bool:
+        """Check if the value already exists."""
+        try:
+            QueryValueEx(self._open, self._v_name)
+        except FileNotFoundError:
+            return False
+        return True
+
+    def set(self) -> None:
         """Set the value."""
-        reg.SetValueEx(self._open, "AVsub", 0, reg.REG_SZ, consts.REG_VAL_RUN)
+        if not self._v_exists() or x.OPTS.fix_startup:
+            SetValueEx(self._open, self._v_name, 0, REG_SZ, consts.REG_VAL_RUN)
 
-    def __del__(self):
+    def __del__(self) -> None:
         """Close the key."""
-        reg.CloseKey(self._open)
+        CloseKey(self._open)
