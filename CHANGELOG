@@ -3,8 +3,8 @@
 ########################
 Yanked versions: 2.2.3, 2.3.0
 
-AVsub 2.5.0
------------
+AVsub 2.5.0 [2021.12.22]
+------------------------
 - N2500: Added a command-line option that repairs startup program that checks for updates.
 - C2500: Allow abbreviations feature is disabled.
 - Code improvements.
