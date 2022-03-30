@@ -50,6 +50,7 @@ C1: Dict[str, str] = {
 C2: Dict[str, str] = C1  # HTML OutlineColour codes in BBGGRR format
 CRF: List[int] = list(range(0, 51 + 1))  # Constant Rate Factor values
 LOGLEVEL: DefaultDict[int, int] = safedict(lambda: 40, {0: 16, 1: 24, 2: 32})
+SHUT: List[int] = list(range(2, 60 + 1))  # Shutdown timeout (2min-1hour)
 
 ####################
 # Exception Choice #

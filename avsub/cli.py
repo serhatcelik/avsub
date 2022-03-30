@@ -69,6 +69,7 @@ from avsub.core import notice_
 from avsub.core.tools import clear_cache
 from avsub.core.tools import convert_trim
 from avsub.core.tools import is_user_an_admin
+from avsub.core.tools import shutdown_cancel
 from avsub.str import Str
 
 
@@ -279,6 +280,19 @@ def create_parser() -> ArgumentParser:
         default=consts.DIR_THE_TEMP_DEF,
         help="set %(metavar)s as the parent of the output folder",
     )  # avsub: N2100
+    group_independent.add_argument(
+        "--shutdown", metavar="<timeout>", dest="shut", action="store",
+        nargs="?", default=None, const=consts.SHUT[0], type=int,
+        choices=consts.SHUT,
+        help=f"shut down the computer after %(metavar)s minutes when done;\n"
+             f"\tCONSTANT: %(const)s\n"
+             f"\tCHOICES: {consts.SHUT[0]}-{consts.SHUT[-1]}".expandtabs(2),
+    )  # avsub: N2600
+    group_independent.add_argument(
+        "--shutdown-cancel", dest="shut_cancel", action="version",
+        default=None, version=shutdown_cancel(),
+        help="cancel a pending shutdown",
+    )  # avsub: N2601
     group_independent.add_argument(
         "--use-cache", dest="use_cache", action="store_true", default=False,
         help="use cache info to process only unsuccessful files",

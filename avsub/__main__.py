@@ -35,6 +35,7 @@ from avsub.core.tools import get_files
 from avsub.core.tools import is_a_foreground
 from avsub.core.tools import is_a_tty
 from avsub.core.tools import mark_as_not_processed
+from avsub.core.tools import shutdown
 from avsub.str import Str
 if OS.nt:
     from avsub import registry
@@ -198,7 +199,8 @@ def logger() -> int:
     if x.OPTS.log:
         try:
             with open(x.LOG_FILE, "a", encoding=U8, errors=XML) as file:
-                date: str = datetime.now().strftime("%m/%d/%Y - %H:%M:%S")
+                date_format: str = "%m/%d/%Y - %H:%M:%S"
+                date: str = datetime.now().strftime(date_format)
                 line: str = Str("=").line(col=len(date))
                 file.write(f"{line}\n{date}\n{line}\n")
                 log.reverse()  # avsub: C2200
@@ -248,6 +250,8 @@ def clean() -> None:
     print(Str("-").line())
 
     dopen(x.A_TEMP)
+    if x.OPTS.shut:
+        shutdown()
     sys.exit(status)  # Exit status (0: All is well, 2: Error, 3: Fatal)
 
 

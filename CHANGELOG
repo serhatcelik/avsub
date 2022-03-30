@@ -3,6 +3,12 @@
 ########################
 Yanked versions: 2.2.3, 2.3.0
 
+AVsub 2.6.0 [2022.03.30]
+------------------------
+- N2600: Added a command-line option that shuts down the computer when the operation is finished.
+- N2601: Added a command-line option that cancels a pending shut down.
+
+
 AVsub 2.5.0 [2021.12.22]
 ------------------------
 - N2500: Added a command-line option that repairs startup program that checks for updates.

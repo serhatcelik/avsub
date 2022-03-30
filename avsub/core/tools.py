@@ -17,6 +17,8 @@ import stat
 import sys
 import threading
 import time
+from datetime import datetime
+from datetime import timedelta
 from subprocess import CalledProcessError  # nosec
 from subprocess import DEVNULL as NULL  # nosec
 from subprocess import TimeoutExpired  # nosec
@@ -24,6 +26,7 @@ from subprocess import check_call  # nosec
 from subprocess import run  # nosec
 from typing import Dict, List, Set, Union
 
+from avsub import OS
 from avsub.core import consts
 from avsub.core import errors
 from avsub.core import x
@@ -164,7 +167,7 @@ def dmaker(*folders: str, exist_ok: bool = True) -> None:
 
 def dopen(folder: str) -> None:
     """Open a folder."""
-    if folder is not None and Str(folder).isdir():
+    if all([not x.OPTS.shut, folder is not None, Str(folder).isdir()]):
         if any([
             x.OPTS.no_open_dir == "never",
             x.OPTS.no_open_dir == "empty" and Str(folder).isfull(),
@@ -271,3 +274,36 @@ def save_to_cache_as_done(file: str) -> None:
     except OSError as err:
         if errors.osraise(errors.ENOENT, err=err):
             raise
+
+
+def shutdown() -> None:
+    """Shutdown the computer when the operation is finished."""
+    cmd: List[str] = ["shutdown"]
+
+    if OS.nt:
+        msg: str = "AVsub operation complete!"
+        cmd += ["/s", "/t", str(x.OPTS.shut * 60), "/d", "p:0:0", "/c", msg]
+    else:
+        cmd += ["-P", str(x.OPTS.shut)]
+
+    try:
+        avsubprocess(cmd, call=True)
+        now: datetime = datetime.now()
+        x_minutes_from_now: datetime = now + timedelta(minutes=x.OPTS.shut)
+        date_format: str = "%H:%M:%S"
+        after: str = format(x_minutes_from_now, date_format)
+        print("[*] PC will shut down in", f"{x.OPTS.shut} minutes ({after})")
+    except (FileNotFoundError, CalledProcessError, TimeoutExpired):
+        print("[x] Cannot shut down PC or there is a pending shut down")
+
+
+def shutdown_cancel() -> str:
+    """Cancel a pending shutdown."""
+    if "--shutdown-cancel" in sys.argv:
+        try:
+            avsubprocess(["shutdown", "/a" if OS.nt else "-c"], call=True)
+        except (FileNotFoundError, CalledProcessError, TimeoutExpired):
+            return "[x] Cannot cancel or there is no pending shut down"
+        else:
+            return "[+] Shut down cancelled"
+    return ""
