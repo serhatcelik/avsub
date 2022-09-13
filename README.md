@@ -1,6 +1,5 @@
 # AVsub
 
-[![QUALITY](https://img.shields.io/codacy/grade/e4743ffb247d48c399d5b92c6bdeaa4b?label=Quality&style=flat-square "QUALITY")][8]
 [![VERSION](https://img.shields.io/pypi/v/avsub?label=PyPI&style=flat-square "VERSION")][7]
 [![REQUIRES](https://img.shields.io/pypi/pyversions/avsub?label=Python&style=flat-square "REQUIRES")][7]
 [![LICENSE](https://img.shields.io/pypi/l/avsub?label=License&style=flat-square "LICENSE")][4]
@@ -90,4 +89,3 @@ If you have found a bug or have a suggestion, please consider
 [5]: https://github.com/serhatcelik/avsub/issues
 [6]: https://github.com/serhatcelik/avsub/wiki#usage
 [7]: https://pypi.org/project/avsub/
-[8]: https://www.codacy.com/gh/serhatcelik/avsub
