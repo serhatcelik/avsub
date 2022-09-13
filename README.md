@@ -75,15 +75,9 @@ avsub "input.mp4" - -e "input.srt" --color1 red --color2 blue
 avsub "input.mp4" - -f="-b:v 2M -maxrate 2M -bufsize 1M"
 ```
 
-## Feedback
-
-If you have found a bug or have a suggestion, please consider
-[creating an issue][5].
-
 [1]: https://www.python.org
 [2]: https://ffmpeg.org
 [3]: https://github.com/serhatcelik/avsub/wiki/Windows-PATH
 [4]: https://choosealicense.com/licenses/gpl-3.0/
-[5]: https://github.com/serhatcelik/avsub/issues
 [6]: https://github.com/serhatcelik/avsub/wiki#usage
 [7]: https://pypi.org/project/avsub/
