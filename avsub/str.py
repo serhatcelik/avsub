@@ -93,7 +93,7 @@ class Str:
         return os.path.join(self.abs(), *[Str(_).base() for _ in args])
 
     def line(self, col: int = 0) -> str:
-        """Create a horizontal line."""
+        """Create a horizontal line from the given string."""
         columns: int = col if col != 0 else os.get_terminal_size().columns - 1
         return self._s * columns
 
