@@ -91,12 +91,12 @@ class FFmpeg:
 
             try:
                 run(self._cmd + [output, '-i', file], stdin=NULL, check=True)
-            except CalledProcessError:
-                # Output will be deleted on exit
-                Globs.corrupted.update({file: Globs.untouched.pop(file)})
             except FileNotFoundError:
                 print('[!]', 'FFmpeg could not be executed. Exiting.')
                 return
+            except CalledProcessError:
+                # Output will be deleted on exit
+                Globs.corrupted.update({file: Globs.untouched.pop(file)})
             else:
                 # Output will not be deleted on exit
                 Globs.completed.update({file: Globs.untouched.pop(file)})
