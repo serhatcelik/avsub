@@ -82,7 +82,6 @@ class FFmpeg:
 
             print('[*]', f"Running [{(i + 1):>{align}}/{total}] -> '{file}'")
 
-            # File status: Untouched
             output = Globs.untouched[file]
 
             # Also for files with the same name but different extensions
@@ -90,17 +89,14 @@ class FFmpeg:
                 print('[ ]', f"File '{output}' already exists. Passing.")
                 continue
 
-            # File status: Untouched -> Corrupted
-            Globs.corrupted.update({file: Globs.untouched.pop(file)})
-
             try:
                 run(self._cmd + [output, '-i', file], stdin=NULL, check=True)
             except CalledProcessError:
                 # Output will be deleted on exit
-                continue
+                Globs.corrupted.update({file: Globs.untouched.pop(file)})
             except FileNotFoundError:
                 print('[!]', 'FFmpeg could not be executed. Exiting.')
                 return
             else:
-                # File status: Untouched -> Corrupted -> Completed
-                Globs.completed.update({file: Globs.corrupted.pop(file)})
+                # Output will not be deleted on exit
+                Globs.completed.update({file: Globs.untouched.pop(file)})
