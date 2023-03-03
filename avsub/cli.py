@@ -7,6 +7,8 @@ from avsub.consts import SUBTITLE_ALIGNMENT, SUBTITLE_BGR_CHART, X
 parser = argparse.ArgumentParser(
     prog='avsub',
     usage='python -m %(prog)s <extension> [<option> ...]',
+    description='AVsub — A simplified command-line interface for FFmpeg',
+    epilog='https://github.com/serhatcelik/avsub',
     formatter_class=argparse.RawTextHelpFormatter,
     allow_abbrev=False,
 )
