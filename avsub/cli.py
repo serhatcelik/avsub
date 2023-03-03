@@ -1,0 +1,183 @@
+"""Command-line interface."""
+
+import argparse
+
+from avsub.consts import SUBTITLE_ALIGNMENT, SUBTITLE_BGR_CHART, X
+
+parser = argparse.ArgumentParser(
+    prog='avsub',
+    usage='python -m %(prog)s <extension> [<option> ...]',
+    formatter_class=argparse.RawTextHelpFormatter,
+    allow_abbrev=False,
+)
+
+group = parser.add_argument_group('subtitle options')
+
+mutual = parser.add_mutually_exclusive_group()
+
+########################
+# Positional Arguments #
+########################
+parser.add_argument(
+    'extension',
+    help='output extension or -',
+    metavar='extension',
+)
+
+###########
+# Options #
+###########
+parser.add_argument(
+    '--codec-audio', '-a',
+    help='set %(metavar)s as output audio codec',
+    metavar='<codec>',
+    dest='codec_a',
+)
+parser.add_argument(
+    '--codec-subtitle', '-s',
+    help='set %(metavar)s as output subtitle codec',
+    metavar='<codec>',
+    dest='codec_s',
+)
+parser.add_argument(
+    '--codec-video', '-v',
+    help='set %(metavar)s as output video codec',
+    metavar='<codec>',
+    dest='codec_v',
+)
+parser.add_argument(
+    '--compress', '-C',
+    nargs='?',
+    const=28,
+    default=23,
+    type=int,
+    choices=range(0, 52),
+    help='set %(metavar)s as crf value for compression (const: %(const)s)',
+    metavar='<value>',
+    dest='compress',
+)
+parser.add_argument(
+    '--copy', '-c',
+    nargs='+',
+    default=[],
+    choices=[X, 'audio', 'subtitle', 'video'],
+    help='use copy codec for output %(metavar)s stream (choices: %(choices)s)',
+    metavar='<stream>',
+    dest='copy',
+)
+parser.add_argument(
+    '--disable-select',
+    action='store_true',
+    help='do not select all streams',
+    dest='disable',
+)
+mutual.add_argument(
+    '--only-audio', '-A',
+    action='store_const',
+    const=['-dn', '-sn', '-vn'],
+    default=[],
+    help='choose audio stream only',
+    dest='only_a',
+)
+mutual.add_argument(
+    '--only-subtitle', '-S',
+    action='store_const',
+    const=['-an', '-dn', '-vn'],
+    default=[],
+    help='choose subtitle stream only',
+    dest='only_s',
+)
+mutual.add_argument(
+    '--only-video', '-V',
+    action='store_const',
+    const=['-an', '-dn', '-sn'],
+    default=[],
+    help='choose video stream only',
+    dest='only_v',
+)
+parser.add_argument(
+    '--remove', '-r',
+    nargs='+',
+    default=[],
+    choices=['audio', 'data', 'subtitle', 'video'],
+    help='do not copy %(metavar)s stream to output (choices: %(choices)s)',
+    metavar='<stream>',
+    dest='remove',
+)
+parser.add_argument(
+    '--remove-chapters',
+    action='store_true',
+    help='remove chapters',
+    dest='chapters',
+)
+parser.add_argument(
+    '--remove-metadata',
+    action='store_true',
+    help='remove metadata',
+    dest='metadata',
+)
+parser.add_argument(
+    '--trim',
+    nargs=6,
+    type=int,
+    choices=range(0, 60),
+    help='extract a part of a video',
+    metavar=('<h:>', '<m:>', '<s:>', '<:h>', '<:m>', '<:s>'),
+    dest='trim',
+)
+parser.add_argument(
+    '--verbose', '-i',
+    action='count',
+    default=0,
+    help='show more information',
+    dest='loglevel',
+)
+
+####################
+# Subtitle Options #
+####################
+group.add_argument(
+    '--burn',
+    action='store_true',
+    help='burn a subtitle into a video',
+    dest='burn',
+)
+group.add_argument(
+    '--color-outline',
+    default='black',
+    choices=SUBTITLE_BGR_CHART,
+    help='set %(metavar)s as subtitle outline color (choices: %(choices)s)',
+    metavar='<color>',
+    dest='color_outline',
+)
+group.add_argument(
+    '--color-primary',
+    default='white',
+    choices=SUBTITLE_BGR_CHART,
+    help='set %(metavar)s as subtitle primary color (choices: %(choices)s)',
+    metavar='<color>',
+    dest='color_primary',
+)
+group.add_argument(
+    '--font-name',
+    default='',
+    help='set %(metavar)s as subtitle font name',
+    metavar='<name>',
+    dest='font_name',
+)
+group.add_argument(
+    '--font-size',
+    default=16,
+    type=int,
+    help='set %(metavar)s as subtitle font size (default: %(default)s)',
+    metavar='<size>',
+    dest='font_size',
+)
+group.add_argument(
+    '--position',
+    default='bottom',
+    choices=SUBTITLE_ALIGNMENT,
+    help='set %(metavar)s as subtitle position (choices: %(choices)s)',
+    metavar='<position>',
+    dest='alignment',
+)
