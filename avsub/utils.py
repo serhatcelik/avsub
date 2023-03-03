@@ -17,9 +17,9 @@ def line(func: Callable[[], Any]) -> Callable[[], None]:
 
     def wrapper() -> None:
         """Wrapper function."""
-        print('-' * os.get_terminal_size().columns)
+        print('-' * (os.get_terminal_size().columns - 1))
         func()
-        print('-' * os.get_terminal_size().columns)
+        print('-' * (os.get_terminal_size().columns - 1))
 
     return wrapper
 
