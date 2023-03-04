@@ -32,19 +32,19 @@ parser.add_argument(
 parser.add_argument(
     '--codec-audio', '-a',
     help='set %(metavar)s as output audio codec',
-    metavar='<codec>',
+    metavar='CODEC',
     dest='codec_a',
 )
 parser.add_argument(
     '--codec-subtitle', '-s',
     help='set %(metavar)s as output subtitle codec',
-    metavar='<codec>',
+    metavar='CODEC',
     dest='codec_s',
 )
 parser.add_argument(
     '--codec-video', '-v',
     help='set %(metavar)s as output video codec',
-    metavar='<codec>',
+    metavar='CODEC',
     dest='codec_v',
 )
 parser.add_argument(
@@ -55,7 +55,7 @@ parser.add_argument(
     type=int,
     choices=range(0, 52),
     help='set %(metavar)s as crf value for compression (const: %(const)s)',
-    metavar='<value>',
+    metavar='VALUE',
     dest='compress',
 )
 parser.add_argument(
@@ -64,7 +64,7 @@ parser.add_argument(
     default=[],
     choices=[X, 'audio', 'subtitle', 'video'],
     help='use copy codec for output %(metavar)s stream (choices: %(choices)s)',
-    metavar='<stream>',
+    metavar='STREAM',
     dest='copy',
 )
 parser.add_argument(
@@ -103,7 +103,7 @@ parser.add_argument(
     default=[],
     choices=['audio', 'data', 'subtitle', 'video'],
     help='do not copy %(metavar)s stream to output (choices: %(choices)s)',
-    metavar='<stream>',
+    metavar='STREAM',
     dest='remove',
 )
 parser.add_argument(
@@ -124,7 +124,7 @@ parser.add_argument(
     type=int,
     choices=range(0, 60),
     help='extract a part of a video',
-    metavar=('<h:>', '<m:>', '<s:>', '<:h>', '<:m>', '<:s>'),
+    metavar=('H:', 'M:', 'S:', ':H', ':M', ':S'),
     dest='trim',
 )
 parser.add_argument(
@@ -149,7 +149,7 @@ group.add_argument(
     default='black',
     choices=SUBTITLE_BGR_CHART,
     help='set %(metavar)s as subtitle outline color (choices: %(choices)s)',
-    metavar='<color>',
+    metavar='COLOR',
     dest='color_outline',
 )
 group.add_argument(
@@ -157,14 +157,14 @@ group.add_argument(
     default='white',
     choices=SUBTITLE_BGR_CHART,
     help='set %(metavar)s as subtitle primary color (choices: %(choices)s)',
-    metavar='<color>',
+    metavar='COLOR',
     dest='color_primary',
 )
 group.add_argument(
     '--font-name',
     default='',
     help='set %(metavar)s as subtitle font name',
-    metavar='<name>',
+    metavar='NAME',
     dest='font_name',
 )
 group.add_argument(
@@ -172,7 +172,7 @@ group.add_argument(
     default=16,
     type=int,
     help='set %(metavar)s as subtitle font size (default: %(default)s)',
-    metavar='<size>',
+    metavar='SIZE',
     dest='font_size',
 )
 group.add_argument(
@@ -180,6 +180,6 @@ group.add_argument(
     default='bottom',
     choices=SUBTITLE_ALIGNMENT,
     help='set %(metavar)s as subtitle position (choices: %(choices)s)',
-    metavar='<position>',
+    metavar='POSITION',
     dest='alignment',
 )
