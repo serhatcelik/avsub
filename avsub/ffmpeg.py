@@ -21,7 +21,7 @@ class FFmpeg:
 
     _style: str
 
-    def build(self, opts: Namespace) -> None:
+    def build(self, opts: Namespace):
         """Update the FFmpeg command."""
         cmd = []
 
@@ -67,11 +67,11 @@ class FFmpeg:
 
         self._style = ','.join(style)
 
-    def build_subtitle(self, file: str) -> None:
+    def build_subtitle(self, file: str):
         """Update the FFmpeg command with the given subtitle."""
         self._cmd += ['-vf', f"subtitles={file}:force_style='{self._style}'"]
 
-    def execute(self, files: Tuple[str, ...]) -> None:
+    def execute(self, files: Tuple[str, ...]):
         """Execute the FFmpeg command."""
         total = len(files)
         align = len(str(total))

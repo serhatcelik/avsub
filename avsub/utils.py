@@ -15,7 +15,7 @@ def exit_if_not(thing: Any, /, status: int = 0) -> Any:
 def line(func: Callable[[], Any]) -> Callable[[], None]:
     """Draw a horizontal line before and after the given function."""
 
-    def wrapper() -> None:
+    def wrapper():
         """Wrapper function."""
         print('-' * (os.get_terminal_size().columns - 1))
         func()

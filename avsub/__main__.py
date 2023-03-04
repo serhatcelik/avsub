@@ -14,7 +14,7 @@ from avsub.globs import Globs
 from avsub.utils import exit_if_not, line, splitext
 
 
-def start() -> None:
+def start():
     """Start the program."""
     signal.signal(signal.SIGINT, stop)
 
@@ -52,7 +52,7 @@ def start() -> None:
     fff.execute(files)
 
 
-def stop(*args) -> None:
+def stop(*args):
     """Tell everything to stop themselves."""
     signal.signal(signal.SIGINT, signal.SIG_IGN)
 
@@ -60,7 +60,7 @@ def stop(*args) -> None:
 
 
 @line
-def log() -> None:
+def log():
     """Print the results."""
     for file in Globs.untouched:
         print('[ ]', f"Not processed: '{file}'")
@@ -70,7 +70,7 @@ def log() -> None:
         print('[+]', f"Job completed: '{file}'")
 
 
-def clear(*files: str) -> None:
+def clear(*files: str):
     """Do the cleaning."""
     for file in files:
         with contextlib.suppress(FileNotFoundError, PermissionError):
@@ -78,7 +78,7 @@ def clear(*files: str) -> None:
 
 
 @line
-def brief() -> None:
+def brief():
     """Print the summary."""
     success = len(Globs.completed)
     failure = len(Globs.corrupted) + len(Globs.untouched)
@@ -86,7 +86,7 @@ def brief() -> None:
     print('[*]', f'{success} out of {success + failure} jobs completed.\a')
 
 
-def main() -> None:
+def main():
     """Entry point."""
     start()
 

@@ -20,7 +20,7 @@ class _Globs:
         return self._run
 
     @run.setter
-    def run(self, run: bool) -> None:
+    def run(self, run: bool):
         """Setter for the controller."""
         self._run = run
 
