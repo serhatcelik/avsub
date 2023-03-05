@@ -7,8 +7,8 @@ from itertools import chain
 from subprocess import CalledProcessError, DEVNULL as NULL, run  # nosec
 from typing import TYPE_CHECKING, Tuple
 
+from avsub import globs
 from avsub.consts import LOGLEVEL, SUBTITLE_ALIGNMENT, SUBTITLE_BGR_CHART, X
-from avsub.globs import Globs
 
 if TYPE_CHECKING:
     from argparse import Namespace
@@ -77,12 +77,12 @@ class FFmpeg:
         align = len(str(total))
 
         for i, file in enumerate(files):
-            if not Globs.run:
+            if not globs.run:
                 return
 
             print('[*]', f"Running [{(i + 1):>{align}}/{total}] -> '{file}'")
 
-            output = Globs.untouched[file]
+            output = globs.untouched[file]
 
             # Also for files with the same name but different extensions
             if os.path.exists(output):
@@ -96,7 +96,7 @@ class FFmpeg:
                 return
             except CalledProcessError:
                 # Output will be deleted on exit
-                Globs.corrupted.update({file: Globs.untouched.pop(file)})
+                globs.corrupted.update({file: globs.untouched.pop(file)})
             else:
                 # Output will not be deleted on exit
-                Globs.completed.update({file: Globs.untouched.pop(file)})
+                globs.completed.update({file: globs.untouched.pop(file)})
