@@ -1,11 +1,22 @@
 """This file contains globals."""
 
+from dataclasses import dataclass
 from typing import Dict
 
-run = True
 
-completed: Dict[str, str] = {}
+@dataclass
+class Control:
+    """Control variables."""
 
-corrupted: Dict[str, str] = {}
+    run: bool
 
-untouched: Dict[str, str] = {}
+    completed: Dict[str, str]
+    corrupted: Dict[str, str]
+    untouched: Dict[str, str]
+
+
+Control.run = True
+
+Control.completed = {}
+Control.corrupted = {}
+Control.untouched = {}

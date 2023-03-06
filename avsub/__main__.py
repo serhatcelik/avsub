@@ -7,10 +7,10 @@ import signal
 import tempfile
 from tkinter.filedialog import askdirectory, askopenfilename, askopenfilenames
 
-from avsub import globs
 from avsub.cli import parser
 from avsub.consts import X
 from avsub.ffmpeg import FFmpeg
+from avsub.globs import Control
 from avsub.utils import exit_if_not, line, splitext
 
 
@@ -47,7 +47,7 @@ def start():
 
         output = os.path.join(folder, filename + extension)
 
-        globs.untouched.update({file: output})  # Mark file as "untouched"
+        Control.untouched.update({file: output})  # Mark file as "untouched"
 
     fff.execute(files)
 
@@ -56,17 +56,17 @@ def stop(*args):
     """Tell everything to stop themselves."""
     signal.signal(signal.SIGINT, signal.SIG_IGN)
 
-    globs.run = False
+    Control.run = False
 
 
 @line
 def log():
     """Print the results."""
-    for file in globs.untouched:
+    for file in Control.untouched:
         print('[ ]', f"Not processed: '{file}'")
-    for file in globs.corrupted:
+    for file in Control.corrupted:
         print('[-]', f"Not completed: '{file}'")
-    for file in globs.completed:
+    for file in Control.completed:
         print('[+]', f"Job completed: '{file}'")
 
 
@@ -80,8 +80,8 @@ def clear(*files: str):
 @line
 def brief():
     """Print the summary."""
-    success = len(globs.completed)
-    failure = len(globs.corrupted) + len(globs.untouched)
+    success = len(Control.completed)
+    failure = len(Control.corrupted) + len(Control.untouched)
 
     print('[*]', f'{success} out of {success + failure} jobs completed.\a')
 
@@ -90,12 +90,12 @@ def main():
     """Entry point."""
     start()
 
-    if globs.run:
+    if Control.run:
         stop()
 
     log()
 
-    clear(*globs.corrupted.values())
+    clear(*Control.corrupted.values())
 
     brief()
 
