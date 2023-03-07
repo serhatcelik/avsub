@@ -53,7 +53,7 @@ def start():
 
 
 def stop(*args):
-    """Tell everything to stop themselves."""
+    """Stop the program."""
     signal.signal(signal.SIGINT, signal.SIG_IGN)
 
     Control.run = False
