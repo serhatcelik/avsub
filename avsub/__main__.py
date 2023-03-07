@@ -7,10 +7,8 @@ import signal
 import tempfile
 from tkinter.filedialog import askdirectory, askopenfilename, askopenfilenames
 
-from .cli import parser
+from . import cli, ffmpeg, globs
 from .consts import X
-from .ffmpeg import FFmpeg
-from .globs import Control
 from .utils import exit_if_not, line, splitext
 
 
@@ -18,9 +16,9 @@ def start():
     """Start the program."""
     signal.signal(signal.SIGINT, stop)
 
-    opts = parser.parse_args()
+    opts = cli.parser.parse_args()
 
-    fff = FFmpeg()
+    fff = ffmpeg.FFmpeg()
 
     fff.build(opts)  # Start creating the FFmpeg command
 
@@ -47,7 +45,7 @@ def start():
 
         output = os.path.join(folder, filename + extension)
 
-        Control.untouched.update({file: output})  # Mark file as "untouched"
+        globs.untouched.update({file: output})  # Mark file as "untouched"
 
     fff.execute(files)
 
@@ -56,17 +54,17 @@ def stop(*args):
     """Stop the program."""
     signal.signal(signal.SIGINT, signal.SIG_IGN)
 
-    Control.run = False
+    globs.run = False
 
 
 @line
 def log():
     """Print the results."""
-    for file in Control.untouched:
+    for file in globs.untouched:
         print('[ ]', f"Not processed: '{file}'")
-    for file in Control.corrupted:
+    for file in globs.corrupted:
         print('[-]', f"Not completed: '{file}'")
-    for file in Control.completed:
+    for file in globs.completed:
         print('[+]', f"Job completed: '{file}'")
 
 
@@ -80,8 +78,8 @@ def clear(*files: str):
 @line
 def brief():
     """Print the summary."""
-    success = len(Control.completed)
-    failure = len(Control.corrupted) + len(Control.untouched)
+    success = len(globs.completed)
+    failure = len(globs.corrupted) + len(globs.untouched)
 
     print('[*]', f'{success} out of {success + failure} jobs completed.\a')
 
@@ -90,12 +88,12 @@ def main():
     """Entry point."""
     start()
 
-    if Control.run:
+    if globs.run:
         stop()
 
     log()
 
-    clear(*Control.corrupted.values())
+    clear(*globs.corrupted.values())
 
     brief()
 

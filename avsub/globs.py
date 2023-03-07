@@ -1,19 +1,9 @@
 """This file contains globals."""
 
-from dataclasses import dataclass
+run = True
 
+completed: dict[str, str] = {}
 
-@dataclass
-class Control:
-    """Control variables."""
+corrupted: dict[str, str] = {}
 
-    completed: dict[str, str]
-    corrupted: dict[str, str]
-    untouched: dict[str, str]
-
-    run: bool = True
-
-
-Control.completed = {}
-Control.corrupted = {}
-Control.untouched = {}
+untouched: dict[str, str] = {}
