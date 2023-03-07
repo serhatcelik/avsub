@@ -2,7 +2,7 @@
 
 import os
 import sys
-from typing import Any, Callable, Tuple
+from typing import Any, Callable
 
 
 def exit_if_not(thing: Any, /, status: int = 0) -> Any:
@@ -24,7 +24,7 @@ def line(func: Callable[[], Any]) -> Callable[[], None]:
     return wrapper
 
 
-def splitext(path: str) -> Tuple[str, str]:
+def splitext(path: str) -> tuple[str, str]:
     """Split the pathname `path` into a pair."""
     tail = os.path.split(path)[1]
 

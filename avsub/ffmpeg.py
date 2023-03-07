@@ -5,7 +5,7 @@ from __future__ import annotations
 import os
 from itertools import chain
 from subprocess import CalledProcessError, DEVNULL as NULL, run  # nosec
-from typing import TYPE_CHECKING, Tuple
+from typing import TYPE_CHECKING
 
 from avsub.consts import LOGLEVEL, SUBTITLE_ALIGNMENT, SUBTITLE_BGR_CHART, X
 from avsub.globs import Control
@@ -71,7 +71,7 @@ class FFmpeg:
         """Update the FFmpeg command with the given subtitle."""
         self._cmd += ['-vf', f"subtitles={file}:force_style='{self._style}'"]
 
-    def execute(self, files: Tuple[str, ...]):
+    def execute(self, files: tuple[str, ...]):
         """Execute the FFmpeg command."""
         total = len(files)
         align = len(str(total))

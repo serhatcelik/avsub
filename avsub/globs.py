@@ -1,16 +1,15 @@
 """This file contains globals."""
 
 from dataclasses import dataclass
-from typing import Dict
 
 
 @dataclass
 class Control:
     """Control variables."""
 
-    completed: Dict[str, str]
-    corrupted: Dict[str, str]
-    untouched: Dict[str, str]
+    completed: dict[str, str]
+    corrupted: dict[str, str]
+    untouched: dict[str, str]
 
     run: bool = True
 
