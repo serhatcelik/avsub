@@ -2,7 +2,7 @@
 
 import argparse
 
-from avsub.consts import SUBTITLE_ALIGNMENT, SUBTITLE_BGR_CHART, X
+from .consts import SUBTITLE_ALIGNMENT, SUBTITLE_BGR_CHART, X
 
 parser = argparse.ArgumentParser(
     prog='avsub',

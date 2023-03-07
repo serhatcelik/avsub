@@ -7,11 +7,11 @@ import signal
 import tempfile
 from tkinter.filedialog import askdirectory, askopenfilename, askopenfilenames
 
-from avsub.cli import parser
-from avsub.consts import X
-from avsub.ffmpeg import FFmpeg
-from avsub.globs import Control
-from avsub.utils import exit_if_not, line, splitext
+from .cli import parser
+from .consts import X
+from .ffmpeg import FFmpeg
+from .globs import Control
+from .utils import exit_if_not, line, splitext
 
 
 def start():

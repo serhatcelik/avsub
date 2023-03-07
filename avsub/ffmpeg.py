@@ -7,8 +7,8 @@ from itertools import chain
 from subprocess import CalledProcessError, DEVNULL as NULL, run  # nosec
 from typing import TYPE_CHECKING
 
-from avsub.consts import LOGLEVEL, SUBTITLE_ALIGNMENT, SUBTITLE_BGR_CHART, X
-from avsub.globs import Control
+from .consts import LOGLEVEL, SUBTITLE_ALIGNMENT, SUBTITLE_BGR_CHART, X
+from .globs import Control
 
 if TYPE_CHECKING:
     from argparse import Namespace
