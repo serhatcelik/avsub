@@ -8,14 +8,12 @@ from typing import Dict
 class Control:
     """Control variables."""
 
-    run: bool
-
     completed: Dict[str, str]
     corrupted: Dict[str, str]
     untouched: Dict[str, str]
 
+    run: bool = True
 
-Control.run = True
 
 Control.completed = {}
 Control.corrupted = {}
