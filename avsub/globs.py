@@ -1,9 +1,11 @@
 """This file contains globals."""
 
-run = True
 
-completed: dict[str, str] = {}
+class Control:
+    run = True
 
-corrupted: dict[str, str] = {}
+    completed: dict[str, str] = {}
 
-untouched: dict[str, str] = {}
+    corrupted: dict[str, str] = {}
+
+    untouched: dict[str, str] = {}
