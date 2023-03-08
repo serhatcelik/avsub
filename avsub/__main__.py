@@ -4,7 +4,6 @@ import contextlib
 import os
 import shutil
 import signal
-import sys
 import tempfile
 from tkinter.filedialog import askdirectory, askopenfilename, askopenfilenames
 
