@@ -6,7 +6,7 @@ import webbrowser
 from datetime import datetime, timedelta
 from subprocess import CalledProcessError, DEVNULL as NULL, check_call  # nosec
 from tkinter.messagebox import askokcancel
-from typing import Any, Optional
+from typing import Any
 from urllib.error import URLError
 from urllib.request import urlopen
 
@@ -54,7 +54,7 @@ def line(func):
     return _
 
 
-def shut(timeout: Optional[int]):
+def shut(timeout: int | None):
     """Shut down the machine."""
     if timeout is None:
         return
