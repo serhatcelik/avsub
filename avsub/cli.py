@@ -3,10 +3,11 @@
 import argparse
 
 from avsub.consts import SUBTITLE_ALIGNMENT, SUBTITLE_BGR_CHART, X
+from avsub.version import __version__
 
 parser = argparse.ArgumentParser(
     prog='avsub',
-    usage='python -m %(prog)s <extension> [<option> ...]',
+    usage='python -m %(prog)s [<extension> [<option> ...]]',
     description='AVsub — A simplified command-line interface for FFmpeg',
     epilog='https://github.com/serhatcelik/avsub',
     formatter_class=argparse.RawTextHelpFormatter,
@@ -133,6 +134,12 @@ parser.add_argument(
     default=0,
     help='show more information',
     dest='loglevel',
+)
+parser.add_argument(
+    '--version',
+    action='version',
+    help='show program version and exit',
+    version=__version__,
 )
 
 ####################

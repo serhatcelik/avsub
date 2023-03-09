@@ -4,6 +4,7 @@ import contextlib
 import os
 import shutil
 import signal
+import sys
 import tempfile
 from tkinter.filedialog import askdirectory, askopenfilename, askopenfilenames
 
@@ -11,12 +12,16 @@ from avsub.cli import parser
 from avsub.consts import X
 from avsub.ffmpeg import FFmpeg
 from avsub.globs import Control
-from avsub.utils import exit_if_not, line, splitext
+from avsub.utils import check_for_updates, exit_if_not, line, splitext
+from avsub.version import __version__
 
 
 def start():
     """Start the program."""
     signal.signal(signal.SIGINT, stop)
+
+    if len(sys.argv) == 1:
+        exit_if_not(check_for_updates(__version__))
 
     opts = parser.parse_args()
 
