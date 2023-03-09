@@ -187,7 +187,7 @@ misc.add_argument(
     nargs='?',
     const=0,
     type=int,
-    help='shut down the machine after %(metavar)s seconds',
+    help='shut down the machine after %(metavar)s seconds (const: %(const)s)',
     metavar='TIMEOUT',
     dest='shutdown',
 )
