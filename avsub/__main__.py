@@ -8,21 +8,19 @@ import shutil
 import signal
 import sys
 import tempfile
+from datetime import datetime, timedelta
+from subprocess import CalledProcessError, DEVNULL as NULL, check_call  # nosec
 from tkinter.filedialog import askdirectory, askopenfilename, askopenfilenames
-from typing import TYPE_CHECKING
 
 from avsub.cli import parser
 from avsub.consts import X
 from avsub.ffmpeg import FFmpeg
 from avsub.globs import Control
-from avsub.utils import check_for_updates, exit_if_not, line, shut, splitext
+from avsub.utils import check_for_updates, exit_if_not, line, splitext
 from avsub.version import __version__
 
-if TYPE_CHECKING:
-    from argparse import Namespace
 
-
-def start() -> Namespace:
+def start() -> tuple[int | None, bool]:
     """Start the program."""
     signal.signal(signal.SIGINT, stop)
 
@@ -58,11 +56,11 @@ def start() -> Namespace:
 
         output = os.path.join(folder, filename + extension)
 
-        Control.corrupted.update({file: output})  # Mark file as "corrupted"
+        Control.untouched.update({file: output})  # Mark file as "untouched"
 
     fff.execute(files)
 
-    return opts
+    return opts.shutdown, opts.shutdown is not None
 
 
 def stop(*args):
@@ -75,6 +73,8 @@ def stop(*args):
 @line
 def log():
     """Print the results."""
+    for file in Control.untouched:
+        print('[ ]', f"Not processed: '{file}'")
     for file in Control.corrupted:
         print('[-]', f"Not completed: '{file}'")
     for file in Control.completed:
@@ -92,14 +92,33 @@ def clear(*files: str):
 def brief():
     """Print the summary."""
     success = len(Control.completed)
-    failure = len(Control.corrupted)
+    failure = len(Control.corrupted) + len(Control.untouched)
 
     print('[*]', f'{success} out of {success + failure} jobs completed.\a')
 
 
+@line
+def shut(timeout: int):
+    """Schedule a shutdown for the machine."""
+    timeout = abs(timeout)
+
+    schedule = format(datetime.now() + timedelta(seconds=timeout), '%H:%M:%S')
+
+    wall = f"Shutdown will start at {schedule}, use 'shutdown /a' to cancel."
+
+    command = ['shutdown', '/s', '/t', str(timeout), '/c', wall, '/d', 'p:0:0']
+
+    try:
+        check_call(command, stdin=NULL, stdout=NULL, stderr=NULL)
+    except (FileNotFoundError, CalledProcessError):
+        print('[!]', "Cannot schedule shutdown or there's a pending shutdown.")
+    else:
+        print('[*]', wall)
+
+
 def main():
     """Entry point."""
-    opts = start()
+    timeout, schedule = start()
 
     if Control.run:
         stop()
@@ -110,7 +129,8 @@ def main():
 
     brief()
 
-    shut(opts.shutdown)
+    if schedule:
+        shut(timeout)
 
 
 if __name__ == '__main__':
