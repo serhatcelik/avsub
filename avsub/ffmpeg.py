@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import os
 from itertools import chain
 from subprocess import CalledProcessError, DEVNULL as NULL, run  # nosec
 from typing import TYPE_CHECKING
@@ -82,21 +81,17 @@ class FFmpeg:
 
             print('[*]', f"Running [{(i + 1):>{align}}/{total}] -> '{file}'")
 
-            output = Control.untouched[file]
-
-            # Also for files with the same name but different extensions
-            if os.path.exists(output):
-                print('[ ]', f"File '{output}' already exists. Passing.")
-                continue
+            output = Control.corrupted[file]
 
             try:
                 run(self._cmd + [output, '-i', file], stdin=NULL, check=True)
             except FileNotFoundError:
                 print('[!]', 'FFmpeg could not be executed. Exiting.')
                 return
+            # Also for files with the same name but different extensions
             except CalledProcessError:
                 # Output will be deleted on exit
-                Control.corrupted.update({file: Control.untouched.pop(file)})
+                continue
             else:
                 # Output will not be deleted on exit
-                Control.completed.update({file: Control.untouched.pop(file)})
+                Control.completed.update({file: Control.corrupted.pop(file)})

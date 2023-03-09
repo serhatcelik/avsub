@@ -1,5 +1,7 @@
 """AVsub — A simplified command-line interface for FFmpeg."""
 
+from __future__ import annotations
+
 import contextlib
 import os
 import shutil
@@ -7,16 +9,20 @@ import signal
 import sys
 import tempfile
 from tkinter.filedialog import askdirectory, askopenfilename, askopenfilenames
+from typing import TYPE_CHECKING
 
 from avsub.cli import parser
 from avsub.consts import X
 from avsub.ffmpeg import FFmpeg
 from avsub.globs import Control
-from avsub.utils import check_for_updates, exit_if_not, line, splitext
+from avsub.utils import check_for_updates, exit_if_not, line, shut, splitext
 from avsub.version import __version__
 
+if TYPE_CHECKING:
+    from argparse import Namespace
 
-def start():
+
+def start() -> Namespace:
     """Start the program."""
     signal.signal(signal.SIGINT, stop)
 
@@ -52,9 +58,11 @@ def start():
 
         output = os.path.join(folder, filename + extension)
 
-        Control.untouched.update({file: output})  # Mark file as "untouched"
+        Control.corrupted.update({file: output})  # Mark file as "corrupted"
 
     fff.execute(files)
+
+    return opts
 
 
 def stop(*args):
@@ -67,8 +75,6 @@ def stop(*args):
 @line
 def log():
     """Print the results."""
-    for file in Control.untouched:
-        print('[ ]', f"Not processed: '{file}'")
     for file in Control.corrupted:
         print('[-]', f"Not completed: '{file}'")
     for file in Control.completed:
@@ -86,14 +92,14 @@ def clear(*files: str):
 def brief():
     """Print the summary."""
     success = len(Control.completed)
-    failure = len(Control.corrupted) + len(Control.untouched)
+    failure = len(Control.corrupted)
 
     print('[*]', f'{success} out of {success + failure} jobs completed.\a')
 
 
 def main():
     """Entry point."""
-    start()
+    opts = start()
 
     if Control.run:
         stop()
@@ -103,6 +109,8 @@ def main():
     clear(*Control.corrupted.values())
 
     brief()
+
+    shut(opts.shutdown)
 
 
 if __name__ == '__main__':

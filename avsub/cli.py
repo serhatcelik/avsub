@@ -14,7 +14,8 @@ parser = argparse.ArgumentParser(
     allow_abbrev=False,
 )
 
-group = parser.add_argument_group('subtitle options')
+burn = parser.add_argument_group('embed options')
+misc = parser.add_argument_group('miscellaneous')
 
 mutual = parser.add_mutually_exclusive_group()
 
@@ -128,30 +129,17 @@ parser.add_argument(
     metavar=('H:', 'M:', 'S:', ':H', ':M', ':S'),
     dest='trim',
 )
-parser.add_argument(
-    '--verbose', '-i',
-    action='count',
-    default=0,
-    help='show more information',
-    dest='loglevel',
-)
-parser.add_argument(
-    '--version',
-    action='version',
-    help='show program version and exit',
-    version=__version__,
-)
 
 ####################
 # Subtitle Options #
 ####################
-group.add_argument(
+burn.add_argument(
     '--burn',
     action='store_true',
     help='burn a subtitle into a video',
     dest='burn',
 )
-group.add_argument(
+burn.add_argument(
     '--color-outline',
     default='black',
     choices=SUBTITLE_BGR_CHART,
@@ -159,7 +147,7 @@ group.add_argument(
     metavar='COLOR',
     dest='color_outline',
 )
-group.add_argument(
+burn.add_argument(
     '--color-primary',
     default='white',
     choices=SUBTITLE_BGR_CHART,
@@ -167,14 +155,14 @@ group.add_argument(
     metavar='COLOR',
     dest='color_primary',
 )
-group.add_argument(
+burn.add_argument(
     '--font-name',
     default='',
     help='set %(metavar)s as subtitle font name',
     metavar='NAME',
     dest='font_name',
 )
-group.add_argument(
+burn.add_argument(
     '--font-size',
     default=16,
     type=int,
@@ -182,11 +170,35 @@ group.add_argument(
     metavar='SIZE',
     dest='font_size',
 )
-group.add_argument(
+burn.add_argument(
     '--position',
     default='bottom',
     choices=SUBTITLE_ALIGNMENT,
     help='set %(metavar)s as subtitle position (choices: %(choices)s)',
     metavar='POSITION',
     dest='alignment',
+)
+
+#################
+# Miscellaneous #
+#################
+misc.add_argument(
+    '--shutdown',
+    type=int,
+    help="shut down the machine after %(metavar)s s ('shutdown /a' to cancel)",
+    metavar='TIMEOUT',
+    dest='shutdown',
+)
+misc.add_argument(
+    '--verbose', '-i',
+    action='count',
+    default=0,
+    help='show more informative messages during processing',
+    dest='loglevel',
+)
+misc.add_argument(
+    '--version',
+    action='version',
+    help='show program version and exit',
+    version=__version__,
 )
