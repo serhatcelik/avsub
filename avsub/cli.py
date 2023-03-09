@@ -184,6 +184,8 @@ burn.add_argument(
 #################
 misc.add_argument(
     '--shutdown',
+    nargs='?',
+    const=0,
     type=int,
     help="shut down the machine after %(metavar)s s ('shutdown /a' to cancel)",
     metavar='TIMEOUT',
