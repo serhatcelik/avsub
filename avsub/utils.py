@@ -3,8 +3,6 @@
 import os
 import sys
 import webbrowser
-from datetime import datetime, timedelta
-from subprocess import CalledProcessError, DEVNULL as NULL, check_call  # nosec
 from tkinter.messagebox import askokcancel
 from typing import Any
 from urllib.error import URLError
@@ -48,29 +46,11 @@ def line(func):
 
     def _(*args, **kwargs):
         print('-' * (os.get_terminal_size().columns - 1))
-        func(*args, **kwargs)
+        value = func(*args, **kwargs)
         print('-' * (os.get_terminal_size().columns - 1))
+        return value
 
     return _
-
-
-def shut(timeout: int | None):
-    """Shut down the machine."""
-    if timeout is None:
-        return
-
-    timeout = abs(timeout)
-
-    schedule = format(datetime.now() + timedelta(seconds=timeout), '%H:%M:%S')
-
-    wall = f'AVsub has scheduled a shutdown for {schedule}.'
-
-    command = ['shutdown', '/s', '/t', str(timeout), '/c', wall, '/d', 'p:0:0']
-
-    try:
-        check_call(command, stdin=NULL, stdout=NULL, stderr=NULL)
-    except (FileNotFoundError, CalledProcessError) as err:
-        print('[!]', err)
 
 
 def splitext(path: str) -> tuple[str, str]:
