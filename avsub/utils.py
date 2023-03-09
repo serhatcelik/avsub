@@ -21,7 +21,7 @@ def check_for_updates(current: str):
         return
 
     if current == latest:
-        print('[*]', 'Up to Date!')
+        print('[*]', 'Up to date!')
         return
 
     print('[*]', message := 'Update available. Download?')
