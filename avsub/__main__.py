@@ -25,7 +25,8 @@ def start() -> tuple[int | None, bool]:
     signal.signal(signal.SIGINT, stop)
 
     if len(sys.argv) == 1:
-        exit_if_not(check_for_updates(__version__))
+        check_for_updates(__version__)
+        sys.exit()
 
     opts = parser.parse_args()
 
@@ -33,11 +34,11 @@ def start() -> tuple[int | None, bool]:
 
     fff.build(opts)  # Start creating the FFmpeg command
 
-    files = exit_if_not(tuple(askopenfilenames(title='Open')))
+    exit_if_not(files := tuple(askopenfilenames(title='Open')))
 
     # Manual hardsub operation?
     if len(files) == 1 and opts.burn:
-        subtitle = exit_if_not(askopenfilename(title='Open subtitle'))
+        exit_if_not(subtitle := askopenfilename(title='Open subtitle'))
 
         # For "escaping" nonsense :/
         temp = os.path.join(tempfile.gettempdir(), 'avsub.tmp')
@@ -46,7 +47,7 @@ def start() -> tuple[int | None, bool]:
 
         fff.build_subtitle(temp.replace('\\', '/').replace(':', '\\\\:'))
 
-    folder = exit_if_not(askdirectory(title='Select a folder', mustexist=True))
+    exit_if_not(folder := askdirectory(title='Select folder', mustexist=True))
 
     for file in files:
         filename, extension = splitext(os.path.basename(file))

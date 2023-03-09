@@ -195,7 +195,7 @@ misc.add_argument(
     '--verbose', '-i',
     action='count',
     default=0,
-    help='show more informative messages during processing',
+    help='show more informative messages, can be used multiple times',
     dest='loglevel',
 )
 misc.add_argument(
