@@ -32,6 +32,8 @@ def start() -> tuple[int | None, bool]:
 
     fff.build(opts)  # Start creating the FFmpeg command
 
+    fff.build_custom(opts.ffmpeg_list)
+
     exit_if_not(files := tuple(askopenfilenames(title='Open')))
 
     # Manual hardsub operation?
@@ -103,16 +105,16 @@ def shut(timeout: int):
 
     schedule = format(datetime.now() + timedelta(seconds=timeout), '%H:%M:%S')
 
-    wall = f"Shutdown will start at {schedule}, use 'shutdown /a' to cancel."
+    wall = f'AVsub has scheduled a shutdown for {schedule}.'
 
-    command = ['shutdown', '/s', '/t', str(timeout), '/c', wall, '/d', 'p:0:0']
+    cmd = ['shutdown', '/s', '/t', str(timeout), '/c', wall, '/d', 'p:0:0']
 
     try:
-        check_call(command, stdin=NULL, stdout=NULL, stderr=NULL)
+        check_call(cmd, stdin=NULL, stdout=NULL, stderr=NULL)
     except (FileNotFoundError, CalledProcessError):
         print('[!]', "Cannot schedule shutdown or there's a pending shutdown.")
     else:
-        print('[*]', wall)
+        print('[*]', wall, "Use 'shutdown /a' to cancel.")
 
 
 def main():
