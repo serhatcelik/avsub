@@ -2,7 +2,7 @@
 
 import argparse
 
-from avsub.consts import SUBTITLE_ALIGNMENT, SUBTITLE_BGR_CHART, X
+from avsub.consts import CHANNEL, SUB_ALIGNMENT, SUB_BGR_CHART, X
 from avsub.version import __version__
 
 parser = argparse.ArgumentParser(
@@ -31,6 +31,13 @@ parser.add_argument(
 ###########
 # Options #
 ###########
+parser.add_argument(
+    '--channel',
+    choices=CHANNEL,
+    help='set %(metavar)s as output audio channel (choices: %(choices)s)',
+    metavar="CHANNEL",
+    dest="channel",
+)
 parser.add_argument(
     '--codec-audio', '-a',
     help='set %(metavar)s as output audio codec',
@@ -74,6 +81,13 @@ parser.add_argument(
     action='store_true',
     help='do not select all streams',
     dest='disable',
+)
+parser.add_argument(
+    '--ffmpeg-list', '-f',
+    default='',
+    help='provide %(metavar)s as an ffmpeg argument list',
+    metavar='ARGS',
+    dest='ffmpeg_list',
 )
 mutual.add_argument(
     '--only-audio', '-A',
@@ -142,7 +156,7 @@ burn.add_argument(
 burn.add_argument(
     '--color-outline',
     default='black',
-    choices=SUBTITLE_BGR_CHART,
+    choices=SUB_BGR_CHART,
     help='set %(metavar)s as subtitle outline color (choices: %(choices)s)',
     metavar='COLOR',
     dest='color_outline',
@@ -150,7 +164,7 @@ burn.add_argument(
 burn.add_argument(
     '--color-primary',
     default='white',
-    choices=SUBTITLE_BGR_CHART,
+    choices=SUB_BGR_CHART,
     help='set %(metavar)s as subtitle primary color (choices: %(choices)s)',
     metavar='COLOR',
     dest='color_primary',
@@ -173,7 +187,7 @@ burn.add_argument(
 burn.add_argument(
     '--position',
     default='bottom',
-    choices=SUBTITLE_ALIGNMENT,
+    choices=SUB_ALIGNMENT,
     help='set %(metavar)s as subtitle position (choices: %(choices)s)',
     metavar='POSITION',
     dest='alignment',
