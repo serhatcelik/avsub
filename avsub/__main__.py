@@ -32,8 +32,6 @@ def start() -> tuple[int | None, bool]:
 
     fff.build(opts)  # Start creating the FFmpeg command
 
-    fff.build_custom(opts.ffmpeg_list)
-
     exit_if_not(files := tuple(askopenfilenames(title='Open')))
 
     # Manual hardsub operation?
