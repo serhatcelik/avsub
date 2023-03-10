@@ -84,7 +84,6 @@ parser.add_argument(
 )
 parser.add_argument(
     '--ffmpeg-list', '-f',
-    default='',
     help='provide %(metavar)s as an ffmpeg argument list',
     metavar='ARGS',
     dest='ffmpeg_list',
