@@ -41,11 +41,11 @@ def start() -> tuple[int | None, bool]:
         exit_if_not(subtitle := askopenfilename(title='Open subtitle'))
 
         # For "escaping" nonsense :/
-        temp = os.path.join(tempfile.gettempdir(), 'avsub.tmp')
+        tmp = os.path.abspath(os.path.join(tempfile.gettempdir(), 'avsub.tmp'))
 
-        shutil.copyfile(subtitle, temp)
+        shutil.copyfile(subtitle, tmp)
 
-        fff.build_subtitle(temp.replace('\\', '/').replace(':', '\\\\:'))
+        fff.build_subtitle(tmp.replace('\\', '/').replace(':', '\\\\:'))
 
     exit_if_not(folder := askdirectory(title='Select folder', mustexist=True))
 
@@ -55,7 +55,7 @@ def start() -> tuple[int | None, bool]:
         if opts.extension != X:
             extension = '.' + opts.extension.lstrip('.')
 
-        output = os.path.join(folder, filename + extension)
+        output = os.path.abspath(os.path.join(folder, filename + extension))
 
         Control.untouched.update({file: output})  # Mark file as "untouched"
 
