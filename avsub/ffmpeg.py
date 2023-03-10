@@ -56,6 +56,9 @@ class FFmpeg:
 
         cmd += ['-loglevel', str(LOGLEVEL[opts.loglevel])]
 
+        if opts.ffmpeg_list:
+            cmd += opts.ffmpeg_list.strip().split()
+
         self._cmd += cmd
 
         style = []
@@ -69,10 +72,6 @@ class FFmpeg:
         style += [f'Alignment={SUB_ALIGNMENT[opts.alignment]}']
 
         self._style = ','.join(style)
-
-    def build_custom(self, args: str):
-        """Update the FFmpeg command with the given arguments."""
-        self._cmd += args.strip().split()
 
     def build_subtitle(self, file: str):
         """Update the FFmpeg command with the given subtitle."""
