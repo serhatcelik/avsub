@@ -43,7 +43,9 @@ def start() -> tuple[int | None, bool]:
 
         shutil.copyfile(subtitle, tmp)
 
-        fff.build_subtitle(tmp.replace('\\', '/').replace(':', '\\\\:'))
+        tmp = tmp.replace('\\', '/').replace(':', '\\\\:')
+
+        fff.build_subtitle(tmp)
 
     exit_if_not(folder := askdirectory(title='Select folder', mustexist=True))
 
