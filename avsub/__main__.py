@@ -43,6 +43,7 @@ def start() -> tuple[int | None, bool]:
 
         shutil.copyfile(subtitle, tmp)
 
+        # Add a new level of escaping
         tmp = tmp.replace('\\', '/').replace(':', '\\\\:')
 
         fff.build_subtitle(tmp)
