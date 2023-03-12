@@ -24,7 +24,7 @@ mutual = parser.add_mutually_exclusive_group()
 ########################
 parser.add_argument(
     'extension',
-    help='output extension or -',
+    help=f'output extension or {X}',
     metavar='extension',
 )
 
