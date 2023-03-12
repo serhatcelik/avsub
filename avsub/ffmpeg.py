@@ -8,7 +8,7 @@ from subprocess import CalledProcessError, DEVNULL as NULL, run  # nosec
 from typing import TYPE_CHECKING
 
 from avsub.consts import CHANNEL, LOGLEVEL, SUB_ALIGNMENT, SUB_BGR_CHART, X
-from avsub.globs import Control
+from avsub.globs import Run, completed, corrupted, untouched
 
 if TYPE_CHECKING:
     from argparse import Namespace
@@ -83,12 +83,12 @@ class FFmpeg:
         align = len(str(total))
 
         for i, file in enumerate(files):
-            if not Control.run:
+            if Run.is_set():
                 return
 
             print('[*]', f"Running [{(i + 1):>{align}}/{total}] -> '{file}'")
 
-            output = Control.untouched[file]
+            output = untouched[file]
 
             # Also for files with the same name but different extensions
             if os.path.exists(output):
@@ -102,7 +102,7 @@ class FFmpeg:
                 return
             except CalledProcessError:
                 # Output will be deleted on exit
-                Control.corrupted.update({file: Control.untouched.pop(file)})
+                corrupted.update({file: untouched.pop(file)})
             else:
                 # Output will not be deleted on exit
-                Control.completed.update({file: Control.untouched.pop(file)})
+                completed.update({file: untouched.pop(file)})

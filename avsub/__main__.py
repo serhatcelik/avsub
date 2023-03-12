@@ -13,7 +13,7 @@ from tkinter.filedialog import askdirectory, askopenfilename, askopenfilenames
 from avsub.cli import parser
 from avsub.consts import X
 from avsub.ffmpeg import FFmpeg
-from avsub.globs import Control
+from avsub.globs import Run, completed, corrupted, untouched
 from avsub.utils import check_for_updates, exit_if_not, line, splitext
 from avsub.version import __version__
 
@@ -58,7 +58,7 @@ def start() -> tuple[int | None, bool]:
 
         output = os.path.abspath(os.path.join(folder, filename + extension))
 
-        Control.untouched.update({file: output})  # Mark file as "untouched"
+        untouched.update({file: output})  # Mark file as "untouched"
 
     fff.execute(files)
 
@@ -69,17 +69,17 @@ def stop(*args):
     """Stop the program."""
     signal.signal(signal.SIGINT, signal.SIG_IGN)
 
-    Control.run = False
+    Run.set()
 
 
 @line
 def log():
     """Print the results."""
-    for file in Control.untouched:
+    for file in untouched:
         print('[ ]', f"Not processed: '{file}'")
-    for file in Control.corrupted:
+    for file in corrupted:
         print('[-]', f"Not completed: '{file}'")
-    for file in Control.completed:
+    for file in completed:
         print('[+]', f"Job completed: '{file}'")
 
 
@@ -93,8 +93,8 @@ def clear(*files: str):
 @line
 def brief():
     """Print the summary."""
-    success = len(Control.completed)
-    failure = len(Control.corrupted) + len(Control.untouched)
+    success = len(completed)
+    failure = len(corrupted) + len(untouched)
 
     print('[*]', f'{success} out of {success + failure} jobs completed.\a')
 
@@ -122,12 +122,12 @@ def main():
     """Entry point."""
     timeout, schedule = start()
 
-    if Control.run:
+    if not Run.is_set():
         stop()
 
     log()
 
-    clear(*Control.corrupted.values())
+    clear(*corrupted.values())
 
     brief()
 
