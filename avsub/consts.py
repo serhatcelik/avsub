@@ -1,11 +1,6 @@
 """This file contains constants."""
 
-import sys
 from collections import defaultdict
-
-LINUX = sys.platform.startswith('linux')
-
-WINDOWS = sys.platform.startswith('win32')
 
 X = '-'  # Placeholder for command-line arguments
 

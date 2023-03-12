@@ -11,7 +11,7 @@ from subprocess import CalledProcessError, DEVNULL as NULL, check_call  # nosec
 from tkinter.filedialog import askdirectory, askopenfilename, askopenfilenames
 
 from avsub.cli import parser
-from avsub.consts import LINUX, WINDOWS, X
+from avsub.consts import X
 from avsub.ffmpeg import FFmpeg
 from avsub.globs import Control
 from avsub.utils import check_for_updates, exit_if_not, line, splitext
@@ -108,19 +108,14 @@ def shut(timeout: int):
 
     wall = f'AVsub has scheduled a shutdown for {schedule}.'
 
-    if WINDOWS:
-        cmd, cancel = ['shutdown', '/t', str(timeout), '/s', '/c', wall], '/a'
-    elif LINUX:
-        cmd, cancel = ['shutdown', '-P', str(timeout), wall], '-c'
-    else:
-        return
+    cmd = ['shutdown', '/s', '/t', str(timeout), '/c', wall, '/d', 'p:0:0']
 
     try:
         check_call(cmd, stdin=NULL, stdout=NULL, stderr=NULL)
     except (FileNotFoundError, CalledProcessError):
         print('[!]', "Cannot schedule shutdown or there's a pending shutdown.")
     else:
-        print('[*]', wall, f"Use 'shutdown {cancel}' to cancel.")
+        print('[*]', wall, "Use 'shutdown /a' to cancel.")
 
 
 def main():
