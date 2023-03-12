@@ -34,7 +34,7 @@ def check_for_updates(current: str):
     webbrowser.open_new_tab(ref)
 
 
-def exit_if_not(thing: Any, /, status: int = 0) -> Any:
+def exit_if_not(thing: Any, /, status: str | int = 0) -> Any:
     """Conditional exit: if not."""
     if not thing:
         sys.exit(status)
