@@ -36,7 +36,7 @@ def start() -> tuple[int | None, bool]:
 
     # Manual hardsub operation?
     if len(files) == 1 and opts.burn:
-        exit_if_not(subtitle := askopenfilename(title='Open subtitle'))
+        exit_if_not(subtitle := askopenfilename(title='Open Subtitle'))
 
         # For "escaping" nonsense :/
         tmp = os.path.abspath(os.path.join(tempfile.gettempdir(), 'avsub.tmp'))
@@ -48,7 +48,7 @@ def start() -> tuple[int | None, bool]:
 
         fff.build_subtitle(tmp)
 
-    exit_if_not(folder := askdirectory(title='Select folder', mustexist=True))
+    exit_if_not(folder := askdirectory(title='Select Folder', mustexist=True))
 
     for file in files:
         filename, extension = splitext(os.path.basename(file))
