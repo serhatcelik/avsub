@@ -1,11 +1,11 @@
 """AVsub — A simplified command-line interface for FFmpeg."""
 
-import contextlib
 import os
 import shutil
 import signal
 import sys
 import tempfile
+from contextlib import suppress
 from datetime import datetime, timedelta
 from subprocess import CalledProcessError, DEVNULL as NULL, check_call  # nosec
 from tkinter.filedialog import askdirectory, askopenfilename, askopenfilenames
@@ -86,7 +86,7 @@ def log():
 def clear(*files: str):
     """Do the cleaning."""
     for file in files:
-        with contextlib.suppress(FileNotFoundError, PermissionError):
+        with suppress(FileNotFoundError, PermissionError):
             os.remove(file)
 
 
