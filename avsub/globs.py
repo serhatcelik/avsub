@@ -18,6 +18,6 @@ class _Run:
 
 Run = _Run()
 
-completed: dict[str, str] = {}
-corrupted: dict[str, str] = {}
-untouched: dict[str, str] = {}
+completed = {}  # type: dict[str, str]
+corrupted = {}  # type: dict[str, str]
+untouched = {}  # type: dict[str, str]
