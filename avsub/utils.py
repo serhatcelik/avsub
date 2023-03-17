@@ -46,9 +46,8 @@ def line(func):
 
     def _(*args, **kwargs):
         print('-' * (os.get_terminal_size().columns - 1))
-        value = func(*args, **kwargs)
+        func(*args, **kwargs)
         print('-' * (os.get_terminal_size().columns - 1))
-        return value
 
     return _
 
