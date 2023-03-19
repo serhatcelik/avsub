@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import os
 from itertools import chain
-from subprocess import CalledProcessError, DEVNULL as NULL, run  # nosec
+from subprocess import CalledProcessError, DEVNULL as NULL, run
 from typing import TYPE_CHECKING
 
 from avsub.consts import CHANNEL, LOGLEVEL, SUB_ALIGNMENT, SUB_BGR_CHART, X
@@ -26,7 +26,7 @@ class FFmpeg:
         cmd = []
 
         if opts.channel:
-            cmd += ['-ac', str(CHANNEL[opts.channel])]
+            cmd += ['-ac', CHANNEL[opts.channel]]
 
         if opts.codec_a:
             cmd += ['-codec:a', opts.codec_a]
@@ -54,7 +54,7 @@ class FFmpeg:
             stop = (opts.trim[3] * 3600) + (opts.trim[4] * 60) + opts.trim[5]
             cmd += ['-ss', str(seek), '-to', str(stop)]
 
-        cmd += ['-loglevel', str(LOGLEVEL[opts.loglevel])]
+        cmd += ['-loglevel', LOGLEVEL[opts.loglevel]]
 
         if opts.ffmpeg_list:
             cmd += opts.ffmpeg_list.strip().split()

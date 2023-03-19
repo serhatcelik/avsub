@@ -7,7 +7,7 @@ import sys
 import tempfile
 from contextlib import suppress
 from datetime import datetime, timedelta
-from subprocess import CalledProcessError, DEVNULL as NULL, check_call  # nosec
+from subprocess import CalledProcessError, DEVNULL as NULL, check_call
 from tkinter.filedialog import askdirectory, askopenfilename, askopenfilenames
 
 from avsub.cli import parser
@@ -28,25 +28,24 @@ def start() -> tuple[int | None, bool]:
 
     opts = parser.parse_args()
 
-    fff = FFmpeg()
+    ff = FFmpeg()
 
-    fff.build(opts)  # Start creating the FFmpeg command
+    ff.build(opts)  # Start creating the FFmpeg command
 
     exit_if_not(files := tuple(askopenfilenames(title='Open')))
 
-    # Manual hardsub operation?
+    # Manual Hardsub Operation?
     if len(files) == 1 and opts.burn:
         exit_if_not(subtitle := askopenfilename(title='Open Subtitle'))
 
-        # For "escaping" nonsense :/
+        # This is necessary for "escaping" nonsense :/
         tmp = os.path.abspath(os.path.join(tempfile.gettempdir(), 'avsub.tmp'))
 
         shutil.copyfile(subtitle, tmp)
 
-        # Add a new level of escaping
         tmp = tmp.replace('\\', '/').replace(':', '\\\\:')
 
-        fff.build_subtitle(tmp)
+        ff.build_subtitle(tmp)
 
     exit_if_not(folder := askdirectory(title='Select Folder', mustexist=True))
 
@@ -60,7 +59,7 @@ def start() -> tuple[int | None, bool]:
 
         untouched.update({file: output})  # Mark file as "untouched"
 
-    fff.execute(files)
+    ff.execute(files)
 
     return opts.shutdown, opts.shutdown is not None
 
@@ -106,16 +105,25 @@ def shut(timeout: int):
 
     schedule = format(datetime.now() + timedelta(seconds=timeout), '%H:%M:%S')
 
-    wall = f'AVsub has scheduled a shutdown for {schedule}.'
+    msg = f'AVsub has scheduled a shutdown for {schedule}.'
 
-    cmd = ['shutdown', '/s', '/t', str(timeout), '/c', wall, '/d', 'p:0:0']
+    shutdown = {
+        'linux': (['shutdown', '-P', str(timeout), msg], '-c'),
+        'win32': (['shutdown', '/t', str(timeout), '/s', '/c', msg], '/a'),
+    }
+
+    if sys.platform not in shutdown:
+        print('[!]', 'Cannot schedule shutdown on this platform.')
+        return
+
+    cmd, cancel = shutdown[sys.platform]
 
     try:
         check_call(cmd, stdin=NULL, stdout=NULL, stderr=NULL)
     except (FileNotFoundError, CalledProcessError):
         print('[!]', "Cannot schedule shutdown or there's a pending shutdown.")
     else:
-        print('[*]', wall, "Use 'shutdown /a' to cancel.")
+        print('[*]', msg, f"Use 'shutdown {cancel}' to cancel.")
 
 
 def main():

@@ -4,7 +4,7 @@ import os
 import sys
 import webbrowser
 from tkinter.messagebox import askokcancel
-from typing import Any
+from typing import Any, NoReturn
 from urllib.error import URLError
 from urllib.request import urlopen
 
@@ -14,7 +14,7 @@ def check_for_updates(current: str):
     raw = 'https://raw.githubusercontent.com/serhatcelik/avsub/main/VERSION'
 
     try:
-        with urlopen(raw, timeout=10) as answer:  # nosec
+        with urlopen(raw, timeout=10) as answer:
             latest = answer.readline().rstrip().decode()
     except URLError as err:
         print('[!]', err)
@@ -34,7 +34,7 @@ def check_for_updates(current: str):
     webbrowser.open_new_tab(ref)
 
 
-def exit_if_not(thing: Any, /, status: str | int = 0) -> Any:
+def exit_if_not(thing: Any, /, status: int | str = 0) -> Any | NoReturn:
     """Conditional exit: if not."""
     if not thing:
         sys.exit(status)

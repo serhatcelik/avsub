@@ -14,7 +14,7 @@ parser = argparse.ArgumentParser(
     allow_abbrev=False,
 )
 
-burn = parser.add_argument_group('embed options')
+burn = parser.add_argument_group('options embed')
 misc = parser.add_argument_group('miscellaneous')
 
 mutual = parser.add_mutually_exclusive_group()
@@ -59,7 +59,7 @@ parser.add_argument(
 parser.add_argument(
     '--compress', '-C',
     nargs='?',
-    const=28,
+    const=33,
     default=23,
     type=int,
     choices=range(0, 52),
@@ -84,7 +84,7 @@ parser.add_argument(
 )
 parser.add_argument(
     '--ffmpeg-list', '-f',
-    help='provide %(metavar)s as an ffmpeg argument list',
+    help='provide %(metavar)s as ffmpeg argument list',
     metavar='ARGS',
     dest='ffmpeg_list',
 )
@@ -143,9 +143,9 @@ parser.add_argument(
     dest='trim',
 )
 
-####################
-# Subtitle Options #
-####################
+#################
+# Options Embed #
+#################
 burn.add_argument(
     '--burn',
     action='store_true',
