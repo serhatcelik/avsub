@@ -14,17 +14,12 @@ from avsub.cli import parser
 from avsub.consts import X
 from avsub.ffmpeg import FFmpeg
 from avsub.globs import Run, completed, corrupted, untouched
-from avsub.utils import check_for_updates, exit_if_not, line, splitext
-from avsub.version import __version__
+from avsub.utils import exit_if_not, line, splitext
 
 
 def start() -> tuple[int | None, bool]:
     """Start the program."""
     signal.signal(signal.SIGINT, stop)
-
-    if len(sys.argv) == 1:
-        check_for_updates(__version__)
-        sys.exit()
 
     opts = parser.parse_args()
 

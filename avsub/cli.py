@@ -3,7 +3,16 @@
 import argparse
 
 from avsub.consts import CHANNEL, SUB_ALIGNMENT, SUB_BGR_CHART, X
+from avsub.utils import check_for_updates
 from avsub.version import __version__
+
+
+class CheckForUpdates(argparse.Action):
+    """Custom action to check for program updates."""
+
+    def __call__(self, p, namespace, values, option_string=None):
+        p.exit(check_for_updates(__version__))
+
 
 parser = argparse.ArgumentParser(
     prog='avsub',
@@ -13,6 +22,8 @@ parser = argparse.ArgumentParser(
     formatter_class=argparse.RawTextHelpFormatter,
     allow_abbrev=False,
 )
+
+parser.register('action', '?', CheckForUpdates)
 
 burn = parser.add_argument_group('options embed')
 misc = parser.add_argument_group('miscellaneous')
@@ -195,6 +206,12 @@ burn.add_argument(
 #################
 # Miscellaneous #
 #################
+misc.add_argument(
+    '-?',
+    action='?',
+    nargs=0,
+    help='check for program updates and exit',
+)
 misc.add_argument(
     '--shutdown',
     nargs='?',
