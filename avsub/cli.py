@@ -23,8 +23,6 @@ parser = argparse.ArgumentParser(
     allow_abbrev=False,
 )
 
-parser.register('action', '?', CheckForUpdates)
-
 burn = parser.add_argument_group('options embed')
 misc = parser.add_argument_group('miscellaneous')
 
@@ -208,7 +206,7 @@ burn.add_argument(
 #################
 misc.add_argument(
     '-?',
-    action='?',
+    action=CheckForUpdates,
     nargs=0,
     help='check for program updates and exit',
 )
