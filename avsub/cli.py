@@ -16,7 +16,7 @@ class CheckForUpdates(argparse.Action):
 
 parser = argparse.ArgumentParser(
     prog='avsub',
-    usage='python -m %(prog)s [<extension> [<option> ...]]',
+    usage='python -m %(prog)s <extension> [<option> ...]',
     description='AVsub — A simplified command-line interface for FFmpeg',
     epilog='https://github.com/serhatcelik/avsub',
     formatter_class=argparse.RawTextHelpFormatter,
