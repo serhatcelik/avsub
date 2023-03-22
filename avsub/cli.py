@@ -1,34 +1,22 @@
 """Command-line interface."""
 
 import argparse
-from urllib.error import URLError
-from urllib.request import urlopen
+from functools import partial
+from typing import Any
 
 from avsub.consts import CHANNEL, SUB_ALIGNMENT, SUB_BGR_CHART, X
+from avsub.utils import check_for_updates
 from avsub.version import __version__
 
 
-class _CheckForUpdatesAction(argparse.Action):
+class _DoAndExitAction(argparse.Action):
 
-    def __init__(self, current: str, url: str, **kwargs):
-        super().__init__(nargs=0, **kwargs)
-
-        self.current = current
-        self.url = url
+    def __init__(self, func: partial[Any], **kwargs):
+        super().__init__(**kwargs)
+        self.func = func
 
     def __call__(self, p, *args):
-        try:
-            with urlopen(self.url, timeout=9) as answer:
-                latest = answer.readline().rstrip().decode()
-        except URLError as err:
-            print('[!]', err)
-        else:
-            if self.current == latest:
-                print('[*]', 'Up to date!')
-            else:
-                print('[*]', f'Update available: {self.current} -> {latest}')
-        finally:
-            p.exit()
+        p.exit(self.func())
 
 
 parser = argparse.ArgumentParser(
@@ -40,7 +28,7 @@ parser = argparse.ArgumentParser(
     allow_abbrev=False,
 )
 
-parser.register('action', 'check_for_updates', _CheckForUpdatesAction)
+parser.register('action', 'do_and_exit', _DoAndExitAction)
 
 burn = parser.add_argument_group('options embed')
 misc = parser.add_argument_group('miscellaneous')
@@ -225,10 +213,10 @@ burn.add_argument(
 #################
 misc.add_argument(
     '-?',
-    action='check_for_updates',
+    action='do_and_exit',
+    nargs=0,
     help='check for program updates and exit',
-    current=__version__,
-    url='https://raw.githubusercontent.com/serhatcelik/avsub/main/VERSION',
+    func=partial(check_for_updates, __version__),
 )
 misc.add_argument(
     '--shutdown',
