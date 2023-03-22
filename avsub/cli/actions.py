@@ -6,7 +6,6 @@ from urllib.request import urlopen
 
 
 class CheckForUpdates(argparse.Action):
-    """Check for program updates."""
 
     def __init__(self, current: str, url: str, **kwargs):
         super().__init__(nargs=0, **kwargs)
