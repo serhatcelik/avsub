@@ -9,7 +9,7 @@ from avsub.utils import check_for_updates
 from avsub.version import __version__
 
 
-class _DoAndExitAction(argparse.Action):
+class _DoExitAction(argparse.Action):
 
     def __init__(self, func: Callable, **kwargs):
         super().__init__(**kwargs)
@@ -28,7 +28,7 @@ parser = argparse.ArgumentParser(
     allow_abbrev=False,
 )
 
-parser.register('action', 'do_and_exit', _DoAndExitAction)
+parser.register('action', 'do_exit', _DoExitAction)
 
 burn = parser.add_argument_group('options embed')
 misc = parser.add_argument_group('miscellaneous')
@@ -213,7 +213,7 @@ burn.add_argument(
 #################
 misc.add_argument(
     '-?',
-    action='do_and_exit',
+    action='do_exit',
     nargs=0,
     help='check for program updates and exit',
     func=partial(check_for_updates, __version__),
