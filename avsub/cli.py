@@ -1,8 +1,7 @@
 """Command-line interface."""
 
 import argparse
-from functools import partial
-from typing import Callable
+from typing import Any, Callable
 
 from avsub.consts import CHANNEL, SUB_ALIGNMENT, SUB_BGR_CHART, X
 from avsub.utils import check_for_updates
@@ -11,12 +10,14 @@ from avsub.version import __version__
 
 class _DoExitAction(argparse.Action):
 
-    def __init__(self, func: Callable, **kwargs):
+    def __init__(self, func: Callable, values: tuple[Any, ...] = (), **kwargs):
         super().__init__(**kwargs)
+
         self.func = func
+        self.values = values
 
     def __call__(self, p, *args):
-        p.exit(self.func())
+        p.exit(self.func(*self.values))
 
 
 parser = argparse.ArgumentParser(
@@ -216,7 +217,8 @@ misc.add_argument(
     action='do_exit',
     nargs=0,
     help='check for program updates and exit',
-    func=partial(check_for_updates, __version__),
+    func=check_for_updates,
+    values=(__version__,),
 )
 misc.add_argument(
     '--shutdown',
