@@ -2,7 +2,7 @@
 
 import argparse
 from functools import partial
-from typing import Any
+from typing import Callable
 
 from avsub.consts import CHANNEL, SUB_ALIGNMENT, SUB_BGR_CHART, X
 from avsub.utils import check_for_updates
@@ -11,7 +11,7 @@ from avsub.version import __version__
 
 class _DoAndExitAction(argparse.Action):
 
-    def __init__(self, func: partial[Any], **kwargs):
+    def __init__(self, func: Callable, **kwargs):
         super().__init__(**kwargs)
         self.func = func
 
