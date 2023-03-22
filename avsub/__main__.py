@@ -10,7 +10,7 @@ from datetime import datetime, timedelta
 from subprocess import CalledProcessError, DEVNULL as NULL, check_call
 from tkinter.filedialog import askdirectory, askopenfilename, askopenfilenames
 
-from avsub.cli import parser
+from avsub.cli.parser import parser
 from avsub.consts import X
 from avsub.ffmpeg import FFmpeg
 from avsub.globs import Run, completed, corrupted, untouched
