@@ -1,24 +1,11 @@
 """Command-line interface."""
 
 import argparse
-from typing import Any, Callable
 
+from avsub.actions import DoAndExitAction
 from avsub.consts import CHANNEL, SUB_ALIGNMENT, SUB_BGR_CHART, X
 from avsub.utils import check_for_updates
 from avsub.version import __version__
-
-
-class _DoAndExitAction(argparse.Action):
-
-    def __init__(self, func: Callable, fargs: tuple[Any, ...] = (), **kwargs):
-        super().__init__(**kwargs)
-
-        self.func = func
-        self.fargs = fargs
-
-    def __call__(self, p, *args):
-        p.exit(self.func(*self.fargs))
-
 
 parser = argparse.ArgumentParser(
     prog='avsub',
@@ -29,7 +16,7 @@ parser = argparse.ArgumentParser(
     allow_abbrev=False,
 )
 
-parser.register('action', 'do_and_exit', _DoAndExitAction)
+parser.register('action', 'do_and_exit', DoAndExitAction)
 
 burn = parser.add_argument_group('options embed')
 misc = parser.add_argument_group('miscellaneous')
