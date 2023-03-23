@@ -10,14 +10,14 @@ from avsub.version import __version__
 
 class _DoAndExitAction(argparse.Action):
 
-    def __init__(self, func: Callable, values: tuple[Any, ...] = (), **kwargs):
+    def __init__(self, func: Callable, fargs: tuple[Any, ...] = (), **kwargs):
         super().__init__(**kwargs)
 
         self.func = func
-        self.values = values
+        self.fargs = fargs
 
     def __call__(self, p, *args):
-        p.exit(self.func(*self.values))
+        p.exit(self.func(*self.fargs))
 
 
 parser = argparse.ArgumentParser(
@@ -218,7 +218,7 @@ misc.add_argument(
     nargs=0,
     help='check for program updates and exit',
     func=check_for_updates,
-    values=(__version__,),
+    fargs=(__version__,),
 )
 misc.add_argument(
     '--shutdown',
