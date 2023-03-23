@@ -17,9 +17,8 @@ if TYPE_CHECKING:
 class FFmpeg:
     """FFmpeg handler."""
 
-    _cmd = ['ffmpeg', '-n', '-stats']
-
-    _style: str
+    cmd = ['ffmpeg', '-n', '-stats']
+    style: str
 
     def build(self, opts: Namespace):
         """Update the FFmpeg command."""
@@ -59,7 +58,7 @@ class FFmpeg:
         if opts.ffmpeg_list:
             cmd += opts.ffmpeg_list.strip().split()
 
-        self._cmd += cmd
+        self.cmd += cmd
 
         style = []
 
@@ -71,11 +70,11 @@ class FFmpeg:
 
         style += [f'Alignment={SUB_ALIGNMENT[opts.alignment]}']
 
-        self._style = ','.join(style)
+        self.style = ','.join(style)
 
     def build_subtitle(self, file: str):
         """Update the FFmpeg command with the given subtitle."""
-        self._cmd += ['-vf', f"subtitles={file}:force_style='{self._style}'"]
+        self.cmd += ['-vf', f"subtitles={file}:force_style='{self.style}'"]
 
     def execute(self, files: tuple[str, ...]):
         """Execute the FFmpeg command."""
@@ -96,7 +95,7 @@ class FFmpeg:
                 continue
 
             try:
-                run(self._cmd + [output, '-i', file], stdin=NULL, check=True)
+                run(self.cmd + [output, '-i', file], stdin=NULL, check=True)
             except FileNotFoundError:
                 print('[!]', 'FFmpeg could not be executed. Exiting.')
                 return
