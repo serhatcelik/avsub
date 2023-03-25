@@ -9,6 +9,7 @@ from contextlib import suppress
 from datetime import datetime, timedelta
 from subprocess import CalledProcessError, DEVNULL as NULL, check_call
 from tkinter.filedialog import askdirectory, askopenfilename, askopenfilenames
+from typing import NoReturn
 
 from avsub.cli import parser
 from avsub.consts import X
@@ -19,7 +20,7 @@ from avsub.utils import exit_if_not, line, splitext
 
 def start() -> tuple[int | None, bool]:
     """Start the program."""
-    signal.signal(signal.SIGINT, stop)
+    signal.signal(signal.SIGINT, terminate)
 
     opts = parser.parse_args()
 
@@ -54,6 +55,8 @@ def start() -> tuple[int | None, bool]:
 
         untouched.update({file: output})  # Mark file as "untouched"
 
+    signal.signal(signal.SIGINT, stop)
+
     ff.execute(files)
 
     return opts.shutdown, opts.shutdown is not None
@@ -64,6 +67,11 @@ def stop(*args):
     signal.signal(signal.SIGINT, signal.SIG_IGN)
 
     Run.set()
+
+
+def terminate(*args) -> NoReturn:
+    """Stop the program the hard way."""
+    os._exit(-1)
 
 
 @line
