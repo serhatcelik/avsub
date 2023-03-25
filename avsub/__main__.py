@@ -133,9 +133,6 @@ def main():
     """Entry point."""
     timeout, schedule = start()
 
-    if not Run.is_set():
-        stop()
-
     log()
 
     clear(*corrupted.values())
