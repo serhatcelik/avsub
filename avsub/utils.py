@@ -44,12 +44,12 @@ def exit_if_not(thing: Any, /, status: int | str = 0) -> Any | NoReturn:
 def line(func):
     """Draw a horizontal line before and after the given function."""
 
-    def _(*args, **kwargs):
+    def wrapper(*args, **kwargs):
         print('-' * (os.get_terminal_size().columns - 1))
         func(*args, **kwargs)
         print('-' * (os.get_terminal_size().columns - 1))
 
-    return _
+    return wrapper
 
 
 def splitext(path: str) -> tuple[str, str]:
