@@ -7,7 +7,7 @@ import sys
 import tempfile
 from contextlib import suppress
 from datetime import datetime, timedelta
-from subprocess import CalledProcessError, DEVNULL as NULL, check_call
+from subprocess import CalledProcessError, DEVNULL, check_call
 from tkinter.filedialog import askdirectory, askopenfilename, askopenfilenames
 from typing import NoReturn
 
@@ -121,7 +121,7 @@ def shut(timeout: int):
     cmd, cancel = shutdown[sys.platform]
 
     try:
-        check_call(cmd, stdin=NULL, stdout=NULL, stderr=NULL)
+        check_call(cmd, stdin=DEVNULL, stdout=DEVNULL, stderr=DEVNULL)
     except (FileNotFoundError, CalledProcessError):
         print('[!]', "Cannot schedule shutdown or there's a pending shutdown.")
     else:
