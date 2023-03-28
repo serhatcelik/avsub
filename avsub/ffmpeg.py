@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import os
 from itertools import chain
-from subprocess import CalledProcessError, DEVNULL as NULL, run
+from subprocess import CalledProcessError, DEVNULL, run
 from typing import TYPE_CHECKING
 
 from avsub.consts import CHANNEL, LOGLEVEL, SUB_ALIGNMENT, SUB_BGR_CHART, X
@@ -95,7 +95,7 @@ class FFmpeg:
                 continue
 
             try:
-                run(self.cmd + [output, '-i', file], stdin=NULL, check=True)
+                run(self.cmd + [output, '-i', file], stdin=DEVNULL, check=True)
             except FileNotFoundError:
                 print('[!]', 'FFmpeg could not be executed. Exiting.')
                 return
