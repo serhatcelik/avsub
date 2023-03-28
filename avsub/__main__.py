@@ -20,7 +20,7 @@ from avsub.utils import exit_if_not, line, splitext
 
 def start() -> tuple[int | None, bool]:
     """Start the program."""
-    signal.signal(signal.SIGINT, terminate)
+    signal.signal(signal.SIGINT, stop_hard)
 
     opts = parser.parse_args()
 
@@ -65,11 +65,10 @@ def start() -> tuple[int | None, bool]:
 def stop(*args):
     """Stop the program."""
     signal.signal(signal.SIGINT, signal.SIG_IGN)
-
     Run.set()
 
 
-def terminate(*args) -> NoReturn:
+def stop_hard(*args) -> NoReturn:
     """Stop the program the hard way."""
     os._exit(-1)
 
