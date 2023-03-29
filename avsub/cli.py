@@ -205,7 +205,7 @@ misc.add_argument(
     nargs=0,
     help='check for program updates and exit',
     func=check_for_updates,
-    fargs=(__version__,),
+    args=(__version__,),
 )
 misc.add_argument(
     '--shutdown',
