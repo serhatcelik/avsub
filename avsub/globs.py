@@ -1,8 +1,8 @@
 """This file contains globals."""
 
-import threading
+from threading import Event
 
-Run = threading.Event()
+Run = Event()
 
 completed = {}  # type: dict[str, str]
 corrupted = {}  # type: dict[str, str]
