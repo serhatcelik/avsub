@@ -1,12 +1,12 @@
 """Custom actions."""
 
 import argparse
-from typing import Any, Callable, Iterable
+from typing import Any, Callable
 
 
 class DoAndExitAction(argparse.Action):
 
-    def __init__(self, func: Callable, args: Iterable[Any] = (), **kwargs):
+    def __init__(self, func: Callable, args: tuple[Any, ...] = (), **kwargs):
         super().__init__(**kwargs)
 
         self.func = func
