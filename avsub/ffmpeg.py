@@ -8,7 +8,7 @@ from subprocess import CalledProcessError, DEVNULL, run
 from typing import TYPE_CHECKING
 
 from avsub.consts import CHANNEL, LOGLEVEL, SUB_ALIGNMENT, SUB_BGR_CHART, X
-from avsub.globs import Run, completed, corrupted, untouched
+from avsub.globs import completed, corrupted, gibberish, untouched
 
 if TYPE_CHECKING:
     from argparse import Namespace
@@ -82,7 +82,7 @@ class FFmpeg:
         align = len(str(total))
 
         for i, file in enumerate(files):
-            if Run.is_set():
+            if gibberish.is_set():
                 return
 
             print('[*]', f"Running [{(i + 1):>{align}}/{total}] -> '{file}'")
