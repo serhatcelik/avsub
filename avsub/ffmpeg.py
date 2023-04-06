@@ -53,7 +53,7 @@ class FFmpeg:
             stop = (opts.trim[3] * 3600) + (opts.trim[4] * 60) + opts.trim[5]
             cmd += ['-ss', str(seek), '-to', str(stop)]
 
-        cmd += ['-loglevel', LOGLEVEL[opts.loglevel]]
+        cmd += ['-loglevel', LOGLEVEL.get(opts.loglevel, 'debug')]
 
         if opts.ffmpeg_list:
             cmd += opts.ffmpeg_list.strip().split()
