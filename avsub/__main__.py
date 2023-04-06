@@ -15,7 +15,7 @@ from avsub.cli import parser
 from avsub.consts import X
 from avsub.ffmpeg import FFmpeg
 from avsub.globs import completed, corrupted, gibberish, untouched
-from avsub.utils import exit_if_not, line, splitext
+from avsub.utils import exit_if_not, separate, splitext
 
 
 def start() -> tuple[int | None, bool]:
@@ -73,7 +73,7 @@ def stop_hard(*args) -> NoReturn:
     os._exit(-1)
 
 
-@line
+@separate
 def log():
     """Print the results."""
     for file in untouched:
@@ -91,7 +91,7 @@ def clear(*files: str):
             os.remove(file)
 
 
-@line
+@separate
 def brief():
     """Print the summary."""
     success = len(completed)
@@ -100,7 +100,7 @@ def brief():
     print('[*]', f'{success} out of {success + failure} jobs completed.\a')
 
 
-@line
+@separate
 def shut(timeout: int):
     """Schedule a shutdown for the machine."""
     timeout = abs(timeout)
