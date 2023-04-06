@@ -1,9 +1,11 @@
 """This file contains constants."""
 
+from collections import defaultdict
+
 X = '-'  # Placeholder for command-line arguments
 
 CHANNEL = {'mono': '1', 'stereo': '2'}  # Audio channel manipulation
-LOGLEVEL = {0: 'warning', 1: 'info', 2: 'verbose'}
+LOGLEVEL = defaultdict(lambda: 'verbose', {0: 'warning', 1: 'info'})
 SUB_ALIGNMENT = {'bottom': '2', 'middle': '10', 'top': '6'}
 SUB_BGR_CHART = {
     'black': '&H000000&',
