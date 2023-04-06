@@ -2,7 +2,7 @@
 
 import threading
 
-gibberish = threading.Event()
+controller = threading.Event()
 
 completed = {}  # type: dict[str, str]
 corrupted = {}  # type: dict[str, str]

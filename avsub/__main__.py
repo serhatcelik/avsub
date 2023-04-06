@@ -14,7 +14,7 @@ from typing import NoReturn
 from avsub.cli import parser
 from avsub.consts import X
 from avsub.ffmpeg import FFmpeg
-from avsub.globs import completed, corrupted, gibberish, untouched
+from avsub.globs import controller, completed, corrupted, untouched
 from avsub.utils import exit_if_not, separate, splitext
 
 
@@ -65,7 +65,7 @@ def start() -> tuple[int | None, bool]:
 def stop(*args):
     """Stop the program."""
     signal.signal(signal.SIGINT, signal.SIG_IGN)
-    gibberish.set()
+    controller.set()
 
 
 def stop_hard(*args) -> NoReturn:
