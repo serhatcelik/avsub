@@ -212,7 +212,7 @@ misc.add_argument(
     nargs='?',
     const=0,
     type=int,
-    choices=[0, 1, 2, 3, 4, 5, 6, 60, 600, 6000],  # Prevent OverflowError!
+    choices=[0, 1, 2, 3, 4, 5, 6, 60, 600, 6000],
     help='shut down the machine after %(metavar)s seconds (const: %(const)s)',
     metavar='TIMEOUT',
     dest='shutdown',
