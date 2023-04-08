@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import os
 import subprocess as sp  # nosec
-from itertools import chain
+from itertools import chain, count
 from typing import TYPE_CHECKING
 
 from avsub.consts import CHANNEL, LOGLEVEL, SUB_ALIGNMENT, SUB_BGR_CHART, X
@@ -19,6 +19,14 @@ class FFmpeg:
 
     cmd = ['ffmpeg', '-n', '-stats']
     style: str
+
+    def __init__(self, files: tuple[str, ...]):
+        self.container = files
+
+        self.total = len(files)
+        self.align = len(str(self.total))
+
+        self.files = iter(files)
 
     def build(self, opts: Namespace):
         """Update the FFmpeg command."""
@@ -76,16 +84,12 @@ class FFmpeg:
         """Update the FFmpeg command with the given subtitle."""
         self.cmd += ['-vf', f"subtitles={file}:force_style='{self.style}'"]
 
-    def execute(self, files: tuple[str, ...]):
+    def execute(self):
         """Execute the FFmpeg command."""
-        total = len(files)
-        align = len(str(total))
+        i = count(1)
 
-        for i, file in enumerate(files):
-            if controller.is_set():
-                return
-
-            print('[*]', f"Running [{(i + 1):>{align}}/{total}] -> '{file}'")
+        while not controller.set() and (file := next(self.files, None)):
+            print('[*]', f"[{next(i):>{self.align}}/{self.total}] -> '{file}'")
 
             output = untouched[file]
 

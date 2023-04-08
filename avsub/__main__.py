@@ -24,11 +24,11 @@ def start() -> tuple[int | None, bool]:
 
     opts = parser.parse_args()
 
-    ff = FFmpeg()
+    exit_if_not(files := tuple(askopenfilenames(title='Open')))
+
+    ff = FFmpeg(files)
 
     ff.build(opts)  # Start creating the FFmpeg command
-
-    exit_if_not(files := tuple(askopenfilenames(title='Open')))
 
     # Manual Hardsub Operation?
     if len(files) == 1 and opts.burn:
@@ -57,7 +57,7 @@ def start() -> tuple[int | None, bool]:
 
     signal.signal(signal.SIGINT, stop)
 
-    ff.execute(files)
+    ff.execute()
 
     return opts.shutdown, opts.shutdown is not None
 
