@@ -21,12 +21,10 @@ class FFmpeg:
     style: str
 
     def __init__(self, files: tuple[str, ...]):
-        self.container = files
+        self.files = iter(files)
 
         self.total = len(files)
         self.align = len(str(self.total))
-
-        self.files = iter(files)
 
     def build(self, opts: Namespace):
         """Update the FFmpeg command."""
