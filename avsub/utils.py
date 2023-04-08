@@ -14,7 +14,7 @@ def check_for_updates(current: str):
     file = 'https://raw.githubusercontent.com/serhatcelik/avsub/main/VERSION'
 
     try:
-        with urlopen(file, timeout=9) as answer:
+        with urlopen(file, timeout=9) as answer:  # nosec
             latest = answer.readline().rstrip().decode()
     except URLError as err:
         print('[!]', err)

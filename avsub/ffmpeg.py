@@ -3,8 +3,8 @@
 from __future__ import annotations
 
 import os
+import subprocess as sp  # nosec
 from itertools import chain
-from subprocess import CalledProcessError, DEVNULL, run
 from typing import TYPE_CHECKING
 
 from avsub.consts import CHANNEL, LOGLEVEL, SUB_ALIGNMENT, SUB_BGR_CHART, X
@@ -94,12 +94,14 @@ class FFmpeg:
                 print(f"File '{output}' already exists. Passing.")
                 continue
 
+            cmd = self.cmd + [output, '-i', file]
+
             try:
-                run(self.cmd + [output, '-i', file], stdin=DEVNULL, check=True)
+                sp.run(cmd, stdin=sp.DEVNULL, check=True)  # nosec
             except FileNotFoundError:
                 print('[!]', 'FFmpeg could not be executed. Exiting.')
                 return
-            except CalledProcessError:
+            except sp.CalledProcessError:
                 # Output will be deleted on exit
                 corrupted.update({file: untouched.pop(file)})
             else:

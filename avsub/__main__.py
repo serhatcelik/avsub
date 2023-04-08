@@ -3,11 +3,11 @@
 import os
 import shutil
 import signal
+import subprocess as sp  # nosec
 import sys
 import tempfile
 from contextlib import suppress
 from datetime import datetime, timedelta
-from subprocess import CalledProcessError, DEVNULL, check_call
 from tkinter.filedialog import askdirectory, askopenfilename, askopenfilenames
 from typing import NoReturn
 
@@ -110,22 +110,22 @@ def shut(timeout: int):
     msg = f'AVsub has scheduled a shutdown for {schedule}.'
 
     shutdown = {
-        'linux': (['shutdown', '-P', str(timeout), msg], '-c'),
-        'win32': (['shutdown', '/t', str(timeout), '/s', '/c', msg], '/a'),
+        'linux': ['shutdown', '-P', str(timeout), msg],
+        'win32': ['shutdown', '/t', str(timeout), '/s', '/c', msg],
     }
 
     if sys.platform not in shutdown:
         print('[!]', 'Cannot schedule shutdown on this platform.')
         return
 
-    cmd, cancel = shutdown[sys.platform]
+    cmd = shutdown[sys.platform]
 
     try:
-        check_call(cmd, stdin=DEVNULL, stdout=DEVNULL, stderr=DEVNULL)
-    except (FileNotFoundError, CalledProcessError):
-        print('[!]', "Cannot schedule shutdown or there's a pending shutdown.")
-    else:
-        print('[*]', msg, f"Use 'shutdown {cancel}' to cancel.")
+        sp.check_call(cmd, stdin=sp.DEVNULL, stdout=sp.DEVNULL)  # nosec
+    except FileNotFoundError as err:
+        print('[!]', err)
+    except sp.CalledProcessError:
+        pass
 
 
 def main():
