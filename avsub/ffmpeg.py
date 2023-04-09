@@ -20,12 +20,6 @@ class FFmpeg:
     cmd = ['ffmpeg', '-n', '-stats']
     style: str
 
-    def __init__(self, files: tuple[str, ...]):
-        self.files = iter(files)
-
-        self.total = len(files)
-        self.align = len(str(self.total))
-
     def build(self, opts: Namespace):
         """Update the FFmpeg command."""
         cmd = []
@@ -82,12 +76,17 @@ class FFmpeg:
         """Update the FFmpeg command with the given subtitle."""
         self.cmd += ['-vf', f"subtitles={file}:force_style='{self.style}'"]
 
-    def execute(self):
+    def execute(self, files: list[str]):
         """Execute the FFmpeg command."""
+        total = len(files)
+        align = len(str(total))
+
         i = count(1)
 
-        while not controller.is_set() and (file := next(self.files, None)):
-            print('[*]', f"[{next(i):>{self.align}}/{self.total}] -> '{file}'")
+        while not controller.is_set() and files:
+            file = files.pop(0)
+
+            print('[*]', f"Running [{next(i):>{align}}/{total}] -> '{file}'")
 
             output = untouched[file]
 
