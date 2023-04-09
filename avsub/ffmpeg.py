@@ -86,7 +86,7 @@ class FFmpeg:
         """Execute the FFmpeg command."""
         i = count(1)
 
-        while not controller.set() and (file := next(self.files, None)):
+        while not controller.is_set() and (file := next(self.files, None)):
             print('[*]', f"[{next(i):>{self.align}}/{self.total}] -> '{file}'")
 
             output = untouched[file]
