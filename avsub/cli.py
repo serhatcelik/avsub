@@ -10,7 +10,7 @@ from avsub.version import __version__
 parser = argparse.ArgumentParser(
     prog='avsub',
     usage='python -m %(prog)s <extension> [<option> ...]',
-    description='AVsub — A simplified command-line interface for FFmpeg',
+    description='%(prog)s — a simplified command-line interface for ffmpeg',
     epilog='https://github.com/serhatcelik/avsub',
     formatter_class=argparse.RawTextHelpFormatter,
     allow_abbrev=False,
