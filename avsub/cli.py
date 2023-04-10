@@ -39,8 +39,8 @@ parser.add_argument(
     '--channel',
     choices=CHANNEL,
     help='set %(metavar)s as output audio channel (choices: %(choices)s)',
-    metavar="CHANNEL",
-    dest="channel",
+    metavar='CHANNEL',
+    dest='channel',
 )
 parser.add_argument(
     '--codec-audio', '-a',
