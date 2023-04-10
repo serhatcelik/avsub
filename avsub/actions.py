@@ -1,4 +1,4 @@
-"""Custom actions."""
+"""Custom argument actions."""
 
 import argparse
 from typing import Any, Callable
