@@ -2,7 +2,7 @@
 
 import argparse
 
-from avsub.actions import DoAndExitAction
+from avsub.actions import ExitAction
 from avsub.consts import CHANNEL, SUB_ALIGNMENT, SUB_BGR_CHART, X
 from avsub.utils import check_for_updates
 from avsub.version import __version__
@@ -16,7 +16,7 @@ parser = argparse.ArgumentParser(
     allow_abbrev=False,
 )
 
-parser.register('action', 'do_and_exit', DoAndExitAction)
+parser.register('action', 'exit', ExitAction)
 
 burn = parser.add_argument_group('options embed')
 misc = parser.add_argument_group('miscellaneous')
@@ -201,7 +201,7 @@ burn.add_argument(
 #################
 misc.add_argument(
     '-?',
-    action='do_and_exit',
+    action='exit',
     nargs=0,
     help='check for program updates and exit',
     func=check_for_updates,
