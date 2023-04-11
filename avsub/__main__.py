@@ -22,9 +22,9 @@ def start() -> tuple[int | None, bool]:
     """Start the program."""
     sys.excepthook = stop_hard
 
-    signal.signal(signal.SIGINT, stop)
-
     opts = parser.parse_args()
+
+    signal.signal(signal.SIGINT, stop)
 
     ff = FFmpeg()
 
