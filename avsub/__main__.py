@@ -22,7 +22,7 @@ def start() -> tuple[int | None, bool]:
     """Start the program."""
     sys.excepthook = stop_hard
 
-    signal.signal(signal.SIGINT, stop_hard)
+    signal.signal(signal.SIGINT, stop)
 
     opts = parser.parse_args()
 
@@ -56,8 +56,6 @@ def start() -> tuple[int | None, bool]:
         output = os.path.abspath(os.path.join(folder, filename + extension))
 
         untouched.update({file: output})  # Mark file as "untouched"
-
-    signal.signal(signal.SIGINT, stop)
 
     ff.execute(files)
 
