@@ -105,7 +105,13 @@ def shut(timeout: int):
     """Schedule a shutdown for the machine."""
     timeout = abs(timeout)
 
-    schedule = format(datetime.now() + timedelta(seconds=timeout), '%H:%M:%S')
+    spec = '%H:%M:%S'
+
+    try:
+        schedule = format(datetime.now() + timedelta(seconds=timeout), spec)
+    except OverflowError as err:
+        print('[!]', err)
+        return
 
     msg = f'AVsub has scheduled a shutdown for {schedule}.'
 
