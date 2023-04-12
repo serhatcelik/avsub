@@ -14,7 +14,7 @@ from typing import NoReturn
 from avsub.cli import parser
 from avsub.consts import X
 from avsub.ffmpeg import FFmpeg
-from avsub.globs import controller, completed, corrupted, untouched
+from avsub.globs import completed, controller, corrupted, untouched
 from avsub.utils import exit_if_not, separate, splitext
 
 

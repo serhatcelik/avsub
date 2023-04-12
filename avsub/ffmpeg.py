@@ -7,8 +7,14 @@ import subprocess as sp  # nosec
 from itertools import chain, count
 from typing import TYPE_CHECKING
 
-from avsub.consts import CHANNEL, LOGLEVEL, SUB_ALIGNMENT, SUB_BGR_CHART, X
-from avsub.globs import controller, completed, corrupted, untouched
+from avsub.consts import (
+    CHANNEL,
+    LOGLEVEL,
+    SUBTITLE_ALIGNMENT,
+    SUBTITLE_BGR_CHART,
+    X,
+)
+from avsub.globs import completed, controller, corrupted, untouched
 
 if TYPE_CHECKING:
     from argparse import Namespace
@@ -65,10 +71,10 @@ class FFmpeg:
         style += [f'Fontname={opts.font_name}']
         style += [f'Fontsize={abs(opts.font_size)}']
 
-        style += [f'PrimaryColour={SUB_BGR_CHART[opts.color_primary]}']
-        style += [f'OutlineColour={SUB_BGR_CHART[opts.color_outline]}']
+        style += [f'PrimaryColour={SUBTITLE_BGR_CHART[opts.color_primary]}']
+        style += [f'OutlineColour={SUBTITLE_BGR_CHART[opts.color_outline]}']
 
-        style += [f'Alignment={SUB_ALIGNMENT[opts.alignment]}']
+        style += [f'Alignment={SUBTITLE_ALIGNMENT[opts.alignment]}']
 
         self.style = ','.join(style)
 
