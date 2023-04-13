@@ -2,6 +2,7 @@
 
 import argparse
 
+from avsub.__version__ import __version__
 from avsub.actions import ExitAction
 from avsub.consts import (
     CHOICES_CHANNEL,
@@ -10,7 +11,6 @@ from avsub.consts import (
     X,
 )
 from avsub.utils import check_for_updates
-from avsub.version import __version__
 
 parser = argparse.ArgumentParser(
     prog='avsub',
