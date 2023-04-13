@@ -98,7 +98,7 @@ class FFmpeg:
 
             # Also for files with the same name but different extensions
             if os.path.exists(output):
-                print(f"File '{output}' already exists. Passing.")
+                print('[ ]', f"File '{output}' already exists. Passing.")
                 continue
 
             cmd = self.cmd + [output, '-i', file]
