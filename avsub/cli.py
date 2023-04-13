@@ -3,7 +3,12 @@
 import argparse
 
 from avsub.actions import ExitAction
-from avsub.consts import CHANNEL, SUBTITLE_ALIGNMENT, SUBTITLE_BGR_CHART, X
+from avsub.consts import (
+    CHOICES_CHANNEL,
+    CHOICES_SUB_ALIGNMENT,
+    CHOICES_SUB_BGR_CHART,
+    X,
+)
 from avsub.utils import check_for_updates
 from avsub.version import __version__
 
@@ -37,7 +42,7 @@ parser.add_argument(
 ###########
 parser.add_argument(
     '--channel',
-    choices=CHANNEL,
+    choices=CHOICES_CHANNEL,
     help='set %(metavar)s as output audio channel (choices: %(choices)s)',
     metavar='CHANNEL',
     dest='channel',
@@ -159,7 +164,7 @@ burn.add_argument(
 burn.add_argument(
     '--color-outline',
     default='black',
-    choices=SUBTITLE_BGR_CHART,
+    choices=CHOICES_SUB_BGR_CHART,
     help='set %(metavar)s as subtitle outline color (choices: %(choices)s)',
     metavar='COLOR',
     dest='color_outline',
@@ -167,7 +172,7 @@ burn.add_argument(
 burn.add_argument(
     '--color-primary',
     default='white',
-    choices=SUBTITLE_BGR_CHART,
+    choices=CHOICES_SUB_BGR_CHART,
     help='set %(metavar)s as subtitle primary color (choices: %(choices)s)',
     metavar='COLOR',
     dest='color_primary',
@@ -190,7 +195,7 @@ burn.add_argument(
 burn.add_argument(
     '--position',
     default='bottom',
-    choices=SUBTITLE_ALIGNMENT,
+    choices=CHOICES_SUB_ALIGNMENT,
     help='set %(metavar)s as subtitle position (choices: %(choices)s)',
     metavar='POSITION',
     dest='alignment',

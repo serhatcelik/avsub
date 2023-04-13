@@ -45,9 +45,9 @@ def separate(func):
     """Draw a horizontal line before and after the given function."""
 
     def wrapper(*args, **kwargs):
-        print('-' * (os.get_terminal_size().columns - 1))
+        print('-' * os.get_terminal_size().columns)
         func(*args, **kwargs)
-        print('-' * (os.get_terminal_size().columns - 1))
+        print('-' * os.get_terminal_size().columns)
 
     return wrapper
 

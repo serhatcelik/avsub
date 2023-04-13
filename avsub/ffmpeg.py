@@ -8,10 +8,10 @@ from itertools import chain, count
 from typing import TYPE_CHECKING
 
 from avsub.consts import (
-    CHANNEL,
+    CHOICES_CHANNEL,
+    CHOICES_SUB_ALIGNMENT,
+    CHOICES_SUB_BGR_CHART,
     LOGLEVEL,
-    SUBTITLE_ALIGNMENT,
-    SUBTITLE_BGR_CHART,
     X,
 )
 from avsub.globs import completed, controller, corrupted, untouched
@@ -31,7 +31,7 @@ class FFmpeg:
         cmd = []
 
         if opts.channel:
-            cmd += ['-ac', CHANNEL[opts.channel]]
+            cmd += ['-ac', CHOICES_CHANNEL[opts.channel]]
 
         if opts.codec_a:
             cmd += ['-codec:a', opts.codec_a]
@@ -42,7 +42,7 @@ class FFmpeg:
 
         cmd += ['-crf', str(opts.compress)]
 
-        cmd += chain(*[['-codec:' + _[0].strip(X), 'copy'] for _ in opts.copy])
+        cmd += chain(*(['-codec:' + _[0].strip(X), 'copy'] for _ in opts.copy))
 
         if not opts.disable:
             cmd += ['-map', '0']
@@ -71,15 +71,15 @@ class FFmpeg:
         style += [f'Fontname={opts.font_name}']
         style += [f'Fontsize={abs(opts.font_size)}']
 
-        style += [f'PrimaryColour={SUBTITLE_BGR_CHART[opts.color_primary]}']
-        style += [f'OutlineColour={SUBTITLE_BGR_CHART[opts.color_outline]}']
+        style += [f'PrimaryColour={CHOICES_SUB_BGR_CHART[opts.color_primary]}']
+        style += [f'OutlineColour={CHOICES_SUB_BGR_CHART[opts.color_outline]}']
 
-        style += [f'Alignment={SUBTITLE_ALIGNMENT[opts.alignment]}']
+        style += [f'Alignment={CHOICES_SUB_ALIGNMENT[opts.alignment]}']
 
         self.style = ','.join(style)
 
     def build_subtitle(self, file: str):
-        """Update the FFmpeg command with the given subtitle."""
+        """Update the FFmpeg command with the given subtitle file."""
         self.cmd += ['-vf', f"subtitles={file}:force_style='{self.style}'"]
 
     def execute(self, files: list[str]):

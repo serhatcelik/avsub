@@ -113,11 +113,11 @@ def shut(timeout: int):
         print('[!]', err)
         return
 
-    msg = f'AVsub has scheduled a shutdown for {schedule}.'
+    message = f'AVsub has scheduled a shutdown for {schedule}.'
 
     shutdown = {
-        'linux': ['shutdown', '-P', str(timeout), msg],
-        'win32': ['shutdown', '/t', str(timeout), '/s', '/c', msg],
+        'linux': ['shutdown', '-P', str(timeout), message],
+        'win32': ['shutdown', '/t', str(timeout), '/s', '/c', message],
     }
 
     if sys.platform not in shutdown:
