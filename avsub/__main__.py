@@ -87,7 +87,7 @@ def log():
 def clear(*files: str):
     """Do the cleaning."""
     for file in files:
-        with suppress(FileNotFoundError, PermissionError):
+        with suppress(OSError):
             os.remove(file)
 
 
@@ -103,12 +103,10 @@ def brief():
 @separate
 def shut(timeout: int):
     """Schedule a shutdown for the machine."""
-    timeout = abs(timeout)
-
-    spec = '%H:%M:%S'
+    sec = abs(timeout)
 
     try:
-        schedule = format(datetime.now() + timedelta(seconds=timeout), spec)
+        schedule = format(datetime.now() + timedelta(seconds=sec), '%H:%M:%S')
     except OverflowError as err:
         print('[!]', err)
         return
@@ -116,15 +114,15 @@ def shut(timeout: int):
     message = f'AVsub has scheduled a shutdown for {schedule}.'
 
     shutdown = {
-        'linux': ['shutdown', '-P', str(timeout), message],
-        'win32': ['shutdown', '/t', str(timeout), '/s', '/c', message],
+        'linux': (['shutdown', '-P', str(sec), message], '-c'),
+        'win32': (['shutdown', '/t', str(sec), '/s', '/c', message], '/a'),
     }
 
     if sys.platform not in shutdown:
         print('[!]', 'Cannot schedule shutdown on this platform.')
         return
 
-    cmd = shutdown[sys.platform]
+    cmd, cancel = shutdown[sys.platform]
 
     try:
         sp.check_call(cmd, stdin=sp.DEVNULL, stdout=sp.DEVNULL)  # nosec
@@ -132,6 +130,8 @@ def shut(timeout: int):
         print('[!]', err)
     except sp.CalledProcessError:
         pass
+    else:
+        print('[*]', message, f"Use 'shutdown {cancel}' to cancel.")
 
 
 def main():
