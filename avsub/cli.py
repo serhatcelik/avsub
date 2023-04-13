@@ -14,7 +14,7 @@ from avsub.utils import check_for_updates
 
 parser = argparse.ArgumentParser(
     prog='avsub',
-    usage='python -m %(prog)s <extension> [<option> ...]',
+    usage='%(prog)s <extension> [<option> ...]',
     description='%(prog)s — a simplified command-line interface for ffmpeg',
     epilog='https://github.com/serhatcelik/avsub',
     formatter_class=argparse.RawTextHelpFormatter,
