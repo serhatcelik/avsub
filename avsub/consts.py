@@ -13,11 +13,9 @@ CHOICES_SUB_BGR_CHART = {
     'white': '&HFFFFFF&',
 }  # HTML color codes in BGR format
 
-LOGLEVEL = collections.defaultdict(lambda: 'debug', {
-    0: 'warning',
-    1: 'info',
-    2: 'verbose',
-})
+LOGLEVEL = collections.defaultdict(
+    lambda: 'debug', {0: 'warning', 1: 'info', 2: 'verbose'}
+)
 
 #################
 # Miscellaneous #
