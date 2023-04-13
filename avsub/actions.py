@@ -5,10 +5,10 @@ from typing import Any, Callable
 
 
 class ExitAction(argparse.Action):
-    """This expects a "func" keyword, executes the given function and exits."""
+    """Execute the function and exit."""
 
     def __init__(self, func: Callable, args: tuple[Any, ...] = (), **kwargs):
-        super().__init__(**kwargs)
+        super().__init__(nargs=0, **kwargs)
 
         self.func = func
         self.args = args

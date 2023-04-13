@@ -207,7 +207,6 @@ burn.add_argument(
 misc.add_argument(
     '-?',
     action='exit',
-    nargs=0,
     help='check for program updates and exit',
     func=check_for_updates,
     args=(__version__,),
