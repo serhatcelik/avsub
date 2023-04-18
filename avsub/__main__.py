@@ -20,8 +20,6 @@ from avsub.utils import exit_if_not, separate, splitext
 
 def start() -> tuple[int | None, bool]:
     """Start the program."""
-    sys.excepthook = stop_hard
-
     opts = parser.parse_args()
 
     signal.signal(signal.SIGINT, stop)
