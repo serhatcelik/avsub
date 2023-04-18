@@ -31,4 +31,4 @@ avsub = 'avsub.__main__:main'
 zip-safe = false
 
 [tool.setuptools.dynamic]
-version = {attr = 'avsub.__version__'}
+version = {attr = 'avsub.__version__.__version__'}
