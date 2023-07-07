@@ -6,6 +6,7 @@ from avsub.__version__ import __version__
 from avsub.actions import ExitAction
 from avsub.consts import (
     CHOICES_CHANNEL,
+    CHOICES_SPEED,
     CHOICES_SUB_ALIGNMENT,
     CHOICES_SUB_BGR_CHART,
     X,
@@ -97,6 +98,13 @@ parser.add_argument(
     metavar='ARGS',
     dest='ffmpeg_list',
 )
+parser.add_argument(
+    '--frame', '-p',
+    type=float,
+    help='set %(metavar)s as frame rate',
+    metavar='VALUE',
+    dest='frame',
+)
 mutual.add_argument(
     '--only-audio', '-A',
     action='store_const',
@@ -141,6 +149,14 @@ parser.add_argument(
     action='store_true',
     help='remove metadata',
     dest='metadata',
+)
+parser.add_argument(
+    '--speed',
+    nargs=2,
+    choices=CHOICES_SPEED,
+    help='speed up or slow down audio and video stream (choices: %(choices)s)',
+    metavar=('AUDIO', 'VIDEO'),
+    dest='speed',
 )
 parser.add_argument(
     '--trim',

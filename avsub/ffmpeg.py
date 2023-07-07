@@ -2,13 +2,16 @@
 
 from __future__ import annotations
 
+import math
 import os
 import subprocess as sp  # nosec
+from fractions import Fraction
 from itertools import chain, count
 from typing import TYPE_CHECKING
 
 from avsub.consts import (
     CHOICES_CHANNEL,
+    CHOICES_SPEED,
     CHOICES_SUB_ALIGNMENT,
     CHOICES_SUB_BGR_CHART,
     LOGLEVEL,
@@ -47,12 +50,24 @@ class FFmpeg:
         if not opts.disable:
             cmd += ['-map', '0']
 
+        if opts.frame is not None:
+            cmd += ['-r', str(opts.frame)]
+
         cmd += opts.only_a + opts.only_s + opts.only_v
 
         cmd += [f'-{_[0]}n' for _ in opts.remove]
 
         cmd += ['-map_chapters', str(-int(opts.chapters))]
         cmd += ['-map_metadata', str(-int(opts.metadata))]
+
+        if opts.speed is not None:
+            speed_a, speed_v = opts.speed
+            by_a, by_v = float(Fraction(speed_a)), float(Fraction(speed_v))
+            k = CHOICES_SPEED[speed_a]
+            n = int(math.log(by_a, k))
+            extra = by_a / (k ** n)
+            cmd += ['-af', ','.join([f'atempo={k}'] * n + [f'atempo={extra}'])]
+            cmd += ['-vf', f'setpts=PTS/{by_v}']
 
         if opts.trim is not None:
             seek = (opts.trim[0] * 3600) + (opts.trim[1] * 60) + opts.trim[2]
