@@ -29,9 +29,9 @@ def check_for_updates(current: str):
     if not askokcancel(message=message, icon='warning'):
         return
 
-    zip_ = 'https://github.com/serhatcelik/avsub/archive/refs/heads/main.zip'
+    zipp = 'https://github.com/serhatcelik/avsub/archive/refs/heads/main.zip'
 
-    webbrowser.open_new_tab(zip_)
+    webbrowser.open_new_tab(zipp)
 
 
 def exit_if_not(thing: Any, /, status: int | str = 0) -> Any | NoReturn:
