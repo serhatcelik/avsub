@@ -45,7 +45,7 @@ class FFmpeg:
 
         cmd += ['-crf', str(opts.compress)]
 
-        cmd += chain(*(['-codec:' + _[0].strip(X), 'copy'] for _ in opts.copy))
+        cmd += chain(*(['-codec:' + s[0].strip(X), 'copy'] for s in opts.copy))
 
         if not opts.disable:
             cmd += ['-map', '0']
@@ -55,7 +55,7 @@ class FFmpeg:
 
         cmd += opts.only_a + opts.only_s + opts.only_v
 
-        cmd += [f'-{_[0]}n' for _ in opts.remove]
+        cmd += [f'-{s[0]}n' for s in opts.remove]
 
         cmd += ['-map_chapters', str(-int(opts.chapters))]
         cmd += ['-map_metadata', str(-int(opts.metadata))]

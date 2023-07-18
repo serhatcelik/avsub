@@ -80,8 +80,8 @@ parser.add_argument(
 parser.add_argument(
     '--copy', '-c',
     nargs='+',
-    default=[],
-    choices=[X, 'audio', 'subtitle', 'video'],
+    default=(),
+    choices=(X, 'audio', 'subtitle', 'video'),
     help='use copy codec for output %(metavar)s stream (choices: %(choices)s)',
     metavar='STREAM',
     dest='copy',
@@ -108,32 +108,32 @@ parser.add_argument(
 mutual.add_argument(
     '--only-audio', '-A',
     action='store_const',
-    const=['-dn', '-sn', '-vn'],
-    default=[],
+    const=('-dn', '-sn', '-vn'),
+    default=(),
     help='choose audio stream only',
     dest='only_a',
 )
 mutual.add_argument(
     '--only-subtitle', '-S',
     action='store_const',
-    const=['-an', '-dn', '-vn'],
-    default=[],
+    const=('-an', '-dn', '-vn'),
+    default=(),
     help='choose subtitle stream only',
     dest='only_s',
 )
 mutual.add_argument(
     '--only-video', '-V',
     action='store_const',
-    const=['-an', '-dn', '-sn'],
-    default=[],
+    const=('-an', '-dn', '-sn'),
+    default=(),
     help='choose video stream only',
     dest='only_v',
 )
 parser.add_argument(
     '--remove', '-r',
     nargs='+',
-    default=[],
-    choices=['audio', 'data', 'subtitle', 'video'],
+    default=(),
+    choices=('audio', 'data', 'subtitle', 'video'),
     help='do not copy %(metavar)s stream to output (choices: %(choices)s)',
     metavar='STREAM',
     dest='remove',

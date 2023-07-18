@@ -56,7 +56,7 @@ def splitext(path: str) -> tuple[str, str]:
     """Split the pathname `path` into a pair."""
     tail = os.path.split(path)[1]
 
-    extension = ''.join(_[1:]) if (_ := tail.rpartition('.'))[1] else _[1]
+    extension = ''.join(t[1:]) if (t := tail.rpartition('.'))[1] else t[1]
 
     filename = path.removesuffix(extension)
 
