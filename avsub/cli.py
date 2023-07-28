@@ -28,9 +28,9 @@ misc = parser.add_argument_group('miscellaneous')
 
 mutual = parser.add_mutually_exclusive_group()
 
-########################
-# Positional Arguments #
-########################
+###############
+# Positionals #
+###############
 parser.add_argument(
     'extension',
     help=f'output extension or {X}',
