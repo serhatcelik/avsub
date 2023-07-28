@@ -23,7 +23,7 @@ parser = argparse.ArgumentParser(
 
 parser.register('action', 'exit', ExitAction)
 
-burn = parser.add_argument_group('options embed')
+burn = parser.add_argument_group('hardsub')
 misc = parser.add_argument_group('miscellaneous')
 
 mutual = parser.add_mutually_exclusive_group()
@@ -167,9 +167,9 @@ parser.add_argument(
     dest='trim',
 )
 
-#################
-# Options Embed #
-#################
+####################
+# Options: Hardsub #
+####################
 burn.add_argument(
     '--burn',
     action='store_true',
@@ -216,9 +216,9 @@ burn.add_argument(
     dest='alignment',
 )
 
-#################
-# Miscellaneous #
-#################
+##########################
+# Options: Miscellaneous #
+##########################
 misc.add_argument(
     '-?',
     action='exit',
