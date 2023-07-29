@@ -16,7 +16,7 @@ def check_for_updates(current: str):
 
     try:
         with urlopen(file, timeout=9) as answer:  # nosec
-            latest = answer.readline().rstrip().decode()
+            latest = answer.readline().decode().rstrip()
     except URLError as err:
         print('[!]', err)
         return
