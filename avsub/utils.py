@@ -1,5 +1,6 @@
 """General utilities."""
 
+import functools
 import os
 import sys
 import webbrowser
@@ -44,6 +45,7 @@ def exit_if_not(thing: Any, /, status: int | str = 0) -> Any | NoReturn:
 def separate(f):
     """Draw a horizontal line before and after the given function."""
 
+    @functools.wraps(f)
     def wrapper(*args, **kwargs):
         print('-' * os.get_terminal_size().columns)
         f(*args, **kwargs)
