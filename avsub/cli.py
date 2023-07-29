@@ -223,7 +223,7 @@ misc.add_argument(
     '-?',
     action='exit',
     help='check for program updates and exit',
-    func=check_for_updates,
+    f=check_for_updates,
     args=(__version__,),
 )
 misc.add_argument(

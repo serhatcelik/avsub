@@ -41,12 +41,12 @@ def exit_if_not(thing: Any, /, status: int | str = 0) -> Any | NoReturn:
     return thing
 
 
-def separate(func):
+def separate(f):
     """Draw a horizontal line before and after the given function."""
 
     def wrapper(*args, **kwargs):
         print('-' * os.get_terminal_size().columns)
-        func(*args, **kwargs)
+        f(*args, **kwargs)
         print('-' * os.get_terminal_size().columns)
 
     return wrapper
