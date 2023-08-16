@@ -36,12 +36,12 @@ class FFmpeg:
         if opts.channel:
             cmd += ['-ac', CHOICES_CHANNEL[opts.channel]]
 
-        if opts.codec_a:
-            cmd += ['-codec:a', opts.codec_a]
-        if opts.codec_s:
-            cmd += ['-codec:s', opts.codec_s]
-        if opts.codec_v:
-            cmd += ['-codec:v', opts.codec_v]
+        if opts.codecA:
+            cmd += ['-codec:a', opts.codecA]
+        if opts.codecS:
+            cmd += ['-codec:s', opts.codecS]
+        if opts.codecV:
+            cmd += ['-codec:v', opts.codecV]
 
         cmd += ['-crf', str(opts.compress)]
 
@@ -53,7 +53,7 @@ class FFmpeg:
         if opts.frame is not None:
             cmd += ['-r', str(opts.frame)]
 
-        cmd += opts.only_a + opts.only_s + opts.only_v
+        cmd += opts.onlyA + opts.onlyS + opts.onlyV
 
         cmd += [f'-{s[0]}n' for s in opts.remove]
 
@@ -76,24 +76,24 @@ class FFmpeg:
 
         cmd += ['-loglevel', LOGLEVEL[opts.loglevel]]
 
-        if opts.ffmpeg_list:
-            cmd += opts.ffmpeg_list.strip().split()
+        if opts.ffmpeg:
+            cmd += opts.ffmpeg.strip().split()
 
         self.cmd += cmd
 
         style = []
 
-        style += [f'Fontname={opts.font_name}']
-        style += [f'Fontsize={abs(opts.font_size)}']
+        style += [f'Fontname={opts.fontname}']
+        style += [f'Fontsize={abs(opts.fontsize)}']
 
-        style += [f'PrimaryColour={CHOICES_SUB_BGR_CHART[opts.color_primary]}']
-        style += [f'OutlineColour={CHOICES_SUB_BGR_CHART[opts.color_outline]}']
+        style += [f'PrimaryColour={CHOICES_SUB_BGR_CHART[opts.colorprimary]}']
+        style += [f'OutlineColour={CHOICES_SUB_BGR_CHART[opts.coloroutline]}']
 
         style += [f'Alignment={CHOICES_SUB_ALIGNMENT[opts.alignment]}']
 
         self.style = ','.join(style)
 
-    def build_subtitle(self, file: str):
+    def buildsubtitle(self, file: str):
         """Update the FFmpeg command with the given subtitle file."""
         self.cmd += ['-vf', f"subtitles={file}:force_style='{self.style}'"]
 

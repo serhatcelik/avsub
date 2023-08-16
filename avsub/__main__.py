@@ -9,7 +9,6 @@ import tempfile
 from contextlib import suppress
 from datetime import datetime, timedelta
 from tkinter.filedialog import askdirectory, askopenfilename, askopenfilenames
-from typing import NoReturn
 
 from avsub.cli import parser
 from avsub.consts import (
@@ -43,7 +42,7 @@ def start() -> tuple[int | None, bool]:
 
         tmp = tmp.replace('\\', '/').replace(':', '\\\\:')
 
-        ff.build_subtitle(tmp)
+        ff.buildsubtitle(tmp)
 
     exit_if_not(folder := askdirectory(title='Select Folder', mustexist=True))
 
@@ -66,11 +65,6 @@ def stop(*args):
     """Stop the program."""
     signal.signal(signal.SIGINT, signal.SIG_IGN)
     controller.set()
-
-
-def stop_hard(*args) -> NoReturn:
-    """Stop the program the hard way."""
-    os._exit(-1)
 
 
 @separate

@@ -51,19 +51,19 @@ parser.add_argument(
     '--codec-audio', '-a',
     help='set %(metavar)s as output audio codec',
     metavar='CODEC',
-    dest='codec_a',
+    dest='codecA',
 )
 parser.add_argument(
     '--codec-subtitle', '-s',
     help='set %(metavar)s as output subtitle codec',
     metavar='CODEC',
-    dest='codec_s',
+    dest='codecS',
 )
 parser.add_argument(
     '--codec-video', '-v',
     help='set %(metavar)s as output video codec',
     metavar='CODEC',
-    dest='codec_v',
+    dest='codecV',
 )
 parser.add_argument(
     '--compress', '-C',
@@ -95,7 +95,7 @@ parser.add_argument(
     '--ffmpeg-list', '-f',
     help='provide %(metavar)s as ffmpeg argument list',
     metavar='ARGS',
-    dest='ffmpeg_list',
+    dest='ffmpeg',
 )
 parser.add_argument(
     '--frame', '-p',
@@ -110,7 +110,7 @@ mutual.add_argument(
     const=('-dn', '-sn', '-vn'),
     default=(),
     help='choose audio stream only',
-    dest='only_a',
+    dest='onlyA',
 )
 mutual.add_argument(
     '--only-subtitle', '-S',
@@ -118,7 +118,7 @@ mutual.add_argument(
     const=('-an', '-dn', '-vn'),
     default=(),
     help='choose subtitle stream only',
-    dest='only_s',
+    dest='onlyS',
 )
 mutual.add_argument(
     '--only-video', '-V',
@@ -126,7 +126,7 @@ mutual.add_argument(
     const=('-an', '-dn', '-sn'),
     default=(),
     help='choose video stream only',
-    dest='only_v',
+    dest='onlyV',
 )
 parser.add_argument(
     '--remove', '-r',
@@ -182,7 +182,7 @@ burn.add_argument(
     choices=CHOICES_SUB_BGR_CHART,
     help='set %(metavar)s as subtitle outline color (choices: %(choices)s)',
     metavar='COLOR',
-    dest='color_outline',
+    dest='coloroutline',
 )
 burn.add_argument(
     '--color-primary',
@@ -190,14 +190,14 @@ burn.add_argument(
     choices=CHOICES_SUB_BGR_CHART,
     help='set %(metavar)s as subtitle primary color (choices: %(choices)s)',
     metavar='COLOR',
-    dest='color_primary',
+    dest='colorprimary',
 )
 burn.add_argument(
     '--font-name',
     default='',
     help='set %(metavar)s as subtitle font name',
     metavar='NAME',
-    dest='font_name',
+    dest='fontname',
 )
 burn.add_argument(
     '--font-size',
@@ -205,7 +205,7 @@ burn.add_argument(
     type=int,
     help='set %(metavar)s as subtitle font size (default: %(default)s)',
     metavar='SIZE',
-    dest='font_size',
+    dest='fontsize',
 )
 burn.add_argument(
     '--position',
