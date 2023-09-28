@@ -9,6 +9,7 @@ import tempfile
 from contextlib import suppress
 from datetime import datetime, timedelta
 from tkinter.filedialog import askdirectory, askopenfilename, askopenfilenames
+from typing import Optional
 
 from avsub.cli import parser
 from avsub.consts import (
@@ -19,7 +20,7 @@ from avsub.globs import completed, controller, corrupted, untouched
 from avsub.utils import exit_if_not, separate, splitext
 
 
-def start() -> tuple[int | None, bool]:
+def start() -> tuple[Optional[int], bool]:
     """Start the program."""
     opts = parser.parse_args()
 
@@ -29,7 +30,7 @@ def start() -> tuple[int | None, bool]:
 
     ff.build(opts)  # Start creating the FFmpeg command
 
-    exit_if_not(files := list(askopenfilenames(title='Open')))
+    exit_if_not(files := list(askopenfilenames(initialdir='.', title='Open')))
 
     # Manual Hardsub Operation?
     if len(files) == 1 and opts.burn:

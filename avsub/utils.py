@@ -5,7 +5,7 @@ import os
 import sys
 import webbrowser
 from tkinter.messagebox import askokcancel
-from typing import Any, NoReturn
+from typing import Any, NoReturn, Union
 from urllib.error import URLError
 from urllib.request import urlopen
 
@@ -35,7 +35,7 @@ def check_for_updates(current: str):
     webbrowser.open_new_tab(zipp)
 
 
-def exit_if_not(thing: Any, /, status: int | str = 0) -> Any | NoReturn:
+def exit_if_not(thing: Any, /, status: Union[int, str] = 0) -> Any | NoReturn:
     """Conditional exit: if not."""
     if not thing:
         sys.exit(status)
