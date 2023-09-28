@@ -35,7 +35,7 @@ def check_for_updates(current: str):
     webbrowser.open_new_tab(zipp)
 
 
-def exit_if_not(thing: Any, /, status: Union[int, str] = 0) -> Any | NoReturn:
+def x_if_n(thing: Any, /, status: Union[int, str] = 0) -> Union[Any, NoReturn]:
     """Conditional exit: if not."""
     if not thing:
         sys.exit(status)
