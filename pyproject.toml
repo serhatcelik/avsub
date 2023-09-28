@@ -6,7 +6,7 @@ build-backend = 'setuptools.build_meta'
 name = 'avsub'
 authors = [{name = 'Serhat Çelik'}]
 description = 'A simplified command-line interface for FFmpeg'
-requires-python = '~=3.10'
+requires-python = '~=3.9'
 keywords = ['avsub', 'audio', 'video', 'subtitle', 'ffmpeg']
 license = {text = 'GPLv3'}
 classifiers = [
