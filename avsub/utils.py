@@ -2,10 +2,8 @@
 
 import functools
 import os
-import sys
 import webbrowser
 from tkinter.messagebox import askokcancel
-from typing import Any, NoReturn, Union
 from urllib.error import URLError
 from urllib.request import urlopen
 
@@ -33,13 +31,6 @@ def check_for_updates(current: str):
     zipp = 'https://github.com/serhatcelik/avsub/archive/refs/heads/main.zip'
 
     webbrowser.open_new_tab(zipp)
-
-
-def x_if_n(thing: Any, /, status: Union[int, str] = 0) -> Union[Any, NoReturn]:
-    """Conditional exit: if not."""
-    if not thing:
-        sys.exit(status)
-    return thing
 
 
 def separate(f):

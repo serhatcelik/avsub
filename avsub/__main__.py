@@ -17,7 +17,7 @@ from avsub.consts import (
 )
 from avsub.ffmpeg import FFmpeg
 from avsub.globs import completed, controller, corrupted, untouched
-from avsub.utils import separate, splitext, x_if_n
+from avsub.utils import separate, splitext
 
 
 def start() -> tuple[Optional[int], bool]:
@@ -30,11 +30,17 @@ def start() -> tuple[Optional[int], bool]:
 
     ff.build(opts)  # Start creating the FFmpeg command
 
-    x_if_n(files := list(askopenfilenames(initialdir='.', title='Open')))
+    files = list(askopenfilenames(initialdir='.', title='Open'))
+
+    if not files:
+        sys.exit(0)
 
     # Manual Hardsub Operation?
     if len(files) == 1 and opts.burn:
-        x_if_n(subtitle := askopenfilename(title='Open Subtitle'))
+        subtitle = askopenfilename(title='Open Subtitle')
+
+        if not subtitle:
+            sys.exit(0)
 
         # This is necessary for "escaping" nonsense :/
         tmp = os.path.abspath(os.path.join(tempfile.gettempdir(), 'avsub.tmp'))
@@ -45,7 +51,10 @@ def start() -> tuple[Optional[int], bool]:
 
         ff.buildsubtitle(tmp)
 
-    x_if_n(folder := askdirectory(title='Select Folder', mustexist=True))
+    folder = askdirectory(title='Select Folder', mustexist=True)
+
+    if not folder:
+        sys.exit(0)
 
     for file in files:
         filename, extension = splitext(os.path.basename(file))
