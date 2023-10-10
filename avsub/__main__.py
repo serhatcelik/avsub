@@ -51,7 +51,7 @@ def start() -> tuple[Optional[int], bool]:
 
         ff.buildsubtitle(tmp)
 
-    folder = askdirectory(title='Select Folder', mustexist=True)
+    folder = askdirectory(initialdir='~', mustexist=True, title='Open Folder')
 
     if not folder:
         sys.exit(0)
