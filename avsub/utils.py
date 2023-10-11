@@ -8,7 +8,7 @@ from urllib.error import URLError
 from urllib.request import urlopen
 
 
-def check_for_updates(current: str):
+def check_for_updates(current: str) -> None:
     """Check for program updates."""
     file = 'https://raw.githubusercontent.com/serhatcelik/avsub/main/VERSION'
 
@@ -37,9 +37,9 @@ def separate(f):
     """Draw a horizontal line before and after the given function."""
 
     @functools.wraps(f)
-    def wrapper(*args, **kwargs):
+    def wrapper(*args, **kw) -> None:
         print('-' * os.get_terminal_size().columns)
-        f(*args, **kwargs)
+        f(*args, **kw)
         print('-' * os.get_terminal_size().columns)
 
     return wrapper

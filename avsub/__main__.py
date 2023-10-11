@@ -71,14 +71,14 @@ def start() -> tuple[Optional[int], bool]:
     return opts.shutdown, opts.shutdown is not None
 
 
-def stop(*args):
+def stop(*args) -> None:
     """Stop the program."""
     signal.signal(signal.SIGINT, signal.SIG_IGN)
     controller.set()
 
 
 @separate
-def log():
+def log() -> None:
     """Print the results."""
     for file in untouched:
         print('[ ]', f"Not processed: '{file}'")
@@ -88,7 +88,7 @@ def log():
         print('[+]', f"Job completed: '{file}'")
 
 
-def clear(*files: str):
+def clear(*files: str) -> None:
     """Do the cleaning."""
     for file in files:
         with suppress(OSError):
@@ -96,7 +96,7 @@ def clear(*files: str):
 
 
 @separate
-def brief():
+def brief() -> None:
     """Print the summary."""
     success = len(completed)
     failure = len(corrupted) + len(untouched)
@@ -105,7 +105,7 @@ def brief():
 
 
 @separate
-def shut(timeout: int):
+def shut(timeout: int) -> None:
     """Schedule a shutdown for the machine."""
     sec = abs(timeout)
 
@@ -138,7 +138,7 @@ def shut(timeout: int):
         print('[*]', message, f"Use 'shutdown {cancel}' to cancel.")
 
 
-def main():
+def main() -> None:
     """Entry point."""
     timeout, schedule = start()
 
