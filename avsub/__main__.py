@@ -1,12 +1,12 @@
 """AVsub — A simplified command-line interface for FFmpeg."""
 
-import contextlib
 import os
 import shutil
 import signal
 import subprocess as sp  # nosec
 import sys
 import tempfile
+from contextlib import suppress
 from datetime import datetime, timedelta
 from tkinter.filedialog import askdirectory, askopenfilename, askopenfilenames
 from typing import Optional
@@ -91,7 +91,7 @@ def log() -> None:
 def clear(*files: str) -> None:
     """Do the cleaning."""
     for file in files:
-        with contextlib.suppress(OSError):
+        with suppress(OSError):
             os.remove(file)
 
 
