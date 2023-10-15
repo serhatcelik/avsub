@@ -1,12 +1,12 @@
 """AVsub — A simplified command-line interface for FFmpeg."""
 
+import contextlib
 import os
 import shutil
 import signal
 import subprocess as sp  # nosec
 import sys
 import tempfile
-from contextlib import suppress
 from datetime import datetime, timedelta
 from tkinter.filedialog import askdirectory, askopenfilename, askopenfilenames
 from typing import Optional
@@ -91,7 +91,7 @@ def log() -> None:
 def clear(*files: str) -> None:
     """Do the cleaning."""
     for file in files:
-        with suppress(OSError):
+        with contextlib.suppress(OSError):
             os.remove(file)
 
 
@@ -118,8 +118,8 @@ def shut(timeout: int) -> None:
     message = f'AVsub has scheduled a shutdown for {schedule}.'
 
     shutdown = {
-        'linux': (('shutdown', '-P', str(sec), message), '-c'),
-        'win32': (('shutdown', '/t', str(sec), '/s', '/c', message), '/a'),
+        'linux': (['shutdown', '-P', str(sec), message], '-c'),
+        'win32': (['shutdown', '/t', str(sec), '/s', '/c', message], '/a'),
     }
 
     if sys.platform not in shutdown:
@@ -129,7 +129,7 @@ def shut(timeout: int) -> None:
     cmd, cancel = shutdown[sys.platform]
 
     try:
-        sp.check_call(cmd, stdin=sp.DEVNULL, stdout=sp.DEVNULL)  # nosec
+        sp.run(cmd, stdin=sp.DEVNULL, capture_output=True, check=True)  # nosec
     except FileNotFoundError as err:
         print('[!]', err)
     except sp.CalledProcessError:
