@@ -1,0 +1,32 @@
+[build-system]
+requires = ['setuptools']
+build-backend = 'setuptools.build_meta'
+
+[project]
+name = 'avsub'
+authors = [{name = 'Serhat Çelik'}]
+description = 'A simplified command-line interface for FFmpeg'
+requires-python = '~=3.9'
+keywords = ['avsub', 'audio', 'video', 'subtitle', 'ffmpeg']
+license = {text = 'GPLv3'}
+classifiers = [
+    'Development Status :: 5 - Production/Stable',
+    'Environment :: Console',
+    'Intended Audience :: End Users/Desktop',
+    'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
+    'Programming Language :: Python :: 3',
+    'Programming Language :: Python :: 3 :: Only',
+    'Topic :: Multimedia',
+    'Topic :: Multimedia :: Sound/Audio',
+    'Topic :: Multimedia :: Video',
+]
+dynamic = ['version']
+
+[project.scripts]
+avsub = 'avsub.__main__:main'
+
+[tool.setuptools]
+zip-safe = false
+
+[tool.setuptools.dynamic]
+version = {attr = 'avsub.__version__.__version__'}
